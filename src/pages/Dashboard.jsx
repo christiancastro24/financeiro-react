@@ -369,7 +369,7 @@ const Dashboard = () => {
       </div>
 
       <div
-        className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] max-h-[600px] overflow-y-auto"
+        className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] max-h-[600px] overflow-y-auto transactions-list"
         style={{
           padding: "24px",
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
@@ -391,7 +391,7 @@ const Dashboard = () => {
           sortedTransactions.map((t) => (
             <div
               key={t.id}
-              className={`flex justify-between items-center border rounded-lg hover:border-[#5b8def] hover:transform hover:translate-x-1 ${
+              className={`flex justify-between transactions-list items-center border rounded-lg hover:border-[#5b8def] hover:transform hover:translate-x-1 ${
                 t.paid
                   ? "bg-[#1e2738] border-[#2a2f3e]"
                   : "bg-[rgba(243,156,18,0.1)] border-[#f39c12] border-l-[3px]"
