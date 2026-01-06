@@ -7,7 +7,6 @@ const Investimentos = () => {
   const myInvestmentChartInstance = useRef(null);
   const simulatorChartInstance = useRef(null);
 
-  // Simulador
   const [initialAmount, setInitialAmount] = useState(1000);
   const [monthlyAmount, setMonthlyAmount] = useState(500);
   const [investmentPeriod, setInvestmentPeriod] = useState(12);
@@ -18,7 +17,7 @@ const Investimentos = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const CDI_RATE_ANNUAL = 0.1175; // 11.75% ao ano
+  const CDI_RATE_ANNUAL = 0.1175;
 
   const formatCurrency = (value) => {
     return value.toLocaleString("pt-BR", {
@@ -27,7 +26,6 @@ const Investimentos = () => {
     });
   };
 
-  // Calcular investimentos
   const getInvestments = () => {
     return transactions.filter(
       (t) => t.type === "expense" && t.category === "Investimentos" && t.paid
@@ -37,7 +35,6 @@ const Investimentos = () => {
   const investments = getInvestments();
   const totalInvested = investments.reduce((sum, inv) => sum + inv.value, 0);
 
-  // Calcular projeção
   const calculateInvestmentProjection = (
     initial,
     monthly,
@@ -55,7 +52,6 @@ const Investimentos = () => {
     return total;
   };
 
-  // Projeção 12 meses dos investimentos
   const projection12m = calculateInvestmentProjection(
     totalInvested,
     0,
@@ -64,7 +60,6 @@ const Investimentos = () => {
   );
   const gain12m = projection12m - totalInvested;
 
-  // Dados para gráfico dos meus investimentos
   const getMyInvestmentChartData = () => {
     const monthlyRate = Math.pow(1 + CDI_RATE_ANNUAL, 1 / 12) - 1;
     const labels = ["Hoje"];
@@ -82,7 +77,6 @@ const Investimentos = () => {
     return { labels, investedData, projectionData };
   };
 
-  // Dados para tabela de projeção
   const getProjectionTable = () => {
     if (totalInvested === 0) return [];
 
@@ -108,7 +102,6 @@ const Investimentos = () => {
     return rows;
   };
 
-  // Dados para gráfico do simulador
   const getSimulatorChartData = () => {
     const monthlyRate =
       Math.pow(1 + CDI_RATE_ANNUAL * (cdiPercentage / 100), 1 / 12) - 1;
@@ -130,7 +123,6 @@ const Investimentos = () => {
     return { labels, investedData, projectionData };
   };
 
-  // Cálculos do simulador
   const simTotalInvested = initialAmount + monthlyAmount * investmentPeriod;
   const simFinalAmount = calculateInvestmentProjection(
     initialAmount,
@@ -142,7 +134,6 @@ const Investimentos = () => {
 
   const projectionTable = getProjectionTable();
 
-  // Criar gráfico dos meus investimentos
   useEffect(() => {
     if (activeView === "my-investments" && myInvestmentChartRef.current) {
       const chartData = getMyInvestmentChartData();
@@ -240,7 +231,6 @@ const Investimentos = () => {
     };
   }, [activeView, totalInvested]);
 
-  // Criar gráfico do simulador
   useEffect(() => {
     if (activeView === "simulator" && simulatorChartRef.current) {
       const chartData = getSimulatorChartData();
@@ -347,251 +337,121 @@ const Investimentos = () => {
   ]);
 
   return (
-    <div
-      className="ml-[260px] flex-1 bg-[#0f1419]"
-      style={{ padding: "40px 50px" }}
-    >
-      <div
-        className="flex justify-between items-center"
-        style={{ marginBottom: "35px" }}
-      >
+    <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+      <div className="flex justify-between items-center mb-9">
         <div>
-          <h2
-            className="text-[28px] font-bold text-white"
-            style={{ marginBottom: "6px", fontWeight: "bold" }}
-          >
+          <h2 className="text-[28px] font-bold text-white mb-1.5">
             Investimentos
           </h2>
-          <div className="text-[#8b92a7] text-[14px]">
+          <div className="text-[#8b92a7] text-sm">
             Gestão de receitas e despesas
           </div>
         </div>
       </div>
 
-      {/* Toggle Abas */}
-      <div className="flex gap-3" style={{ marginBottom: "30px" }}>
+      <div className="flex gap-3 mb-8">
         <button
           onClick={() => setActiveView("my-investments")}
-          className={`flex-1 rounded-lg cursor-pointer transition-all ${
+          className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
             activeView === "my-investments"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
               : "bg-[#1a1f2e] border border-[#2a2f3e] text-[#8b92a7] hover:border-[#5b8def]"
           }`}
-          style={{
-            padding: "14px 20px",
-            fontSize: "15px",
-            fontWeight: "bold",
-            borderRadius: "0.5rem",
-            color: "white",
-          }}
         >
           💎 Meus Investimentos
         </button>
         <button
           onClick={() => setActiveView("simulator")}
-          className={`flex-1 rounded-lg cursor-pointer transition-all ${
+          className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
             activeView === "simulator"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
               : "bg-[#1a1f2e] border border-[#2a2f3e] text-[#8b92a7] hover:border-[#5b8def]"
           }`}
-          style={{
-            padding: "14px 20px",
-            fontSize: "15px",
-            fontWeight: "bold",
-            borderRadius: "0.5rem",
-            color: "white",
-          }}
         >
           🧮 Simulador
         </button>
       </div>
 
-      {/* MEUS INVESTIMENTOS */}
       {activeView === "my-investments" && (
         <div>
-          {/* Cards de resumo */}
-          <div
-            className="grid grid-cols-3 gap-12"
-            style={{ marginBottom: "35px", gap: "12px" }}
-          >
-            <div
-              className="rounded-xl border border-[#2a2f3e] overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-                borderRadius: "1rem",
-              }}
-            >
-              <div style={{ padding: "24px" }}>
-                <div
-                  className="flex items-center gap-2"
-                  style={{ marginBottom: "16px" }}
-                >
+          <div className="grid grid-cols-3 gap-3 mb-9">
+            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px]">💰</div>
-                  <div
-                    className="text-[#8b92a7] text-[13px] uppercase font-bold"
-                    style={{
-                      letterSpacing: "1px",
-                      fontWeight: "bold",
-                      paddingLeft: "5px",
-                    }}
-                  >
+                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
                     Total Investido
                   </div>
                 </div>
-                <div
-                  className="text-[32px] font-bold text-white"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-[32px] font-bold text-white tracking-tight">
                   R$ {formatCurrency(totalInvested)}
                 </div>
               </div>
             </div>
 
-            <div
-              className="rounded-xl border border-[#2a2f3e] overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-                borderRadius: "1rem",
-              }}
-            >
-              <div style={{ padding: "24px" }}>
-                <div
-                  className="flex items-center gap-2"
-                  style={{ marginBottom: "16px" }}
-                >
+            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px]">📊</div>
-                  <div
-                    className="text-[#8b92a7] text-[13px] uppercase font-bold"
-                    style={{
-                      letterSpacing: "1px",
-                      fontWeight: "bold",
-                      paddingLeft: "5px",
-                    }}
-                  >
+                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
                     Projeção 12 meses
                   </div>
                 </div>
-                <div
-                  className="text-[32px] font-bold text-[#5b8def]"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-[32px] font-bold text-[#5b8def] tracking-tight">
                   R$ {formatCurrency(projection12m)}
                 </div>
-                <div
-                  className="text-[#27ae60] text-[12px] font-bold"
-                  style={{ marginTop: "8px", fontWeight: "bold" }}
-                >
+                <div className="text-[#27ae60] text-xs font-bold mt-2">
                   +R$ {formatCurrency(gain12m)} de rendimento
                 </div>
               </div>
             </div>
 
-            <div
-              className="rounded-xl border border-[#2a2f3e] overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-                borderRadius: "1rem",
-              }}
-            >
-              <div style={{ padding: "24px" }}>
-                <div
-                  className="flex items-center gap-2"
-                  style={{ marginBottom: "16px" }}
-                >
+            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px] pl-4">📈</div>
-                  <div
-                    className="text-[#8b92a7] text-[13px] uppercase font-bold"
-                    style={{
-                      letterSpacing: "1px",
-                      fontWeight: "bold",
-                      paddingLeft: "5px",
-                    }}
-                  >
+                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
                     Rentabilidade (CDI)
                   </div>
                 </div>
-                <div
-                  className="text-[32px] font-bold text-[#9b59b6] relative left-4"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-[32px] font-bold text-[#9b59b6] tracking-tight pl-4">
                   100%
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Gráfico */}
-          <div
-            className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-            style={{
-              padding: "28px",
-              marginBottom: "30px",
-              borderRadius: "0.5rem",
-            }}
-          >
-            <h3
-              className="text-[18px] font-bold text-white"
-              style={{
-                marginBottom: "20px",
-                fontWeight: "bold",
-                color: "white",
-              }}
-            >
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
+            <h3 className="text-lg font-bold text-white mb-5">
               📈 Projeção de Crescimento - Meus Investimentos
             </h3>
             <canvas
               ref={myInvestmentChartRef}
-              style={{ maxHeight: "300px" }}
+              className="max-h-[300px]"
             ></canvas>
           </div>
 
-          {/* Tabela de Projeção */}
-          <div
-            className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-            style={{
-              padding: "28px",
-              marginBottom: "30px",
-              borderRadius: "0.5rem",
-            }}
-          >
-            <h3
-              className="text-[18px] font-bold text-white"
-              style={{ marginBottom: "20px", fontWeight: "bold" }}
-            >
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
+            <h3 className="text-lg font-bold text-white mb-5">
               📊 Tabela de Projeção Mensal
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#2a2f3e]">
-                    <th
-                      className="text-left text-[#8b92a7] text-[12px] uppercase"
-                      style={{ padding: "12px", fontWeight: "bold" }}
-                    >
+                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
                       Mês
                     </th>
-                    <th
-                      className="text-left text-[#8b92a7] text-[12px] uppercase"
-                      style={{ padding: "12px", fontWeight: "bold" }}
-                    >
+                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
                       Juros
                     </th>
-                    <th
-                      className="text-left text-[#8b92a7] text-[12px] uppercase"
-                      style={{ padding: "12px", fontWeight: "bold" }}
-                    >
+                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
                       Total Investido
                     </th>
-                    <th
-                      className="text-left text-[#8b92a7] text-[12px] uppercase"
-                      style={{ padding: "12px", fontWeight: "bold" }}
-                    >
+                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
                       Total Juros
                     </th>
-                    <th
-                      className="text-left text-[#8b92a7] text-[12px] uppercase"
-                      style={{ padding: "12px", fontWeight: "bold" }}
-                    >
+                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
                       Total Acumulado
                     </th>
                   </tr>
@@ -601,8 +461,7 @@ const Investimentos = () => {
                     <tr>
                       <td
                         colSpan="5"
-                        className="text-center text-[#8b92a7]"
-                        style={{ padding: "40px" }}
+                        className="text-center text-[#8b92a7] py-10"
                       >
                         Nenhum investimento registrado ainda.
                       </td>
@@ -610,31 +469,17 @@ const Investimentos = () => {
                   ) : (
                     projectionTable.map((row) => (
                       <tr key={row.month} className="border-b border-[#2a2f3e]">
-                        <td className="text-white" style={{ padding: "12px" }}>
-                          {row.month}
-                        </td>
-                        <td
-                          className="text-[#27ae60]"
-                          style={{ padding: "12px" }}
-                        >
+                        <td className="text-white p-3">{row.month}</td>
+                        <td className="text-[#27ae60] p-3">
                           R$ {formatCurrency(row.interest)}
                         </td>
-                        <td
-                          className="text-[#5b8def]"
-                          style={{ padding: "12px" }}
-                        >
+                        <td className="text-[#5b8def] p-3">
                           R$ {formatCurrency(row.totalInvested)}
                         </td>
-                        <td
-                          className="text-[#27ae60]"
-                          style={{ padding: "12px" }}
-                        >
+                        <td className="text-[#27ae60] p-3">
                           R$ {formatCurrency(row.totalInterest)}
                         </td>
-                        <td
-                          className="text-[#9b59b6] font-bold"
-                          style={{ padding: "12px", fontWeight: "bold" }}
-                        >
+                        <td className="text-[#9b59b6] font-bold p-3">
                           R$ {formatCurrency(row.accumulated)}
                         </td>
                       </tr>
@@ -645,25 +490,13 @@ const Investimentos = () => {
             </div>
           </div>
 
-          {/* Histórico de Investimentos */}
-          <div
-            className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-            style={{ padding: "28px", borderRadius: "0.5rem" }}
-          >
-            <h3
-              className="text-[18px] font-bold text-white"
-              style={{ marginBottom: "20px", fontWeight: "bold" }}
-            >
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7">
+            <h3 className="text-lg font-bold text-white mb-5">
               💼 Histórico de Investimentos
             </h3>
             {investments.length === 0 ? (
-              <div
-                className="text-center bg-[#252b3b] rounded-lg"
-                style={{ padding: "60px 20px" }}
-              >
-                <div className="text-[48px]" style={{ marginBottom: "16px" }}>
-                  💎
-                </div>
+              <div className="text-center bg-[#252b3b] rounded-lg py-15 px-5">
+                <div className="text-5xl mb-4">💎</div>
                 <p className="text-[#8b92a7]">
                   Nenhum investimento registrado ainda.
                   <br />
@@ -678,33 +511,18 @@ const Investimentos = () => {
                   .map((inv) => (
                     <div
                       key={inv.id}
-                      className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] hover:border-[#5b8def] transition-all"
-                      style={{ padding: "20px", borderRadius: "0.5rem" }}
+                      className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] hover:border-[#5b8def] transition-all p-5"
                     >
-                      <div
-                        className="flex justify-between items-start"
-                        style={{ marginBottom: "12px" }}
-                      >
-                        <div
-                          className="text-white font-bold"
-                          style={{ fontWeight: "bold" }}
-                        >
-                          {inv.title}
-                        </div>
-                        <div className="text-[#8b92a7] text-[12px]">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="text-white font-bold">{inv.title}</div>
+                        <div className="text-[#8b92a7] text-xs">
                           {new Date(inv.date).toLocaleDateString("pt-BR")}
                         </div>
                       </div>
-                      <div
-                        className="text-[#27ae60] text-[20px] font-bold"
-                        style={{ marginBottom: "8px", fontWeight: "bold" }}
-                      >
+                      <div className="text-[#27ae60] text-xl font-bold mb-2">
                         R$ {formatCurrency(inv.value)}
                       </div>
-                      <div
-                        className="inline-block bg-[rgba(91,141,239,0.2)] text-[#5b8def] rounded text-[12px]"
-                        style={{ padding: "4px 10px", borderRadius: "0.5rem" }}
-                      >
+                      <div className="inline-block bg-[rgba(91,141,239,0.2)] text-[#5b8def] rounded text-xs py-1 px-2.5">
                         {inv.category}
                       </div>
                     </div>
@@ -715,33 +533,15 @@ const Investimentos = () => {
         </div>
       )}
 
-      {/* SIMULADOR */}
       {activeView === "simulator" && (
         <div>
-          {/* Controles do Simulador */}
-          <div
-            className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-            style={{
-              padding: "28px",
-              marginBottom: "30px",
-              borderRadius: "0.5rem",
-            }}
-          >
-            <h3
-              className="text-[18px] font-bold text-white"
-              style={{ marginBottom: "20px", fontWeight: "bold" }}
-            >
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
+            <h3 className="text-lg font-bold text-white mb-5">
               💡 Simulador de Investimentos
             </h3>
-            <div
-              className="grid grid-cols-4 gap-4"
-              style={{ marginBottom: "24px", gap: "16px", color: "white" }}
-            >
+            <div className="grid grid-cols-4 gap-4 mb-6">
               <div>
-                <label
-                  className="text-[#8b92a7] text-[13px] block"
-                  style={{ marginBottom: "8px", color: "white" }}
-                >
+                <label className="text-[#8b92a7] text-[13px] block mb-2">
                   Aporte Inicial (R$)
                 </label>
                 <input
@@ -750,22 +550,13 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInitialAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg"
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                  }}
+                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
                   step="100"
                   min="0"
                 />
               </div>
               <div>
-                <label
-                  className="text-[#8b92a7] text-[13px] block"
-                  style={{ marginBottom: "8px", color: "white" }}
-                >
+                <label className="text-[#8b92a7] text-[13px] block mb-2">
                   Aporte Mensal (R$)
                 </label>
                 <input
@@ -774,22 +565,13 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setMonthlyAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg"
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                  }}
+                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
                   step="50"
                   min="0"
                 />
               </div>
               <div>
-                <label
-                  className="text-[#8b92a7] text-[13px] block"
-                  style={{ marginBottom: "8px", color: "white" }}
-                >
+                <label className="text-[#8b92a7] text-[13px] block mb-2">
                   Período (meses)
                 </label>
                 <input
@@ -798,22 +580,13 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInvestmentPeriod(parseInt(e.target.value) || 12)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg"
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                  }}
+                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
                   min="1"
                   max="360"
                 />
               </div>
               <div>
-                <label
-                  className="text-[#8b92a7] text-[13px] block"
-                  style={{ marginBottom: "8px", color: "white" }}
-                >
+                <label className="text-[#8b92a7] text-[13px] block mb-2">
                   % do CDI
                 </label>
                 <input
@@ -822,13 +595,7 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setCdiPercentage(parseInt(e.target.value) || 100)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg"
-                  style={{
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                  }}
+                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
                   step="5"
                   min="0"
                   max="150"
@@ -836,110 +603,39 @@ const Investimentos = () => {
               </div>
             </div>
 
-            {/* Resultados */}
-            <div
-              className="grid grid-cols-3 gap-4"
-              style={{ marginBottom: "0" }}
-            >
-              <div
-                className="text-center rounded-xl overflow-hidden"
-                style={{
-                  padding: "24px",
-                  background:
-                    "linear-gradient(135deg, rgba(91, 141, 239, 0.15) 0%, rgba(91, 141, 239, 0.05) 100%)",
-                  border: "1px solid rgba(91, 141, 239, 0.2)",
-                  borderRadius: "1rem",
-                }}
-              >
-                <div
-                  className="text-[#8b92a7] text-[11px] uppercase font-bold"
-                  style={{
-                    marginBottom: "12px",
-                    letterSpacing: "1px",
-                    fontWeight: "bold",
-                  }}
-                >
+            <div className="grid grid-cols-3 gap-4">
+              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(91,141,239,0.15)] to-[rgba(91,141,239,0.05)] border border-[rgba(91,141,239,0.2)]">
+                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
                   Total Investido:
                 </div>
-                <div
-                  className="text-white text-[28px] font-bold"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-white text-[28px] font-bold tracking-tight">
                   R$ {formatCurrency(simTotalInvested)}
                 </div>
               </div>
-              <div
-                className="text-center rounded-xl overflow-hidden"
-                style={{
-                  padding: "24px",
-                  background:
-                    "linear-gradient(135deg, rgba(39, 174, 96, 0.15) 0%, rgba(39, 174, 96, 0.05) 100%)",
-                  border: "1px solid rgba(39, 174, 96, 0.2)",
-                  borderRadius: "1rem",
-                }}
-              >
-                <div
-                  className="text-[#8b92a7] text-[11px] uppercase font-bold"
-                  style={{
-                    marginBottom: "12px",
-                    letterSpacing: "1px",
-                    fontWeight: "bold",
-                  }}
-                >
+              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(39,174,96,0.15)] to-[rgba(39,174,96,0.05)] border border-[rgba(39,174,96,0.2)]">
+                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
                   Rendimento:
                 </div>
-                <div
-                  className="text-[#27ae60] text-[28px] font-bold"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-[#27ae60] text-[28px] font-bold tracking-tight">
                   R$ {formatCurrency(simEarnings)}
                 </div>
               </div>
-              <div
-                className="text-center rounded-xl overflow-hidden"
-                style={{
-                  padding: "24px",
-                  background:
-                    "linear-gradient(135deg, rgba(155, 89, 182, 0.2) 0%, rgba(155, 89, 182, 0.08) 100%)",
-                  border: "1px solid rgba(155, 89, 182, 0.3)",
-                  borderRadius: "1rem",
-                }}
-              >
-                <div
-                  className="text-[#8b92a7] text-[11px] uppercase font-bold"
-                  style={{
-                    marginBottom: "12px",
-                    letterSpacing: "1px",
-                    fontWeight: "bold",
-                  }}
-                >
+              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(155,89,182,0.2)] to-[rgba(155,89,182,0.08)] border border-[rgba(155,89,182,0.3)]">
+                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
                   Montante Final:
                 </div>
-                <div
-                  className="text-[#9b59b6] text-[28px] font-bold"
-                  style={{ fontWeight: "bold", letterSpacing: "-0.5px" }}
-                >
+                <div className="text-[#9b59b6] text-[28px] font-bold tracking-tight">
                   R$ {formatCurrency(simFinalAmount)}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Gráfico do Simulador */}
-          <div
-            className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-            style={{ padding: "28px", borderRadius: "0.5rem" }}
-          >
-            <h3
-              className="text-[18px] font-bold text-white"
-              style={{ marginBottom: "20px", fontWeight: "bold" }}
-            >
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7">
+            <h3 className="text-lg font-bold text-white mb-5">
               📈 Projeção de Crescimento - Simulador
             </h3>
-            <canvas
-              ref={simulatorChartRef}
-              style={{ maxHeight: "400px" }}
-            ></canvas>
+            <canvas ref={simulatorChartRef} className="max-h-[400px]"></canvas>
           </div>
         </div>
       )}

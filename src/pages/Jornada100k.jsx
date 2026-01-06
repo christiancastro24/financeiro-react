@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 const Jornada100k = () => {
   const TARGET_AMOUNT = 100000;
@@ -63,7 +63,6 @@ const Jornada100k = () => {
     const newMonths = [...jornadaData.months];
     newMonths[index].deposit = parseFloat(deposit) || 0;
 
-    // Recalcular saldos
     let runningBalance = jornadaData.startingBalance;
     newMonths.forEach((month) => {
       runningBalance += month.deposit;
@@ -96,7 +95,6 @@ const Jornada100k = () => {
     }
   };
 
-  // Cálculos
   const totalDeposits = jornadaData.months.reduce(
     (sum, m) => sum + m.deposit,
     0
@@ -146,323 +144,100 @@ const Jornada100k = () => {
   };
 
   return (
-    <div
-      className="ml-[260px] min-h-screen bg-[#0f1419]"
-      style={{ padding: "40px 50px" }}
-    >
-      {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "30px" }}>
-        <h1
-          style={{
-            fontSize: "2.5em",
-            color: "#667eea",
-            marginBottom: "10px",
-            fontWeight: "bold",
-          }}
-        >
+    <div className="ml-[260px] min-h-screen bg-[#0f1419] p-10">
+      <div className="text-center mb-8">
+        <h1 className="text-5xl text-[#667eea] mb-2.5 font-bold">
           🎯 Jornada para 100k
         </h1>
-        <p style={{ color: "#8b92a7", fontSize: "1.1em" }}>
+        <p className="text-[#8b92a7] text-lg">
           Acompanhamento mês a mês até sua liberdade financeira
         </p>
       </div>
 
-      {/* Progress Section */}
-      <div style={{ marginBottom: "40px" }}>
-        <h3
-          style={{ color: "#ffffff", marginBottom: "20px", fontSize: "1.2em" }}
-        >
-          Progresso Atual
-        </h3>
-        <div
-          style={{
-            background: "#252b3b",
-            height: "40px",
-            borderRadius: "20px",
-            overflow: "hidden",
-            position: "relative",
-            border: "1px solid #2a2f3e",
-          }}
-        >
+      <div className="mb-10">
+        <h3 className="text-white mb-5 text-xl">Progresso Atual</h3>
+        <div className="bg-[#252b3b] h-10 rounded-[20px] overflow-hidden relative border border-[#2a2f3e]">
           <div
-            style={{
-              height: "100%",
-              background: "linear-gradient(90deg, #667eea 0%, #764ba2 100%)",
-              width: `${Math.min(progress, 100)}%`,
-              transition: "width 1s ease",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              paddingRight: "15px",
-              minWidth: "60px",
-            }}
+            className="h-full bg-gradient-to-r from-[#667eea] to-[#764ba2] flex items-center justify-end pr-4 min-w-[60px] transition-all duration-1000"
+            style={{ width: `${Math.min(progress, 100)}%` }}
           >
-            <span
-              style={{
-                color: "white",
-                fontWeight: "bold",
-                fontSize: "0.9em",
-                whiteSpace: "nowrap",
-              }}
-            >
+            <span className="text-white font-bold text-sm whitespace-nowrap">
               {progress.toFixed(1)}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div
-        className="grid grid-cols-4"
-        style={{ gap: "16px", margin: "30px 0" }}
-      >
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-            padding: "20px",
-            borderRadius: "12px",
-            textAlign: "center",
-            border: "1px solid #2a2f3e",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            minHeight: "120px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
+      <div className="grid grid-cols-4 gap-4 my-8">
+        {[
+          {
+            label: "Saldo Atual",
+            value: formatCurrency(currentAmount),
+            color: "#ffffff",
+          },
+          {
+            label: "Meta Final",
+            value: formatCurrency(TARGET_AMOUNT),
+            color: "#ffffff",
+          },
+          {
+            label: "Falta para Meta",
+            value: formatCurrency(Math.max(0, remaining)),
+            color: "#ffffff",
+          },
+          {
+            label: "Meses Restantes",
+            value: Math.max(0, monthsRemaining),
+            color: "#ffffff",
+          },
+        ].map((stat, i) => (
           <div
-            style={{
-              fontSize: "12px",
-              opacity: 0.9,
-              marginBottom: "8px",
-              color: "#8b92a7",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              fontWeight: "600",
-            }}
+            key={i}
+            className="bg-gradient-to-br from-[#1a1f2e] to-[#252b3b] p-5 rounded-xl text-center border border-[#2a2f3e] shadow-[0_4px_12px_rgba(0,0,0,0.3)] min-h-[120px] flex flex-col justify-center"
           >
-            Saldo Atual
+            <div className="text-xs opacity-90 mb-2 text-[#8b92a7] uppercase tracking-wide font-semibold">
+              {stat.label}
+            </div>
+            <div
+              className="text-[1.6em] font-bold leading-tight"
+              style={{ color: stat.color }}
+            >
+              {stat.value}
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: "1.6em",
-              fontWeight: "700",
-              color: "#ffffff",
-              lineHeight: "1.2",
-            }}
-          >
-            {formatCurrency(currentAmount)}
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-            padding: "20px",
-            borderRadius: "12px",
-            textAlign: "center",
-            border: "1px solid #2a2f3e",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            minHeight: "120px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              opacity: 0.9,
-              marginBottom: "8px",
-              color: "#8b92a7",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              fontWeight: "600",
-            }}
-          >
-            Meta Final
-          </div>
-          <div
-            style={{
-              fontSize: "1.6em",
-              fontWeight: "700",
-              color: "#ffffff",
-              lineHeight: "1.2",
-            }}
-          >
-            {formatCurrency(TARGET_AMOUNT)}
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-            padding: "20px",
-            borderRadius: "12px",
-            textAlign: "center",
-            border: "1px solid #2a2f3e",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            minHeight: "120px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              opacity: 0.9,
-              marginBottom: "8px",
-              color: "#8b92a7",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              fontWeight: "600",
-            }}
-          >
-            Falta para Meta
-          </div>
-          <div
-            style={{
-              fontSize: "1.6em",
-              fontWeight: "700",
-              color: "#ffffff",
-              lineHeight: "1.2",
-            }}
-          >
-            {formatCurrency(Math.max(0, remaining))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a1f2e 0%, #252b3b 100%)",
-            padding: "20px",
-            borderRadius: "12px",
-            textAlign: "center",
-            border: "1px solid #2a2f3e",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            minHeight: "120px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              opacity: 0.9,
-              marginBottom: "8px",
-              color: "#8b92a7",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              fontWeight: "600",
-            }}
-          >
-            Meses Restantes
-          </div>
-          <div
-            style={{
-              fontSize: "1.6em",
-              fontWeight: "700",
-              color: "#ffffff",
-              lineHeight: "1.2",
-            }}
-          >
-            {Math.max(0, monthsRemaining)}
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Recommendation Card */}
-      <div className="grid grid-cols-1" style={{ marginTop: "10px" }}>
-        <div
-          style={{
-            background: "linear-gradient(135deg, #1a3a2e 0%, #1e4a38 100%)",
-            borderLeft: "4px solid #27ae60",
-            padding: "20px",
-            borderRadius: "12px",
-            textAlign: "center",
-            border: "1px solid #2a2f3e",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            minHeight: "100px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "14px",
-              color: "#a8e6cf",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              marginBottom: "12px",
-            }}
-          >
+      <div className="grid grid-cols-1 mt-2.5">
+        <div className="bg-gradient-to-br from-[#1a3a2e] to-[#1e4a38] border-l-4 border-l-[#27ae60] p-5 rounded-xl text-center border border-[#2a2f3e] shadow-[0_4px_12px_rgba(0,0,0,0.3)] min-h-[100px] flex flex-col justify-center">
+          <div className="text-sm text-[#a8e6cf] flex items-center justify-center gap-2 mb-3">
             💡 Aporte Recomendado
           </div>
-          <div
-            style={{
-              fontSize: "1.8em",
-              color: "#27ae60",
-              marginBottom: "5px",
-              fontWeight: "bold",
-            }}
-          >
+          <div className="text-[1.8em] text-[#27ae60] mb-1 font-bold">
             {formatCurrency(Math.max(0, recommendedDeposit))}
           </div>
-          <div
-            style={{
-              fontSize: "11px",
-              color: "#8b92a7",
-              marginTop: "4px",
-              fontWeight: "500",
-            }}
-          >
+          <div className="text-[11px] text-[#8b92a7] mt-1 font-medium">
             Valor mensal para manter o prazo
           </div>
         </div>
       </div>
 
-      {/* Config Button */}
-      <div style={{ textAlign: "center", margin: "30px 0" }}>
+      <div className="text-center my-8">
         <button
           onClick={() => setShowConfigModal(true)}
-          className="rounded-lg cursor-pointer"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "12px 24px",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            border: "none",
-            fontSize: "1em",
-            fontWeight: "600",
-            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-            borderRadius: "10px",
-          }}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white border-none text-base font-semibold shadow-[0_4px_12px_rgba(102,126,234,0.3)] rounded-lg cursor-pointer"
         >
           ⚙️ Configurar Planejamento
         </button>
       </div>
 
-      {/* Months List */}
       {jornadaData.months.length > 0 && (
-        <div style={{ marginTop: "30px" }}>
-          <h3
-            style={{
-              color: "#ffffff",
-              fontSize: "1.2em",
-              marginBottom: "20px",
-            }}
-          >
-            <span style={{ fontSize: "1.5em", marginRight: "10px" }}>📅</span>
+        <div className="mt-8">
+          <h3 className="text-white text-xl mb-5">
+            <span className="text-2xl mr-2.5">📅</span>
             Registro Mensal de Aportes
           </h3>
-          <div className="flex flex-col" style={{ gap: "15px" }}>
+          <div className="flex flex-col gap-4">
             {jornadaData.months.map((month, index) => {
               const isCurrent = isCurrentMonth(month.date);
               const isCompleted =
@@ -472,44 +247,19 @@ const Jornada100k = () => {
               return (
                 <div
                   key={index}
-                  className="grid grid-cols-3 rounded-lg"
-                  style={{
-                    background: isCompleted
-                      ? "#1e3a38"
+                  className={`grid grid-cols-3 rounded-lg p-5 gap-5 items-center transition-all ${
+                    isCompleted
+                      ? "bg-[#1e3a38] border-2 border-[#27ae60] border-l-4"
                       : isCurrent
-                      ? "#2e2738"
-                      : "#1e2738",
-                    border: isCurrent
-                      ? "3px solid #f39c12"
-                      : isCompleted
-                      ? "2px solid #27ae60"
-                      : "2px solid #2a2f3e",
-                    borderLeft: isCurrent
-                      ? "4px solid #f39c12"
-                      : isCompleted
-                      ? "4px solid #27ae60"
-                      : "2px solid #2a2f3e",
-                    borderRadius: "10px",
-                    padding: "20px",
-                    gap: "20px",
-                    alignItems: "center",
-                    transition: "all 0.2s ease",
-                  }}
+                      ? "bg-[#2e2738] border-[3px] border-[#f39c12] border-l-4"
+                      : "bg-[#1e2738] border-2 border-[#2a2f3e]"
+                  }`}
                 >
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      color: "#5b8def",
-                      fontSize: "1.1em",
-                    }}
-                  >
+                  <div className="font-bold text-[#5b8def] text-lg">
                     {formatDate(month.date)}
                   </div>
 
-                  <div
-                    className="flex"
-                    style={{ alignItems: "center", gap: "10px" }}
-                  >
+                  <div className="flex items-center gap-2.5">
                     {isEditing ? (
                       <>
                         <input
@@ -519,15 +269,7 @@ const Jornada100k = () => {
                           placeholder="R$ 0,00"
                           min="0"
                           step="0.01"
-                          className="flex-1 rounded-lg"
-                          style={{
-                            padding: "12px",
-                            border: "2px solid #2a2f3e",
-                            fontSize: "1em",
-                            background: "#1a1f2e",
-                            color: "#e4e6eb",
-                            borderRadius: "10px",
-                          }}
+                          className="flex-1 rounded-lg p-3 border-2 border-[#2a2f3e] text-base bg-[#1a1f2e] text-[#e4e6eb]"
                         />
                         <button
                           onClick={() => {
@@ -536,18 +278,7 @@ const Jornada100k = () => {
                             );
                             updateMonthDeposit(index, input.value);
                           }}
-                          className="rounded-lg"
-                          style={{
-                            padding: "8px 15px",
-                            fontSize: "0.9em",
-                            background: "#27ae60",
-                            color: "white",
-                            border: "none",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            boxShadow: "0 2px 8px rgba(39, 174, 96, 0.3)",
-                            borderRadius: "10px",
-                          }}
+                          className="rounded-lg px-4 py-2 text-sm bg-[#27ae60] text-white border-none cursor-pointer font-bold shadow-[0_2px_8px_rgba(39,174,96,0.3)]"
                         >
                           Salvar
                         </button>
@@ -558,31 +289,11 @@ const Jornada100k = () => {
                           type="number"
                           value={month.deposit}
                           disabled
-                          className="flex-1 rounded-lg"
-                          style={{
-                            padding: "12px",
-                            border: "2px solid #2a2f3e",
-                            fontSize: "1em",
-                            background: "#1a1f2e",
-                            color: "#e4e6eb",
-                            opacity: 0.5,
-                            borderRadius: "10px",
-                          }}
+                          className="flex-1 rounded-lg p-3 border-2 border-[#2a2f3e] text-base bg-[#1a1f2e] text-[#e4e6eb] opacity-50"
                         />
                         <button
                           onClick={() => setEditingMonth(index)}
-                          className="rounded-lg"
-                          style={{
-                            padding: "8px 15px",
-                            fontSize: "0.9em",
-                            background: "#5a6c7d",
-                            color: "white",
-                            border: "none",
-                            cursor: "pointer",
-                            fontWeight: "bold",
-                            boxShadow: "0 2px 8px rgba(90, 108, 125, 0.3)",
-                            borderRadius: "10px",
-                          }}
+                          className="rounded-lg px-4 py-2 text-sm bg-[#5a6c7d] text-white border-none cursor-pointer font-bold shadow-[0_2px_8px_rgba(90,108,125,0.3)]"
                         >
                           Editar
                         </button>
@@ -590,14 +301,7 @@ const Jornada100k = () => {
                     )}
                   </div>
 
-                  <div
-                    style={{
-                      textAlign: "right",
-                      fontSize: "1.2em",
-                      fontWeight: "bold",
-                      color: "#ffffff",
-                    }}
-                  >
+                  <div className="text-right text-xl font-bold text-white">
                     {formatCurrency(month.balance)}
                   </div>
                 </div>
@@ -607,100 +311,72 @@ const Jornada100k = () => {
         </div>
       )}
 
-      {/* Config Modal */}
       {showConfigModal && (
         <div
-          className={`modal ${showConfigModal ? "active" : ""}`}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={() => setShowConfigModal(false)}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                marginBottom: "30px",
-                paddingBottom: "20px",
-                borderBottom: "1px solid #2a2f3e",
-              }}
-            >
-              <span style={{ fontSize: "1.5em" }}>⚙️</span>
-              <h2 style={{ margin: 0, color: "#ffffff", fontSize: "1.5em" }}>
+          <div
+            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2.5 mb-8 pb-5 border-b border-[#2a2f3e]">
+              <span className="text-2xl">⚙️</span>
+              <h2 className="m-0 text-white text-2xl">
                 Configurações Iniciais
               </h2>
             </div>
 
-            <div className="form-group">
-              <label>Saldo Inicial (R$)</label>
-              <input
-                type="number"
-                value={startingBalance}
-                onChange={(e) => setStartingBalance(e.target.value)}
-                min="0"
-                step="0.01"
-              />
-            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Saldo Inicial (R$)
+                </label>
+                <input
+                  type="number"
+                  value={startingBalance}
+                  onChange={(e) => setStartingBalance(e.target.value)}
+                  min="0"
+                  step="0.01"
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Prazo Desejado (meses)</label>
-              <input
-                type="number"
-                value={targetMonths}
-                onChange={(e) => setTargetMonths(e.target.value)}
-                min="1"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Prazo Desejado (meses)
+                </label>
+                <input
+                  type="number"
+                  value={targetMonths}
+                  onChange={(e) => setTargetMonths(e.target.value)}
+                  min="1"
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                />
+              </div>
 
-            <div className="form-actions">
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowConfigModal(false)}
+                  className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={initializePlanning}
+                  className="flex-1 px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(102,126,234,0.3)] transition-all hover:bg-[#5568d3]"
+                >
+                  Iniciar Planejamento
+                </button>
+              </div>
+
               <button
-                onClick={() => setShowConfigModal(false)}
-                className="border-none rounded-lg cursor-pointer bg-[#5a6c7d] hover:bg-[#4a5c6d]"
-                style={{
-                  padding: "12px 24px",
-                  color: "white",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  transition: "all 0.2s ease",
-                  borderRadius: "0.5rem",
-                }}
+                onClick={resetAll}
+                className="w-full mt-4 px-6 py-3 bg-gradient-to-br from-[#f39c12] to-[#e74c3c] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(243,156,18,0.3)] transition-all"
               >
-                Cancelar
-              </button>
-              <button
-                onClick={initializePlanning}
-                className="border-none rounded-lg cursor-pointer bg-[#667eea] hover:bg-[#5568d3]"
-                style={{
-                  padding: "12px 24px",
-                  color: "white",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                  boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-                  transition: "all 0.2s ease",
-                  borderRadius: "0.5rem",
-                }}
-              >
-                Iniciar Planejamento
+                🔄 Resetar Tudo
               </button>
             </div>
-
-            <button
-              onClick={resetAll}
-              className="border-none rounded-lg cursor-pointer"
-              style={{
-                width: "100%",
-                marginTop: "15px",
-                padding: "12px 24px",
-                background: "linear-gradient(135deg, #f39c12 0%, #e74c3c 100%)",
-                color: "white",
-                fontSize: "14px",
-                fontWeight: "bold",
-                boxShadow: "0 4px 12px rgba(243, 156, 18, 0.3)",
-                transition: "all 0.2s ease",
-                borderRadius: "0.5rem",
-              }}
-            >
-              🔄 Resetar Tudo
-            </button>
           </div>
         </div>
       )}

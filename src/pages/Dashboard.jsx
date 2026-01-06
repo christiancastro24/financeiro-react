@@ -3,6 +3,8 @@ import React, { useState } from "react";
 const Dashboard = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [selectedImportMonth, setSelectedImportMonth] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     type: "expense",
@@ -74,6 +76,92 @@ const Dashboard = () => {
     return `${months[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
   };
 
+  const getAvailableMonths = () => {
+    const monthsMap = new Map();
+
+    transactions.forEach((t) => {
+      const date = new Date(t.date);
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      const label = `${
+        [
+          "Janeiro",
+          "Fevereiro",
+          "Março",
+          "Abril",
+          "Maio",
+          "Junho",
+          "Julho",
+          "Agosto",
+          "Setembro",
+          "Outubro",
+          "Novembro",
+          "Dezembro",
+        ][date.getMonth()]
+      } ${date.getFullYear()}`;
+
+      // Não incluir o mês atual
+      if (
+        !(
+          date.getMonth() === currentMonth.getMonth() &&
+          date.getFullYear() === currentMonth.getFullYear()
+        )
+      ) {
+        monthsMap.set(key, {
+          key,
+          label,
+          month: date.getMonth(),
+          year: date.getFullYear(),
+        });
+      }
+    });
+
+    return Array.from(monthsMap.values()).sort((a, b) => {
+      if (a.year !== b.year) return b.year - a.year;
+      return b.month - a.month;
+    });
+  };
+
+  const openImportModal = () => {
+    const availableMonths = getAvailableMonths();
+    if (availableMonths.length > 0) {
+      setSelectedImportMonth(availableMonths[0].key);
+    }
+    setIsImportModalOpen(true);
+  };
+
+  const importTransactions = () => {
+    if (!selectedImportMonth) return;
+
+    const [year, month] = selectedImportMonth.split("-").map(Number);
+
+    const transactionsToImport = transactions.filter((t) => {
+      const tDate = new Date(t.date);
+      return tDate.getMonth() === month && tDate.getFullYear() === year;
+    });
+
+    if (transactionsToImport.length === 0) {
+      alert("Nenhuma transação encontrada no mês selecionado.");
+      return;
+    }
+
+    const importedTransactions = transactionsToImport.map((t) => {
+      const newDate = new Date(currentMonth);
+      newDate.setDate(new Date(t.date).getDate());
+
+      return {
+        ...t,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        date: newDate.toISOString(),
+        paid: false,
+      };
+    });
+
+    const newTransactions = [...transactions, ...importedTransactions];
+    saveData(newTransactions);
+    setIsImportModalOpen(false);
+    alert(`${importedTransactions.length} transações importadas com sucesso!`);
+  };
+
   const openModal = () => {
     setEditingId(null);
     setFormData({
@@ -109,7 +197,8 @@ const Dashboard = () => {
     e.preventDefault();
 
     const transaction = {
-      id: editingId || Date.now().toString(),
+      id:
+        editingId || `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type: formData.type,
       title: formData.title,
       value: parseFloat(formData.value),
@@ -153,275 +242,114 @@ const Dashboard = () => {
     return 0;
   });
 
+  const availableMonths = getAvailableMonths();
+
   return (
-    <div
-      className="ml-[260px] flex-1 bg-[#0f1419]"
-      style={{ padding: "40px 50px" }}
-    >
-      <div
-        className="flex justify-between items-center"
-        style={{ marginBottom: "35px" }}
-      >
+    <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+      <div className="flex justify-between items-center mb-9">
         <div>
-          <h2
-            className="text-[28px] font-bold text-white"
-            style={{ marginBottom: "6px", fontWeight: "bold" }}
-          >
-            Dashboard
-          </h2>
-          <div className="text-[#8b92a7] text-[14px]">
+          <h2 className="text-[28px] font-bold text-white mb-1.5">Dashboard</h2>
+          <div className="text-[#8b92a7] text-sm">
             Gestão de receitas e despesas
           </div>
         </div>
       </div>
 
-      <div
-        className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e]"
-        style={{
-          marginBottom: "30px",
-          padding: "18px 24px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-          borderRadius: "0.5rem",
-        }}
-      >
+      <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 py-4 px-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => changeMonth(-1)}
-          className="bg-[#252b3b] border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
-          style={{
-            padding: "10px 18px",
-            fontSize: "14px",
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-            borderRadius: "0.5rem",
-          }}
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
         >
           ← Anterior
         </button>
-        <span
-          className="text-[18px] font-bold text-white"
-          style={{ fontWeight: "bold" }}
-        >
-          {getMonthName()}
-        </span>
+        <span className="text-lg font-bold text-white">{getMonthName()}</span>
         <button
           onClick={() => changeMonth(1)}
-          className="bg-[#252b3b] border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
-          style={{
-            padding: "10px 18px",
-            fontSize: "14px",
-            fontWeight: 600,
-            transition: "all 0.2s ease",
-            borderRadius: "0.5rem",
-          }}
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
         >
           Próximo →
         </button>
       </div>
 
-      <div
-        className="grid grid-cols-3 border border-[#2a2f3e]"
-        style={{
-          gap: "24px",
-          marginBottom: "35px",
-        }}
-      >
-        <div
-          className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] hover:transform hover:-translate-y-1 border-l-4 border-l-[#27ae60]"
-          style={{
-            padding: "28px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            transition: "all 0.2s ease",
-            borderRadius: "0.5rem",
-          }}
-        >
-          <h3
-            className="flex items-center text-[12px] font-bold text-[#8b92a7] uppercase"
-            style={{
-              letterSpacing: "0.5px",
-              marginBottom: "14px",
-              gap: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            <div
-              className="w-7 h-7 rounded flex items-center justify-center text-[14px]"
-              style={{
-                background: "rgba(39, 174, 96, 0.2)",
-                color: "#27ae60",
-                borderRadius: "0.5rem",
-              }}
-            >
+      <div className="grid grid-cols-3 gap-6 mb-9">
+        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#27ae60] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+          <h3 className="flex items-center gap-2 text-xs font-bold text-[#8b92a7] uppercase tracking-wide mb-3.5">
+            <div className="w-7 h-7 rounded bg-[rgba(39,174,96,0.2)] text-[#27ae60] flex items-center justify-center text-sm">
               ↑
             </div>
             Entradas
           </h3>
-          <div
-            className="text-[32px] font-bold text-[#27ae60]"
-            style={{ marginBottom: "8px", fontWeight: "bold" }}
-          >
+          <div className="text-[32px] font-bold text-[#27ae60] mb-2">
             R$ {formatCurrency(totalIncome)}
           </div>
         </div>
 
-        <div
-          className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] hover:transform hover:-translate-y-1 border-l-4 border-l-[#e74c3c]"
-          style={{
-            padding: "28px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            transition: "all 0.2s ease",
-            borderRadius: "0.5rem",
-          }}
-        >
-          <h3
-            className="flex items-center text-[12px] font-bold text-[#8b92a7] uppercase"
-            style={{
-              letterSpacing: "0.5px",
-              marginBottom: "14px",
-              gap: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            <div
-              className="w-7 h-7 rounded flex items-center justify-center text-[14px]"
-              style={{
-                background: "rgba(231, 76, 60, 0.2)",
-                color: "#e74c3c",
-                borderRadius: "0.5rem",
-              }}
-            >
+        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#e74c3c] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+          <h3 className="flex items-center gap-2 text-xs font-bold text-[#8b92a7] uppercase tracking-wide mb-3.5">
+            <div className="w-7 h-7 rounded bg-[rgba(231,76,60,0.2)] text-[#e74c3c] flex items-center justify-center text-sm">
               ↓
             </div>
             Saídas
           </h3>
-          <div
-            className="text-[32px] font-bold text-[#e74c3c]"
-            style={{ marginBottom: "8px", fontWeight: "bold" }}
-          >
+          <div className="text-[32px] font-bold text-[#e74c3c] mb-2">
             R$ {formatCurrency(totalExpense)}
           </div>
         </div>
 
-        <div
-          className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] hover:transform hover:-translate-y-1 border-l-4 border-l-[#5b8def]"
-          style={{
-            padding: "28px",
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-            transition: "all 0.2s ease",
-          }}
-        >
-          <h3
-            className="flex items-center text-[12px] font-bold text-[#8b92a7] uppercase"
-            style={{
-              letterSpacing: "0.5px",
-              marginBottom: "14px",
-              gap: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            <div
-              className="w-7 h-7 rounded flex items-center justify-center text-[14px] font-bold"
-              style={{
-                background: "rgba(91, 141, 239, 0.2)",
-                color: "#5b8def",
-                fontWeight: "bold",
-                borderRadius: "0.5rem",
-              }}
-            >
+        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#5b8def] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+          <h3 className="flex items-center gap-2 text-xs font-bold text-[#8b92a7] uppercase tracking-wide mb-3.5">
+            <div className="w-7 h-7 rounded bg-[rgba(91,141,239,0.2)] text-[#5b8def] flex items-center justify-center text-sm font-bold">
               ≈
             </div>
             Saldo Previsto
           </h3>
-          <div
-            className="text-[32px] font-bold text-[#5b8def]"
-            style={{ marginBottom: "8px", fontWeight: "bold" }}
-          >
+          <div className="text-[32px] font-bold text-[#5b8def] mb-2">
             R$ {formatCurrency(balance)}
           </div>
         </div>
       </div>
 
-      <div
-        className="flex justify-between items-center"
-        style={{ marginBottom: "24px" }}
-      >
-        <h3
-          className="text-[18px] font-bold text-white"
-          style={{ fontWeight: "bold" }}
-        >
-          Transações do Mês
-        </h3>
-        <button
-          onClick={openModal}
-          className="border-none rounded-lg cursor-pointer bg-[#5b8def] text-white hover:bg-[#4a7dd9] hover:transform hover:-translate-y-0.5"
-          style={{
-            padding: "12px 24px",
-            fontSize: "14px",
-
-            boxShadow: "0 4px 12px rgba(91, 141, 239, 0.3)",
-            transition: "all 0.2s ease",
-            borderRadius: "0.5rem",
-            color: "white",
-            fontWeight: "bold",
-          }}
-        >
-          + Nova Transação
-        </button>
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-bold text-white">Transações do Mês</h3>
+        <div className="flex gap-3">
+          {availableMonths.length > 0 && (
+            <button
+              onClick={openImportModal}
+              className="px-6 py-3 bg-[#f39c12] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(243,156,18,0.3)] transition-all hover:bg-[#e67e22] hover:-translate-y-0.5"
+            >
+              📋 Importar Transações
+            </button>
+          )}
+          <button
+            onClick={openModal}
+            className="px-6 py-3 bg-[#5b8def] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(91,141,239,0.3)] transition-all hover:bg-[#4a7dd9] hover:-translate-y-0.5"
+          >
+            + Nova Transação
+          </button>
+        </div>
       </div>
 
-      <div
-        className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] max-h-[600px] overflow-y-auto transactions-list"
-        style={{
-          padding: "24px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-          borderRadius: "0.5rem",
-        }}
-      >
+      <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] max-h-[600px] overflow-y-auto transactions-list">
         {sortedTransactions.length === 0 ? (
-          <div
-            className="text-center text-[#8b92a7] bg-[#1e2738] rounded-lg border border-[#2a2f3e]"
-            style={{
-              padding: "60px 20px",
-              fontSize: "15px",
-              borderRadius: "0.5rem",
-            }}
-          >
+          <div className="text-center text-[#8b92a7] rounded-lg py-15 px-5 text-[16px]">
             Nenhuma transação registrada neste mês
           </div>
         ) : (
           sortedTransactions.map((t) => (
             <div
               key={t.id}
-              className={`flex justify-between transactions-list items-center border rounded-lg hover:border-[#5b8def] hover:transform hover:translate-x-1 ${
+              className={`flex transactions-list justify-between items-center rounded-lg p-4 mb-3 transition-all hover:border-[#5b8def] hover:translate-x-1 ${
                 t.paid
-                  ? "bg-[#1e2738] border-[#2a2f3e]"
-                  : "bg-[rgba(243,156,18,0.1)] border-[#f39c12] border-l-[3px]"
+                  ? "bg-[#1e2738] border border-[#2a2f3e]"
+                  : "bg-[rgba(243,156,18,0.1)] border border-[#f39c12] border-l-[3px]"
               }`}
-              style={{
-                padding: "18px",
-                marginBottom: "12px",
-                boxShadow: t.paid ? "none" : undefined,
-                transition: "all 0.2s ease",
-                borderRadius: "0.5rem",
-              }}
             >
               <div className="flex-1">
-                <div
-                  className="font-bold text-white text-[15px]"
-                  style={{ marginBottom: "6px", fontWeight: "bold" }}
-                >
+                <div className="font-bold text-white text-[15px] mb-1.5">
                   {t.title}
                 </div>
                 <div className="text-[13px] text-[#8b92a7] flex items-center">
-                  <span
-                    className="inline-block rounded text-[12px] text-[#5b8def] font-bold"
-                    style={{
-                      padding: "4px 10px",
-                      background: "rgba(91, 141, 239, 0.2)",
-                      marginRight: "8px",
-                      borderRadius: "0.5rem",
-                      fontWeight: "bold",
-                    }}
-                  >
+                  <span className="inline-block rounded px-2.5 py-1 text-xs text-[#5b8def] font-bold bg-[rgba(91,141,239,0.2)] mr-2">
                     {t.category}
                   </span>
                   <span>{new Date(t.date).toLocaleDateString("pt-BR")}</span>
@@ -430,29 +358,18 @@ const Dashboard = () => {
               </div>
 
               <div
-                className={`text-[18px] font-bold text-right ${
+                className={`text-lg font-bold text-right mx-5 min-w-[120px] ${
                   t.type === "income" ? "text-[#27ae60]" : "text-[#e74c3c]"
                 }`}
-                style={{
-                  margin: "0 20px",
-                  minWidth: "120px",
-                  fontWeight: "bold",
-                }}
               >
                 {t.type === "income" ? "+" : "-"} R$ {formatCurrency(t.value)}
               </div>
 
-              <div className="flex" style={{ gap: "6px" }}>
+              <div className="flex gap-1.5">
                 {!t.paid ? (
                   <button
                     onClick={() => togglePaid(t.id)}
-                    className="border-none rounded-lg cursor-pointer bg-[#27ae60] text-white text-[13px] hover:bg-[#229954] hover:transform hover:-translate-y-0.5"
-                    style={{
-                      padding: "8px 12px",
-                      boxShadow: "0 2px 8px rgba(39, 174, 96, 0.3)",
-                      transition: "all 0.2s ease",
-                      borderRadius: "0.5rem",
-                    }}
+                    className="px-3 py-2 bg-[#27ae60] text-white text-[13px] rounded-lg shadow-[0_2px_8px_rgba(39,174,96,0.3)] transition-all hover:bg-[#229954] hover:-translate-y-0.5"
                     title="Marcar como pago"
                   >
                     ✓
@@ -460,15 +377,7 @@ const Dashboard = () => {
                 ) : (
                   <button
                     onClick={() => togglePaid(t.id)}
-                    className="border-none cursor-pointer bg-[#f39c12] text-white text-[13px] hover:bg-[#e67e22] hover:transform hover:-translate-y-0.5"
-                    style={{
-                      padding: "8px 12px",
-                      boxShadow: "0 2px 8px rgba(243, 156, 18, 0.3)",
-                      transition: "all 0.2s ease",
-                      borderRadius: "0.5rem",
-                      color: "white",
-                      fontWeight: "bold",
-                    }}
+                    className="px-3 py-2 bg-[#f39c12] text-white text-[13px] font-bold rounded-lg shadow-[0_2px_8px_rgba(243,156,18,0.3)] transition-all hover:bg-[#e67e22] hover:-translate-y-0.5"
                     title="Desmarcar como pago"
                   >
                     ↺
@@ -476,30 +385,14 @@ const Dashboard = () => {
                 )}
                 <button
                   onClick={() => editTransaction(t.id)}
-                  className="border-none rounded-lg cursor-pointer bg-[#5a6c7d] text-white text-[13px] hover:bg-[#4a5c6d] hover:transform hover:-translate-y-0.5"
-                  style={{
-                    padding: "8px 12px",
-                    boxShadow: "0 2px 8px rgba(90, 108, 125, 0.3)",
-                    transition: "all 0.2s ease",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
+                  className="px-3 py-2 bg-[#5a6c7d] text-white text-[13px] font-bold rounded-lg shadow-[0_2px_8px_rgba(90,108,125,0.3)] transition-all hover:bg-[#4a5c6d] hover:-translate-y-0.5"
                   title="Editar"
                 >
                   ✎
                 </button>
                 <button
                   onClick={() => deleteTransaction(t.id)}
-                  className="border-none rounded-lg cursor-pointer bg-[#e74c3c] text-white text-[13px] hover:bg-[#c0392b] hover:transform hover:-translate-y-0.5"
-                  style={{
-                    padding: "8px 12px",
-                    boxShadow: "0 2px 8px rgba(231, 76, 60, 0.3)",
-                    transition: "all 0.2s ease",
-                    borderRadius: "0.5rem",
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
+                  className="px-3 py-2 bg-[#e74c3c] text-white text-[13px] font-bold rounded-lg shadow-[0_2px_8px_rgba(231,76,60,0.3)] transition-all hover:bg-[#c0392b] hover:-translate-y-0.5"
                   title="Excluir"
                 >
                   ✕
@@ -512,39 +405,52 @@ const Dashboard = () => {
 
       {isModalOpen && (
         <div
-          className={`modal ${isModalOpen ? "active" : ""}`}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closeModal}
         >
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? "Editar Transação" : "Nova Transação"}</h2>
+          <div
+            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-white mb-6">
+              {editingId ? "Editar Transação" : "Nova Transação"}
+            </h2>
 
-            <div>
-              <div className="form-group">
-                <label>Tipo</label>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Tipo
+                </label>
                 <select
                   value={formData.type}
                   onChange={(e) =>
                     setFormData({ ...formData, type: e.target.value })
                   }
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
                 >
                   <option value="expense">Despesa</option>
                   <option value="income">Receita</option>
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Título</label>
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Título
+                </label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
                   }
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Valor (R$)</label>
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Valor (R$)
+                </label>
                 <input
                   type="number"
                   step="0.01"
@@ -552,16 +458,20 @@ const Dashboard = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, value: e.target.value })
                   }
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Categoria</label>
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Categoria
+                </label>
                 <select
                   value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
                   }
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
                 >
                   <option value="Alimentação">Alimentação</option>
                   <option value="Transporte">Transporte</option>
@@ -577,44 +487,95 @@ const Dashboard = () => {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Data</label>
+              <div>
+                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  Data
+                </label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
                   }
+                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
                 />
               </div>
 
-              <div className="form-actions">
+              <div className="flex gap-3 pt-4">
                 <button
                   onClick={closeModal}
-                  className="border-none rounded-lg cursor-pointer bg-[#5a6c7d] text-white text-[14px] font-bold hover:bg-[#4a5c6d]"
-                  style={{
-                    padding: "12px 24px",
-                    transition: "all 0.2s ease",
-                    borderRadius: "0.5rem",
-                    fontWeight: "bold",
-                  }}
+                  className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={saveTransaction}
-                  className="border-none rounded-lg cursor-pointer bg-[#5b8def] text-white text-[14px] font-bold hover:bg-[#4a7dd9]"
-                  style={{
-                    padding: "12px 24px",
-                    boxShadow: "0 4px 12px rgba(91, 141, 239, 0.3)",
-                    transition: "all 0.2s ease",
-                    borderRadius: "0.5rem",
-                    fontWeight: "bold",
-                  }}
+                  className="flex-1 px-6 py-3 bg-[#5b8def] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(91,141,239,0.3)] transition-all hover:bg-[#4a7dd9]"
                 >
                   Salvar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImportModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setIsImportModalOpen(false)}
+        >
+          <div
+            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-2xl font-bold text-white mb-4">
+              📋 Importar Transações
+            </h2>
+            <p className="text-[#8b92a7] text-sm mb-6">
+              Selecione um mês para copiar todas as transações para{" "}
+              <strong className="text-white">{getMonthName()}</strong>
+            </p>
+
+            <div className="mb-6">
+              <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                Importar de:
+              </label>
+              <select
+                value={selectedImportMonth}
+                onChange={(e) => setSelectedImportMonth(e.target.value)}
+                className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#5b8def] transition-all"
+              >
+                {availableMonths.map((m) => (
+                  <option key={m.key} value={m.key}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="bg-[#252b3b] border border-[#2a2f3e] rounded-lg p-4 mb-6">
+              <p className="text-[#8b92a7] text-xs">
+                ℹ️ <strong className="text-white">Importante:</strong> As
+                transações serão copiadas com as mesmas datas (dia), mas no mês
+                atual. Todas serão marcadas como{" "}
+                <strong className="text-[#f39c12]">não pagas</strong>.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsImportModalOpen(false)}
+                className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={importTransactions}
+                className="flex-1 px-6 py-3 bg-[#f39c12] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(243,156,18,0.3)] transition-all hover:bg-[#e67e22]"
+              >
+                Importar
+              </button>
             </div>
           </div>
         </div>

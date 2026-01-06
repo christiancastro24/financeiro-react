@@ -63,7 +63,7 @@ const MetasSonhos = () => {
   const [showAddAmountModal, setShowAddAmountModal] = useState(false);
   const [editingDreamId, setEditingDreamId] = useState(null);
   const [selectedDream, setSelectedDream] = useState(null);
-  const [currentImage, setCurrentImage] = useState(null);
+  const [_currentImage, setCurrentImage] = useState(null);
 
   const [formData, setFormData] = useState({
     type: "other",
@@ -157,15 +157,21 @@ const MetasSonhos = () => {
       return;
     }
 
+    const generateId = () => {
+      const timestamp = new Date().getTime();
+      const random = Math.floor(Math.random() * 10000);
+      return `dream-${timestamp}-${random}`;
+    };
+
     const dreamData = {
-      id: editingDreamId || Date.now().toString(),
+      id: editingDreamId || generateId(),
       type: formData.type,
       name: formData.name.trim(),
       target: parseFloat(formData.target),
       current: parseFloat(formData.current) || 0,
       targetDate: formData.targetDate || null,
       description: formData.description.trim(),
-      image: formData.imageUrl || currentImage || null,
+      image: formData.imageUrl || null,
       country: formData.country || null,
       city: formData.city || null,
       createdAt: new Date().toISOString(),
@@ -247,17 +253,6 @@ const MetasSonhos = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setCurrentImage(event.target.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const showToast = (message) => {
     const toast = document.createElement("div");
     toast.textContent = message;
@@ -285,10 +280,7 @@ const MetasSonhos = () => {
   }, []);
 
   return (
-    <div
-      className="ml-[260px] min-h-screen bg-[#0f1419]"
-      style={{ padding: "40px 50px" }}
-    >
+    <div className="ml-[260px] min-h-screen bg-[#0f1419] p-10">
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
@@ -310,138 +302,104 @@ const MetasSonhos = () => {
           from { transform: translateX(0); opacity: 1; }
           to { transform: translateX(100%); opacity: 0; }
         }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        /* MODAL */
+        .modal {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.8);
+          backdrop-filter: blur(8px);
+          z-index: 1000;
+        }
+
+        .modal.active {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+          background: #1a1f2e;
+          padding: 15px;
+          border-radius: 20px;
+          width: 90%;
+          max-width: 500px;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          animation: slideUp 0.3s ease;
+          border: 1px solid #2a2f3e;
+        }
+
+        .modal-content h2 {
+          margin-bottom: 25px;
+          color: #ffffff;
+          font-size: 24px;
+          font-weight: 700;
+        }
       `}</style>
 
-      {/* Header Motivacional */}
-      <div style={{ marginBottom: "30px" }}>
-        <div
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            padding: "30px",
-            borderRadius: "20px",
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            boxShadow: "0 8px 24px rgba(102, 126, 234, 0.3)",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              content: '""',
-              position: "absolute",
-              top: "-50%",
-              right: "-20%",
-              width: "300px",
-              height: "300px",
-              background: "rgba(255, 255, 255, 0.1)",
-              borderRadius: "50%",
-            }}
-          ></div>
+      <div className="mb-8">
+        <div className="bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8 rounded-[20px] flex items-center gap-5 shadow-[0_8px_24px_rgba(102,126,234,0.3)] relative overflow-hidden">
+          <div className="absolute -top-1/2 -right-1/5 w-[300px] h-[300px] bg-white/10 rounded-full" />
 
-          <div
-            style={{
-              fontSize: "48px",
-              animation: "float 3s ease-in-out infinite",
-            }}
-          >
+          <div className="text-5xl animate-[float_3s_ease-in-out_infinite]">
             💫
           </div>
 
-          <div style={{ flex: 1, position: "relative", zIndex: 1 }}>
-            <div
-              style={{
-                fontSize: "14px",
-                color: "rgba(255, 255, 255, 0.9)",
-                marginBottom: "8px",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                fontWeight: "600",
-              }}
-            >
+          <div className="flex-1 relative z-10">
+            <div className="text-sm text-white/90 mb-2 uppercase tracking-wider font-semibold">
               Frase do Dia
             </div>
-            <p
-              style={{
-                fontSize: "20px",
-                color: "white",
-                fontWeight: "500",
-                lineHeight: "1.6",
-                fontStyle: "italic",
-                margin: 0,
-              }}
-            >
+            <p className="text-xl text-white font-medium leading-relaxed italic m-0">
               {dailyQuote}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Botão Adicionar */}
-      <div
-        className="flex"
-        style={{ justifyContent: "flex-end", marginBottom: "30px" }}
-      >
+      <div className="flex justify-end mb-8">
         <button
           onClick={() => openDreamModal()}
-          className="border-none rounded-lg cursor-pointer"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "12px 24px",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            fontSize: "15px",
-            fontWeight: "600",
-            boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-            borderRadius: "12px",
-          }}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white text-[15px] font-semibold shadow-[0_4px_12px_rgba(102,126,234,0.3)] rounded-xl border-none cursor-pointer"
         >
           <span>✨</span> Adicionar Novo Sonho
         </button>
       </div>
 
-      {/* Grid de Sonhos */}
       {dreams.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "80px 20px",
-            background: "#1a1f2e",
-            borderRadius: "16px",
-            border: "2px dashed #2a2f3e",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "72px",
-              marginBottom: "20px",
-              opacity: 0.3,
-              animation: "pulse 2s ease-in-out infinite",
-            }}
-          >
+        <div className="text-center py-20 px-5 bg-[#1a1f2e] rounded-2xl border-2 border-dashed border-[#2a2f3e]">
+          <div className="text-7xl mb-5 opacity-30 animate-[pulse_2s_ease-in-out_infinite]">
             🌟
           </div>
-          <h3
-            style={{ color: "#ffffff", marginBottom: "12px", fontSize: "20px" }}
-          >
+          <h3 className="text-white mb-3 text-xl">
             Nenhum sonho cadastrado ainda
           </h3>
-          <p style={{ color: "#8b92a7", fontSize: "14px" }}>
+          <p className="text-[#8b92a7] text-sm">
             Comece agora a planejar seus objetivos e conquistas!
           </p>
         </div>
       ) : (
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-            gap: "24px",
-            marginBottom: "30px",
-          }}
-        >
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(350px,1fr))] gap-6 mb-8">
           {dreams.map((dream) => {
             const progress = (dream.current / dream.target) * 100;
             const remaining = dream.target - dream.current;
@@ -450,106 +408,40 @@ const MetasSonhos = () => {
               <div
                 key={dream.id}
                 onClick={() => openDetailModal(dream.id)}
-                style={{
-                  background: "#1a1f2e",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
-                  border: "1px solid #2a2f3e",
-                  transition: "all 0.3s ease",
-                  cursor: "pointer",
-                  position: "relative",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-8px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 12px 32px rgba(0, 0, 0, 0.5)";
-                  e.currentTarget.style.borderColor = "#667eea";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 12px rgba(0, 0, 0, 0.3)";
-                  e.currentTarget.style.borderColor = "#2a2f3e";
-                }}
+                className="bg-[#1a1f2e] rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)] border border-[#2a2f3e] transition-all duration-300 cursor-pointer relative hover:-translate-y-2 hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] hover:border-[#667eea]"
               >
                 {/* Imagem */}
                 <div
-                  style={{
-                    width: "100%",
-                    height: "200px",
-                    background: dream.image
-                      ? "none"
-                      : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "64px",
-                    position: "relative",
-                  }}
+                  className={`w-full h-[200px] ${
+                    !dream.image
+                      ? "bg-gradient-to-br from-[#667eea] to-[#764ba2]"
+                      : ""
+                  } flex items-center justify-center text-6xl relative`}
                 >
                   {dream.image ? (
                     <img
                       src={dream.image}
                       alt={dream.name}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     typeIcons[dream.type]
                   )}
 
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "12px",
-                      left: "12px",
-                      background: "rgba(0, 0, 0, 0.7)",
-                      backdropFilter: "blur(10px)",
-                      padding: "6px 12px",
-                      borderRadius: "20px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      color: "white",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "4px",
-                    }}
-                  >
+                  <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-[10px] px-3 py-1.5 rounded-[20px] text-xs font-semibold text-white flex items-center gap-1">
                     {typeIcons[dream.type]} {typeLabels[dream.type]}
                   </div>
                 </div>
 
                 {/* Conteúdo */}
-                <div style={{ padding: "24px" }}>
-                  <div style={{ marginBottom: "16px" }}>
-                    <h3
-                      style={{
-                        fontSize: "20px",
-                        fontWeight: "700",
-                        color: "#ffffff",
-                        marginBottom: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
+                <div className="p-6">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
                       {dream.name}
                     </h3>
 
                     {dream.country && (
-                      <div
-                        style={{
-                          fontSize: "13px",
-                          color: "#8b92a7",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "6px",
-                        }}
-                      >
+                      <div className="text-[13px] text-[#8b92a7] flex items-center gap-1.5">
                         📍 {dream.city || ""}{" "}
                         {dream.city && dream.country ? "•" : ""}{" "}
                         {countryCoordinates[dream.country]?.name || ""}
@@ -557,99 +449,40 @@ const MetasSonhos = () => {
                     )}
                   </div>
 
-                  {/* Progress */}
-                  <div style={{ margin: "20px 0" }}>
-                    <div
-                      className="flex"
-                      style={{
-                        justifyContent: "space-between",
-                        marginBottom: "8px",
-                        fontSize: "13px",
-                      }}
-                    >
-                      <span style={{ color: "#27ae60", fontWeight: "700" }}>
+                  <div className="my-5">
+                    <div className="flex justify-between mb-2 text-[13px]">
+                      <span className="text-[#27ae60] font-bold">
                         R$ {formatCurrency(dream.current)}
                       </span>
-                      <span style={{ color: "#8b92a7" }}>
+                      <span className="text-[#8b92a7]">
                         R$ {formatCurrency(dream.target)}
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        height: "12px",
-                        background: "#252b3b",
-                        borderRadius: "20px",
-                        overflow: "hidden",
-                        position: "relative",
-                      }}
-                    >
+                    <div className="h-3 bg-[#252b3b] rounded-[20px] overflow-hidden relative">
                       <div
-                        style={{
-                          height: "100%",
-                          background:
-                            "linear-gradient(90deg, #27ae60 0%, #2ecc71 100%)",
-                          borderRadius: "20px",
-                          width: `${Math.min(progress, 100)}%`,
-                          transition: "width 1s ease",
-                          position: "relative",
-                          overflow: "hidden",
-                        }}
+                        className="h-full bg-gradient-to-r from-[#27ae60] to-[#2ecc71] rounded-[20px] transition-[width] duration-1000 relative overflow-hidden"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
                       >
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background:
-                              "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)",
-                            animation: "shimmer 2s infinite",
-                          }}
-                        ></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite]" />
                       </div>
                     </div>
 
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "#8b92a7",
-                        marginTop: "6px",
-                        textAlign: "center",
-                      }}
-                    >
+                    <div className="text-xs text-[#8b92a7] mt-1.5 text-center">
                       {progress.toFixed(1)}% conquistado
                     </div>
                   </div>
 
-                  {/* Footer */}
-                  <div
-                    className="flex"
-                    style={{
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      paddingTop: "16px",
-                      borderTop: "1px solid #2a2f3e",
-                    }}
-                  >
-                    <div style={{ fontSize: "13px", color: "#8b92a7" }}>
+                  <div className="flex justify-between items-center pt-4 border-t border-[#2a2f3e]">
+                    <div className="text-[12px] text-[#8b92a7]">
                       Falta:{" "}
-                      <strong style={{ color: "#f39c12", fontSize: "16px" }}>
+                      <strong className="text-[#f39c12] text-[12px]">
                         R$ {formatCurrency(remaining)}
                       </strong>
                     </div>
 
                     {dream.targetDate && (
-                      <div
-                        style={{
-                          fontSize: "12px",
-                          color: "#8b92a7",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                        }}
-                      >
+                      <div className="text-xs text-[#8b92a7] flex items-center gap-1">
                         📅{" "}
                         {new Date(dream.targetDate).toLocaleDateString("pt-BR")}
                       </div>
@@ -662,17 +495,12 @@ const MetasSonhos = () => {
         </div>
       )}
 
-      {/* Modal Criar/Editar Sonho */}
       {showDreamModal && (
         <div
           className={`modal ${showDreamModal ? "active" : ""}`}
           onClick={() => setShowDreamModal(false)}
         >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "600px" }}
-          >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{editingDreamId ? "✏️ Editar Sonho" : "✨ Novo Sonho"}</h2>
 
             <form onSubmit={saveDream}>
@@ -706,7 +534,7 @@ const MetasSonhos = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2" style={{ gap: "16px" }}>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="form-group">
                   <label>Valor Meta (R$)</label>
                   <input
@@ -755,16 +583,7 @@ const MetasSonhos = () => {
                   }
                   placeholder="Descreva seu sonho..."
                   rows="3"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    background: "#1e2738",
-                    border: "2px solid #2a2f3e",
-                    borderRadius: "8px",
-                    color: "#e4e6eb",
-                    fontSize: "14px",
-                    resize: "vertical",
-                  }}
+                  className="w-full p-3 bg-[#1e2738] border-2 border-[#2a2f3e] rounded-lg text-[#e4e6eb] text-sm resize-y"
                 />
               </div>
 
@@ -781,70 +600,51 @@ const MetasSonhos = () => {
               </div>
 
               {formData.type === "travel" && (
-                <>
-                  <div className="grid grid-cols-2" style={{ gap: "16px" }}>
-                    <div className="form-group">
-                      <label>País</label>
-                      <select
-                        value={formData.country}
-                        onChange={(e) =>
-                          setFormData({ ...formData, country: e.target.value })
-                        }
-                      >
-                        <option value="">Selecione...</option>
-                        {Object.entries(countryCoordinates).map(
-                          ([code, data]) => (
-                            <option key={code} value={code}>
-                              {data.name}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Cidade</label>
-                      <input
-                        type="text"
-                        value={formData.city}
-                        onChange={(e) =>
-                          setFormData({ ...formData, city: e.target.value })
-                        }
-                        placeholder="Ex: Paris"
-                      />
-                    </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="form-group">
+                    <label>País</label>
+                    <select
+                      value={formData.country}
+                      onChange={(e) =>
+                        setFormData({ ...formData, country: e.target.value })
+                      }
+                    >
+                      <option value="">Selecione...</option>
+                      {Object.entries(countryCoordinates).map(
+                        ([code, data]) => (
+                          <option key={code} value={code}>
+                            {data.name}
+                          </option>
+                        )
+                      )}
+                    </select>
                   </div>
-                </>
+
+                  <div className="form-group">
+                    <label>Cidade</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) =>
+                        setFormData({ ...formData, city: e.target.value })
+                      }
+                      placeholder="Ex: Paris"
+                    />
+                  </div>
+                </div>
               )}
 
               <div className="form-actions">
                 <button
                   type="button"
                   onClick={() => setShowDreamModal(false)}
-                  className="border-none rounded-lg cursor-pointer bg-[#5a6c7d] hover:bg-[#4a5c6d]"
-                  style={{
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    transition: "all 0.2s ease",
-                    borderRadius: "12px",
-                  }}
+                  className="px-6 py-3 bg-[#5a6c7d] hover:bg-[#4a5c6d] text-white text-sm font-bold transition-all duration-200 rounded-xl border-none cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="border-none rounded-lg cursor-pointer bg-[#667eea] hover:bg-[#5568d3]"
-                  style={{
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-                    transition: "all 0.2s ease",
-                    borderRadius: "12px",
-                  }}
+                  className="px-6 py-3 bg-[#667eea] hover:bg-[#5568d3] text-white text-sm font-bold shadow-[0_4px_12px_rgba(102,126,234,0.3)] transition-all duration-200 rounded-xl border-none cursor-pointer"
                 >
                   Salvar Sonho
                 </button>
@@ -854,72 +654,36 @@ const MetasSonhos = () => {
         </div>
       )}
 
-      {/* Modal Detalhes */}
       {showDetailModal && selectedDream && (
         <div
           className={`modal ${showDetailModal ? "active" : ""}`}
           onClick={() => setShowDetailModal(false)}
         >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: "700px", padding: 0, overflow: "hidden" }}
-          >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div
-              style={{
-                height: "250px",
-                background: selectedDream.image
-                  ? "none"
-                  : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className={`h-[250px] ${
+                !selectedDream.image
+                  ? "bg-gradient-to-br from-[#667eea] to-[#764ba2]"
+                  : ""
+              } relative flex items-center justify-center`}
             >
               {selectedDream.image ? (
                 <img
                   src={selectedDream.image}
                   alt={selectedDream.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
+                  className="w-full h-full object-cover"
                 />
               ) : (
-                <div style={{ fontSize: "80px" }}>🌟</div>
+                <div className="text-8xl">🌟</div>
               )}
 
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  padding: "24px",
-                  background:
-                    "linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent)",
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "28px",
-                    fontWeight: "700",
-                    color: "white",
-                    marginBottom: "8px",
-                  }}
-                >
+              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                <h2 className="text-[28px] font-bold text-white mb-2">
                   {selectedDream.name}
                 </h2>
                 {selectedDream.country && (
-                  <div
-                    style={{
-                      color: "rgba(255, 255, 255, 0.9)",
-                      fontSize: "14px",
-                    }}
-                  >
+                  <div className="text-white/90 text-sm">
                     📍 {selectedDream.city || ""}{" "}
                     {countryCoordinates[selectedDream.country]?.name || ""}
                   </div>
@@ -927,112 +691,37 @@ const MetasSonhos = () => {
               </div>
             </div>
 
-            {/* Body */}
-            <div style={{ padding: "32px" }}>
+            <div className="p-8">
               {selectedDream.description && (
-                <p style={{ color: "#8b92a7", marginBottom: "24px" }}>
+                <p className="text-[#8b92a7] mb-6">
                   {selectedDream.description}
                 </p>
               )}
 
-              {/* Stats */}
-              <div
-                className="grid grid-cols-3"
-                style={{ gap: "16px", marginBottom: "24px" }}
-              >
-                <div
-                  style={{
-                    background: "#1e2738",
-                    padding: "16px",
-                    borderRadius: "10px",
-                    textAlign: "center",
-                    border: "1px solid #2a2f3e",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "17px",
-                      color: "#8b92a7",
-                      marginBottom: "8px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
+                  <div className="text-[17px] text-[#8b92a7] mb-2 uppercase tracking-wide">
                     Meta
                   </div>
-                  <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: "700",
-                      color: "#ffffff",
-                      position: "relative",
-                    }}
-                  >
+                  <div className="text-[16px] font-bold text-white relative">
                     {formatCurrency(selectedDream.target)}
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    background: "#1e2738",
-                    padding: "16px",
-                    borderRadius: "10px",
-                    textAlign: "center",
-                    border: "1px solid #2a2f3e",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "17px",
-                      color: "#8b92a7",
-                      marginBottom: "8px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
+                  <div className="text-[13px] text-[#8b92a7] mb-2 uppercase tracking-wide">
                     Economizado
                   </div>
-                  <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: "700",
-                      color: "#27ae60",
-                      position: "relative",
-                    }}
-                  >
+                  <div className="text-[16px]font-bold text-[#27ae60] relative">
                     {formatCurrency(selectedDream.current)}
                   </div>
                 </div>
 
-                <div
-                  style={{
-                    background: "#1e2738",
-                    padding: "16px",
-                    borderRadius: "10px",
-                    textAlign: "center",
-                    border: "1px solid #2a2f3e",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "17px",
-                      color: "#8b92a7",
-                      marginBottom: "8px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
+                  <div className="text-[17px] text-[#8b92a7] mb-2 uppercase tracking-wide">
                     Falta
                   </div>
-                  <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: "700",
-                      color: "#f39c12",
-                      position: "relative",
-                    }}
-                  >
-                  
+                  <div className="text-[16px] font-bold text-[#f39c12] relative">
                     {formatCurrency(
                       selectedDream.target - selectedDream.current
                     )}
@@ -1040,17 +729,10 @@ const MetasSonhos = () => {
                 </div>
               </div>
 
-              {/* Progress Bar */}
-              <div style={{ margin: "24px 0" }}>
-                <div
-                  className="flex"
-                  style={{
-                    justifyContent: "space-between",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <span style={{ color: "#8b92a7" }}>Progresso</span>
-                  <span style={{ color: "#27ae60", fontWeight: "700" }}>
+              <div className="my-6">
+                <div className="flex justify-between mb-2">
+                  <span className="text-[#8b92a7]">Progresso</span>
+                  <span className="text-[#27ae60] font-bold">
                     {(
                       (selectedDream.current / selectedDream.target) *
                       100
@@ -1058,41 +740,23 @@ const MetasSonhos = () => {
                     %
                   </span>
                 </div>
-                <div
-                  style={{
-                    height: "16px",
-                    background: "#252b3b",
-                    borderRadius: "20px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div className="h-4 bg-[#252b3b] rounded-[20px] overflow-hidden">
                   <div
+                    className="h-full bg-gradient-to-r from-[#27ae60] to-[#2ecc71] transition-[width] duration-1000"
                     style={{
-                      height: "100%",
-                      background:
-                        "linear-gradient(90deg, #27ae60 0%, #2ecc71 100%)",
                       width: `${Math.min(
                         (selectedDream.current / selectedDream.target) * 100,
                         100
                       )}%`,
-                      transition: "width 1s ease",
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
 
               {selectedDream.targetDate && (
-                <div
-                  style={{
-                    textAlign: "center",
-                    margin: "20px 0",
-                    padding: "12px",
-                    background: "#1e2738",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <span style={{ color: "#8b92a7" }}>Data Alvo: </span>
-                  <strong style={{ color: "#ffffff" }}>
+                <div className="text-center my-5 p-3 bg-[#1e2738] rounded-lg">
+                  <span className="text-[#8b92a7]">Data Alvo: </span>
+                  <strong className="text-white">
                     {new Date(selectedDream.targetDate).toLocaleDateString(
                       "pt-BR"
                     )}
@@ -1101,24 +765,13 @@ const MetasSonhos = () => {
               )}
 
               {/* Botões de Ação */}
-              <div className="flex" style={{ gap: "12px", marginTop: "20px" }}>
+              <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => {
                     setShowDetailModal(false);
                     openAddAmountModal();
                   }}
-                  className="border-none rounded-lg cursor-pointer"
-                  style={{
-                    flex: 1,
-                    padding: "12px 24px",
-                    background:
-                      "linear-gradient(135deg, #27ae60 0%, #2ecc71 100%)",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    boxShadow: "0 4px 12px rgba(39, 174, 96, 0.3)",
-                    borderRadius: "12px",
-                  }}
+                  className="flex-1 px-6 py-3 bg-gradient-to-br from-[#27ae60] to-[#2ecc71] text-white text-sm font-bold shadow-[0_4px_12px_rgba(39,174,96,0.3)] rounded-xl border-none cursor-pointer"
                 >
                   💰 Adicionar Valor
                 </button>
@@ -1127,29 +780,13 @@ const MetasSonhos = () => {
                     setShowDetailModal(false);
                     openDreamModal(selectedDream.id);
                   }}
-                  className="border-none rounded-lg cursor-pointer bg-[#5b8def] hover:bg-[#4a7dd9]"
-                  style={{
-                    flex: 1,
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    borderRadius: "12px",
-                  }}
+                  className="flex-1 px-6 py-3 bg-[#5b8def] hover:bg-[#4a7dd9] text-white text-sm font-bold rounded-xl border-none cursor-pointer"
                 >
                   ✏️ Editar
                 </button>
                 <button
                   onClick={() => deleteDream(selectedDream.id)}
-                  className="border-none rounded-lg cursor-pointer bg-[#e74c3c] hover:bg-[#c0392b]"
-                  style={{
-                    flex: 1,
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    borderRadius: "12px",
-                  }}
+                  className="flex-1 px-6 py-3 bg-[#e74c3c] hover:bg-[#c0392b] text-white text-sm font-bold rounded-xl border-none cursor-pointer"
                 >
                   🗑️ Excluir
                 </button>
@@ -1159,7 +796,6 @@ const MetasSonhos = () => {
         </div>
       )}
 
-      {/* Modal Adicionar Valor */}
       {showAddAmountModal && (
         <div
           className={`modal ${showAddAmountModal ? "active" : ""}`}
@@ -1199,30 +835,13 @@ const MetasSonhos = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddAmountModal(false)}
-                  className="border-none rounded-lg cursor-pointer bg-[#5a6c7d] hover:bg-[#4a5c6d]"
-                  style={{
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    transition: "all 0.2s ease",
-                    borderRadius: "12px",
-                  }}
+                  className="px-6 py-3 bg-[#5a6c7d] hover:bg-[#4a5c6d] text-white text-sm font-bold transition-all duration-200 rounded-xl border-none cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="border-none rounded-lg cursor-pointer bg-[#27ae60] hover:bg-[#229954]"
-                  style={{
-                    padding: "12px 24px",
-                    color: "white",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    boxShadow: "0 4px 12px rgba(39, 174, 96, 0.3)",
-                    transition: "all 0.2s ease",
-                    borderRadius: "12px",
-                  }}
+                  className="px-6 py-3 bg-[#27ae60] hover:bg-[#229954] text-white text-sm font-bold shadow-[0_4px_12px_rgba(39,174,96,0.3)] transition-all duration-200 rounded-xl border-none cursor-pointer"
                 >
                   Adicionar
                 </button>
