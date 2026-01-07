@@ -153,14 +153,14 @@ const OrcamentoDiario = () => {
       <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 p-[18px_24px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => changeMonth(-1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
         >
           ← Anterior
         </button>
         <span className="text-lg font-bold text-white">{getMonthName()}</span>
         <button
           onClick={() => changeMonth(1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
         >
           Próximo →
         </button>

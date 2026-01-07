@@ -26,10 +26,8 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
     { id: "dashboard", label: "Dashboard", icon: "📊" },
     { id: "analises", label: "Análises", icon: "📈" },
     { id: "orcamento", label: "Orçamento Diário", icon: "📅" },
-    { id: "resumo", label: "Resumo por Categoria", icon: "🍕" },
     { id: "investimentos", label: "Investimentos", icon: "💎" },
     { id: "aposentadoria", label: "Aposentadoria", icon: "🎯" },
-    { id: "jornada", label: "Jornada 100k", icon: "🚀" },
     { id: "metas", label: "Metas & Sonhos", icon: "✨" },
   ];
 

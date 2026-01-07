@@ -10,11 +10,12 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #0f1419;
     min-height: 100vh;
     color: #e4e6eb;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   #root {
@@ -47,8 +48,8 @@
   background: #1a1f2e;
   padding: 35px;
   border-radius: 20px;
-  width: 90%;
-  max-width: 500px;
+  width: 100%;
+  max-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -93,7 +94,7 @@
   border: 2px solid #2a2f3e;
   border-radius: 10px;
   font-size: 14px;
-  font-family: inherit;
+  font-family: 'Inter', sans-serif;
   transition: all 0.3s ease;
   background: #1e2738;
   color: #e4e6eb;
