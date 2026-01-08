@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import AIAssistant from "./pages/AssistenteFinanceiro";
 import Cartoes from "./pages/Cartoes";
 
+// --- FUNÇÕES AUXILIARES (Sem 'export' = HMR Seguro) ---
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -30,16 +31,14 @@ function deleteCookie(name) {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
 }
 
+// --- COMPONENTE PRINCIPAL ---
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     const authCookie = getCookie("financeapp_auth");
     return authCookie === "true";
   });
 
-  const [currentRoute, setCurrentRoute] = useState(() => {
-    return window.location.pathname;
-  });
-
+  const [currentRoute, setCurrentRoute] = useState(() => window.location.pathname);
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const navigate = useCallback((path) => {
@@ -55,7 +54,6 @@ function App() {
         navigate("/login");
       }
     }, 60000);
-
     return () => clearInterval(checkAuth);
   }, [isAuthenticated, navigate]);
 
@@ -73,22 +71,14 @@ function App() {
   }, [navigate]);
 
   useEffect(() => {
-    const handlePopState = () => {
-      setCurrentRoute(window.location.pathname);
-    };
-
+    const handlePopState = () => setCurrentRoute(window.location.pathname);
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   const renderPage = () => {
-    if (currentRoute === "/") {
-      return <LandingPage onNavigate={navigate} />;
-    }
-
-    if (currentRoute === "/login") {
-      return <LoginPage onLogin={handleLogin} onNavigate={navigate} />;
-    }
+    if (currentRoute === "/") return <LandingPage onNavigate={navigate} />;
+    if (currentRoute === "/login") return <LoginPage onLogin={handleLogin} onNavigate={navigate} />;
 
     if (currentRoute === "/dashboard") {
       if (!isAuthenticated) {
@@ -98,47 +88,38 @@ function App() {
 
       const pageContent = () => {
         switch (activeTab) {
-          case "dashboard":
-            return <Dashboard />;
-          case "analises":
-            return <Analises />;
-          case "orcamento":
-            return <OrcamentoDiario />;
-          case "investimentos":
-            return <Investimentos />;
-          case "aposentadoria":
-            return <Aposentadoria />;
-          case "metas":
-            return <MetasSonhos />;
-          case "cartoes":
-            return <Cartoes />;
-          case "configuracoes":
-            return <Configuracoes />;
-          default:
-            return <Dashboard />;
+          case "dashboard": return <Dashboard />;
+          case "analises": return <Analises />;
+          case "orcamento": return <OrcamentoDiario />;
+          case "investimentos": return <Investimentos />;
+          case "aposentadoria": return <Aposentadoria />;
+          case "metas": return <MetasSonhos />;
+          case "cartoes": return <Cartoes />;
+          case "configuracoes": return <Configuracoes />;
+          default: return <Dashboard />;
         }
       };
 
       return (
         <>
-          <Layout
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            onLogout={handleLogout}
-          >
+          <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
             {pageContent()}
           </Layout>
-
           <AIAssistant />
         </>
       );
     }
 
-    navigate("/");
-    return null;
+    // Fallback
+    return <LandingPage onNavigate={navigate} />;
   };
 
-  return <>{renderPage()}</>;
+  // Ajustado o retorno para não ficar vazio
+  return (
+    <div className="app-container">
+      {renderPage()}
+    </div>
+  );
 }
 
 export default App;

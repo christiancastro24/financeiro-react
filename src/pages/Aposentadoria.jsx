@@ -1,6 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Aposentadoria = () => {
+  // --- LÓGICA DE TEMA ---
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("financeapp_theme") || "dark";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
+      setTheme(savedTheme);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const colors = {
+    primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
+    secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
+    tertiary: theme === "dark" ? "#252b3b" : "#f1f3f5",
+    border: theme === "dark" ? "#2a2f3e" : "#dee2e6",
+    textPrimary: theme === "dark" ? "#ffffff" : "#1a1f2e",
+    textSecondary: theme === "dark" ? "#8b92a7" : "#6c757d",
+    cardItem: theme === "dark" ? "#1e2738" : "#f8f9fa",
+  };
+
   const [retirementData, setRetirementData] = useState(() => {
     const saved = localStorage.getItem("retirementData2");
     if (saved) {
@@ -42,10 +66,6 @@ const Aposentadoria = () => {
   };
 
   const getTargetAmount = () => {
-    // Calcular patrimônio necessário baseado no RENDIMENTO mensal
-    // Se quero R$ 3.000/mês e a taxa real é 6% ao ano
-    // Preciso de: (3.000 × 12) / 0.06 = R$ 600.000
-    // Porque R$ 600k rendendo 6%aa = R$ 36k/ano = R$ 3k/mês
     const annualIncome = retirementData.targetIncome * 12;
     const requiredCapital = annualIncome / (retirementData.interestRate / 100);
     return requiredCapital;
@@ -112,12 +132,10 @@ const Aposentadoria = () => {
 
   const addContribution = () => {
     const amount = parseFloat(monthlyAmount);
-
     if (!amount || amount <= 0) {
       alert("Digite um valor válido!");
       return;
     }
-
     const newData = {
       ...retirementData,
       contributions: [
@@ -128,7 +146,6 @@ const Aposentadoria = () => {
         },
       ],
     };
-
     saveData(newData);
     setMonthlyAmount("");
     alert("✅ Aporte registrado com sucesso!");
@@ -140,24 +157,18 @@ const Aposentadoria = () => {
       "Digite o novo valor do aporte:",
       contribution.amount.toFixed(2)
     );
-
     if (newAmount === null) return;
-
     const amount = parseFloat(newAmount);
-
     if (!amount || amount <= 0) {
       alert("❌ Valor inválido!");
       return;
     }
-
     const newContributions = [...retirementData.contributions];
     newContributions[index].amount = amount;
-
     saveData({
       ...retirementData,
       contributions: newContributions,
     });
-
     alert("✅ Aporte editado com sucesso!");
   };
 
@@ -168,18 +179,14 @@ const Aposentadoria = () => {
         contribution.amount
       )}?\n\nData: ${contribution.date.toLocaleDateString("pt-BR")}`
     );
-
     if (!confirmDelete) return;
-
     const newContributions = retirementData.contributions.filter(
       (_, i) => i !== index
     );
-
     saveData({
       ...retirementData,
       contributions: newContributions,
     });
-
     alert("🗑️ Aporte removido com sucesso!");
   };
 
@@ -210,28 +217,46 @@ const Aposentadoria = () => {
   );
 
   return (
-    <div className="ml-[260px] min-h-screen bg-[#0f1419] p-10">
-      <div className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 mb-8">
+    <div
+      className="ml-[260px] min-h-screen transition-colors duration-300 p-10"
+      style={{ backgroundColor: colors.primary }}
+    >
+      <div
+        className="rounded-2xl border p-8 mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
         <h2 className="text-[28px] font-bold mb-3 text-[#667eea]">
           🎯 Minha Aposentadoria aos {retirementData.retirementAge} Anos
         </h2>
-        <p className="text-[#8b92a7] text-sm">
+        <p className="text-sm" style={{ color: colors.textSecondary }}>
           Idade Atual: {retirementData.currentAge} anos • Faltam{" "}
           {remainingYears} anos ({remainingMonths} meses)
         </p>
-        <p className="text-[#8b92a7] text-sm mt-2">
+        <p className="text-sm mt-2" style={{ color: colors.textSecondary }}>
           Meta: {formatCurrency(retirementData.targetIncome)}/mês em poder de
           compra
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-9">
+        <div
+          className="rounded-2xl border p-9"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2.5 text-[#667eea]">
             📊 Situação Atual
           </h3>
           <div className="mb-5">
-            <div className="text-[#8b92a7] text-sm mb-2 mt-8">
+            <div
+              className="text-sm mb-2 mt-8"
+              style={{ color: colors.textSecondary }}
+            >
               Patrimônio Acumulado
             </div>
             <div className="text-[32px] font-bold text-[#667eea]">
@@ -239,15 +264,24 @@ const Aposentadoria = () => {
             </div>
           </div>
           <div className="mb-5">
-            <div className="text-[#8b92a7] text-sm mb-2 mt-5">
+            <div
+              className="text-sm mb-2 mt-5"
+              style={{ color: colors.textSecondary }}
+            >
               Aportes Realizados
             </div>
-            <div className="text-[32px] font-bold text-white">
+            <div
+              className="text-[32px] font-bold"
+              style={{ color: colors.textPrimary }}
+            >
               {formatCurrency(totalContributed)}
             </div>
           </div>
           <div>
-            <div className="text-[#8b92a7] text-sm mb-2 mt-5">
+            <div
+              className="text-sm mb-2 mt-5"
+              style={{ color: colors.textSecondary }}
+            >
               Rendimento até agora
             </div>
             <div className="text-[32px] font-bold text-[#27ae60]">
@@ -256,33 +290,59 @@ const Aposentadoria = () => {
           </div>
         </div>
 
-        <div className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-9">
+        <div
+          className="rounded-2xl border p-9"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <h3 className="text-xl font-bold mb-6 flex items-center gap-2.5 text-[#667eea]">
             🎯 Meta e Projeção
           </h3>
           <div className="mb-5">
-            <div className="text-[#8b92a7] text-sm mb-2 mt-2.5">
+            <div
+              className="text-sm mb-2 mt-2.5"
+              style={{ color: colors.textSecondary }}
+            >
               Patrimônio Necessário
             </div>
-            <div className="text-[32px] font-bold text-white">
+            <div
+              className="text-[32px] font-bold"
+              style={{ color: colors.textPrimary }}
+            >
               {formatCurrency(targetAmount)}
             </div>
-            <div className="text-xs text-[#8b92a7] mt-1">
+            <div
+              className="text-xs mt-1"
+              style={{ color: colors.textSecondary }}
+            >
               (Rendimento de {retirementData.interestRate}% a.a. ={" "}
               {formatCurrency(retirementData.targetIncome)}/mês)
             </div>
           </div>
           <div className="mb-5">
-            <div className="text-[#8b92a7] text-sm mb-2">Tempo restante</div>
-            <div className="text-[32px] font-bold text-white">
+            <div
+              className="text-sm mb-2"
+              style={{ color: colors.textSecondary }}
+            >
+              Tempo restante
+            </div>
+            <div
+              className="text-[32px] font-bold"
+              style={{ color: colors.textPrimary }}
+            >
               {remainingYears} anos
             </div>
-            <div className="text-sm text-[#8b92a7]">
+            <div className="text-sm" style={{ color: colors.textSecondary }}>
               ({remainingMonths} meses)
             </div>
           </div>
           <div className="mb-5">
-            <div className="text-[#8b92a7] text-sm mb-2">
+            <div
+              className="text-sm mb-2"
+              style={{ color: colors.textSecondary }}
+            >
               Aporte Ideal por Mês
             </div>
             <div className="text-[32px] font-bold text-[#f39c12]">
@@ -293,8 +353,9 @@ const Aposentadoria = () => {
             className={`rounded p-4 mt-5 text-sm ${
               idealMonthly === 0
                 ? "bg-[#d1fae5] border-l-4 border-l-[#10b981] text-[#065f46]"
-                : "bg-[rgba(59,130,246,0.1)] border-l-4 border-l-[#3b82f6] text-white"
+                : "bg-[rgba(59,130,246,0.1)] border-l-4 border-l-[#3b82f6]"
             }`}
+            style={idealMonthly !== 0 ? { color: colors.textPrimary } : {}}
           >
             {idealMonthly === 0
               ? "🎉 Parabéns! Você já atingiu a meta!"
@@ -313,15 +374,24 @@ const Aposentadoria = () => {
           onClick={() => setShowContributionModal(false)}
         >
           <div
-            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            className="rounded-2xl border p-8 w-full max-w-md shadow-2xl"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2
+              className="text-2xl font-bold mb-6"
+              style={{ color: colors.textPrimary }}
+            >
               💰 Novo Aporte
             </h2>
-
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: colors.textSecondary }}
+              >
                 Valor do aporte (R$)
               </label>
               <input
@@ -329,12 +399,14 @@ const Aposentadoria = () => {
                 value={monthlyAmount}
                 onChange={(e) => setMonthlyAmount(e.target.value)}
                 placeholder="Ex: 1500"
-                min="0"
-                step="0.01"
-                className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                style={{
+                  backgroundColor: colors.tertiary,
+                  borderColor: colors.border,
+                  color: colors.textPrimary,
+                }}
               />
             </div>
-
             <div className="flex gap-3 pt-4">
               <button
                 onClick={() => setShowContributionModal(false)}
@@ -347,7 +419,7 @@ const Aposentadoria = () => {
                   addContribution();
                   setShowContributionModal(false);
                 }}
-                className="flex-1 px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(102,126,234,0.3)] transition-all hover:bg-[#5568d3]"
+                className="flex-1 px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg shadow-lg transition-all hover:bg-[#5568d3]"
               >
                 💾 Registrar Aporte
               </button>
@@ -362,16 +434,25 @@ const Aposentadoria = () => {
           onClick={() => setShowSettingsModal(false)}
         >
           <div
-            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            className="rounded-2xl border p-8 w-full max-w-md shadow-2xl"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2
+              className="text-2xl font-bold mb-6"
+              style={{ color: colors.textPrimary }}
+            >
               ⚙️ Configurações
             </h2>
-
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Idade Atual (anos)
                 </label>
                 <input
@@ -383,15 +464,19 @@ const Aposentadoria = () => {
                       currentAge: parseFloat(e.target.value),
                     })
                   }
-                  min="18"
-                  max="100"
-                  step="1"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Idade para Aposentar (anos)
                 </label>
                 <input
@@ -403,15 +488,19 @@ const Aposentadoria = () => {
                       retirementAge: parseFloat(e.target.value),
                     })
                   }
-                  min={retirementData.currentAge + 1}
-                  max="100"
-                  step="1"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Renda mensal desejada (R$)
                 </label>
                 <input
@@ -423,14 +512,19 @@ const Aposentadoria = () => {
                       targetIncome: parseFloat(e.target.value),
                     })
                   }
-                  min="0"
-                  step="100"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Taxa real anual (%)
                 </label>
                 <input
@@ -442,20 +536,21 @@ const Aposentadoria = () => {
                       interestRate: parseFloat(e.target.value),
                     })
                   }
-                  min="0"
-                  max="20"
-                  step="0.1"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
-
               <div className="flex flex-col gap-3 pt-4">
                 <button
                   onClick={() => {
                     recalculate();
                     setShowSettingsModal(false);
                   }}
-                  className="w-full px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg shadow-[0_4px_12px_rgba(102,126,234,0.3)] transition-all hover:bg-[#5568d3]"
+                  className="w-full px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#5568d3]"
                 >
                   🔄 Recalcular Tudo
                 </button>
@@ -480,31 +575,41 @@ const Aposentadoria = () => {
         </div>
       )}
 
-      <div className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-9">
+      <div
+        className="rounded-2xl border p-9"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-[22px] font-bold text-[#667eea]">
             📈 Histórico de Aportes
           </h3>
-
           <div className="flex gap-3 mb-5">
             <button
               onClick={() => setShowContributionModal(true)}
-              className="bg-[#667eea] text-white rounded-full hover:bg-[#5568d3] transition-all hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-[0_4px_12px_rgba(102,126,234,0.3)] border-none cursor-pointer"
-              title="Registrar Novo Aporte"
+              className="bg-[#667eea] text-white rounded-full hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-lg border-none cursor-pointer"
             >
               💰
             </button>
             <button
               onClick={() => setShowSettingsModal(true)}
-              className="bg-[#2a2f3e] text-white rounded-full hover:bg-[#3a3f4e] transition-all hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-[0_4px_12px_rgba(42,47,62,0.3)] border-none cursor-pointer"
-              title="Configurações"
+              className="rounded-full hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-lg border-none cursor-pointer"
+              style={{
+                backgroundColor: colors.border,
+                color: colors.textPrimary,
+              }}
             >
               ⚙️
             </button>
           </div>
         </div>
         {sortedContributions.length === 0 ? (
-          <p className="text-center text-[#8b92a7] py-8">
+          <p
+            className="text-center py-8"
+            style={{ color: colors.textSecondary }}
+          >
             Nenhum aporte registrado ainda
           </p>
         ) : (
@@ -518,10 +623,14 @@ const Aposentadoria = () => {
               return (
                 <div
                   key={index}
-                  className="bg-[#1e2738] rounded flex justify-between items-center p-4 border-l-4 border-l-[#667eea]"
+                  className="rounded flex justify-between items-center p-4 border-l-4 border-l-[#667eea]"
+                  style={{ backgroundColor: colors.cardItem }}
                 >
                   <div className="flex-1">
-                    <div className="text-[13px] text-[#8b92a7]">
+                    <div
+                      className="text-[13px]"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {contribution.date.toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
@@ -530,22 +639,25 @@ const Aposentadoria = () => {
                         minute: "2-digit",
                       })}
                     </div>
-                    <div className="text-xl font-bold text-white mt-1.5">
+                    <div
+                      className="text-xl font-bold mt-1.5"
+                      style={{ color: colors.textPrimary }}
+                    >
                       {formatCurrency(contribution.amount)}
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => editContribution(originalIndex)}
-                      className="bg-transparent text-[#8b92a7] hover:bg-[rgba(91,141,239,0.1)] hover:text-[#5b8def] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
-                      title="Editar"
+                      className="bg-transparent hover:bg-[rgba(91,141,239,0.1)] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
+                      style={{ color: colors.textSecondary }}
                     >
                       ✏️
                     </button>
                     <button
                       onClick={() => deleteContribution(originalIndex)}
-                      className="bg-transparent text-[#8b92a7] hover:bg-[rgba(231,76,60,0.1)] hover:text-[#e74c3c] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
-                      title="Remover"
+                      className="bg-transparent hover:bg-[rgba(231,76,60,0.1)] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
+                      style={{ color: colors.textSecondary }}
                     >
                       🗑️
                     </button>

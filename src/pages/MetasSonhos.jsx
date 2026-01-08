@@ -1,6 +1,34 @@
 import React, { useState, useEffect } from "react";
 
 const MetasSonhos = () => {
+  // --- LÓGICA DE TEMA PADRONIZADA ---
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("financeapp_theme") || "dark";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
+      setTheme(savedTheme);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const colors = {
+    primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
+    secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
+    tertiary: theme === "dark" ? "#252b3b" : "#e9ecef",
+    border: theme === "dark" ? "#2a2f3e" : "#dee2e6",
+    textPrimary: theme === "dark" ? "#ffffff" : "#1a1f2e",
+    textSecondary: theme === "dark" ? "#8b92a7" : "#6c757d",
+    accent: "#667eea",
+    success: "#27ae60",
+    warning: "#f39c12",
+    danger: "#e74c3c",
+  };
+
+  // --- LÓGICA ORIGINAL DO COMPONENTE ---
   const motivationalQuotes = [
     "Sonhos não morrem, apenas adormecem na alma da gente. 💫",
     "O sucesso é a soma de pequenos esforços repetidos dia após dia. 🌟",
@@ -63,7 +91,6 @@ const MetasSonhos = () => {
   const [showAddAmountModal, setShowAddAmountModal] = useState(false);
   const [editingDreamId, setEditingDreamId] = useState(null);
   const [selectedDream, setSelectedDream] = useState(null);
-  const [conquered, setConquered] = useState(null);
 
   const [formData, setFormData] = useState({
     type: "other",
@@ -268,7 +295,7 @@ const MetasSonhos = () => {
       position: fixed;
       top: 20px;
       right: 20px;
-      background: #27ae60;
+      background: ${colors.success};
       color: white;
       padding: 12px 24px;
       border-radius: 8px;
@@ -288,7 +315,10 @@ const MetasSonhos = () => {
   }, []);
 
   return (
-    <div className="ml-[260px] min-h-screen bg-[#0f1419] p-10">
+    <div
+      className="ml-[260px] flex-1 min-h-screen transition-colors duration-300 p-8"
+      style={{ backgroundColor: colors.primary }}
+    >
       {/* Banner Motivacional */}
       <div className="mb-8">
         <div className="bg-gradient-to-br from-[#667eea] to-[#764ba2] p-8 rounded-[20px] flex items-center gap-5 shadow-[0_8px_24px_rgba(102,126,234,0.3)] relative overflow-hidden">
@@ -319,14 +349,20 @@ const MetasSonhos = () => {
 
       {/* Grid de Sonhos */}
       {dreams.length === 0 ? (
-        <div className="text-center py-20 px-5 bg-[#1a1f2e] rounded-2xl border-2 border-dashed border-[#2a2f3e]">
+        <div
+          className="text-center py-20 px-5 rounded-2xl border-2 border-dashed"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <div className="text-7xl mb-5 opacity-30 animate-[pulse_2s_ease-in-out_infinite]">
             🌟
           </div>
-          <h3 className="text-white mb-3 text-xl">
+          <h3 className="mb-3 text-xl" style={{ color: colors.textPrimary }}>
             Nenhum sonho cadastrado ainda
           </h3>
-          <p className="text-[#8b92a7] text-sm">
+          <p style={{ color: colors.textSecondary }} className="text-sm">
             Comece agora a planejar seus objetivos e conquistas!
           </p>
         </div>
@@ -341,11 +377,15 @@ const MetasSonhos = () => {
               <div
                 key={dream.id}
                 onClick={() => openDetailModal(dream.id)}
-                className={`bg-[#1a1f2e] rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)] border transition-all duration-300 cursor-pointer relative hover:-translate-y-2 hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] ${
+                className={`rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)] border transition-all duration-300 cursor-pointer relative hover:-translate-y-2 hover:shadow-[0_12px_32px_rgba(0,0,0,0.5)] ${
                   isCompleted
                     ? "border-[#27ae60] shadow-[0_0_20px_rgba(39,174,96,0.3)]"
                     : "border-[#2a2f3e] hover:border-[#667eea]"
                 }`}
+                style={{
+                  backgroundColor: colors.secondary,
+                  borderColor: isCompleted ? "#27ae60" : colors.border,
+                }}
               >
                 {/* Imagem */}
                 <div
@@ -389,11 +429,17 @@ const MetasSonhos = () => {
                 {/* Conteúdo */}
                 <div className="p-6">
                   <div className="mb-4">
-                    <h3 className="text-xl font-bold text-white mb-2">
+                    <h3
+                      className="text-xl font-bold mb-2"
+                      style={{ color: colors.textPrimary }}
+                    >
                       {dream.name}
                     </h3>
                     {dream.country && (
-                      <div className="text-[13px] text-[#8b92a7] flex items-center gap-1.5">
+                      <div
+                        className="text-[13px] flex items-center gap-1.5"
+                        style={{ color: colors.textSecondary }}
+                      >
                         📍 {dream.city || ""}{" "}
                         {dream.city && dream.country ? "•" : ""}{" "}
                         {countryCoordinates[dream.country]?.name || ""}
@@ -403,15 +449,21 @@ const MetasSonhos = () => {
 
                   <div className="my-5">
                     <div className="flex justify-between mb-2 text-[13px]">
-                      <span className="font-bold text-[#27ae60]">
+                      <span
+                        className="font-bold"
+                        style={{ color: colors.success }}
+                      >
                         {formatCurrency(dream.current)}
                       </span>
-                      <span className="text-[#8b92a7]">
+                      <span style={{ color: colors.textSecondary }}>
                         {formatCurrency(dream.target)}
                       </span>
                     </div>
 
-                    <div className="h-3 bg-[#252b3b] rounded-[20px] overflow-hidden relative">
+                    <div
+                      className="h-3 rounded-[20px] overflow-hidden relative"
+                      style={{ backgroundColor: colors.tertiary }}
+                    >
                       <div
                         className="h-full bg-gradient-to-r from-[#27ae60] to-[#2ecc71] rounded-[20px] transition-[width] duration-1000 relative overflow-hidden"
                         style={{ width: `${Math.min(progress, 100)}%` }}
@@ -422,8 +474,11 @@ const MetasSonhos = () => {
 
                     <div
                       className={`text-xs mt-2 text-center font-bold ${
-                        isCompleted ? "text-[#27ae60]" : "text-[#8b92a7]"
+                        isCompleted ? "text-[#27ae60]" : ""
                       }`}
+                      style={{
+                        color: isCompleted ? "#27ae60" : colors.textSecondary,
+                      }}
                     >
                       {isCompleted
                         ? "🎉 100% conquistado!"
@@ -431,21 +486,36 @@ const MetasSonhos = () => {
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center pt-4 border-t border-[#2a2f3e]">
+                  <div
+                    className="flex justify-between items-center pt-4 border-t"
+                    style={{ borderColor: colors.border }}
+                  >
                     {isCompleted ? (
-                      <div className="text-[13px] text-[#27ae60] font-bold w-full text-center">
+                      <div
+                        className="text-[13px] font-bold w-full text-center"
+                        style={{ color: colors.success }}
+                      >
                         ✅ Meta Atingida!
                       </div>
                     ) : (
                       <>
-                        <div className="text-[12px] text-[#8b92a7]">
+                        <div
+                          style={{ color: colors.textSecondary }}
+                          className="text-[12px]"
+                        >
                           Falta:{" "}
-                          <strong className="text-[#f39c12] text-[12px]">
+                          <strong
+                            className="text-[12px]"
+                            style={{ color: colors.warning }}
+                          >
                             {formatCurrency(remaining)}
                           </strong>
                         </div>
                         {dream.targetDate && (
-                          <div className="text-xs text-[#8b92a7] flex items-center gap-1">
+                          <div
+                            className="text-xs flex items-center gap-1"
+                            style={{ color: colors.textSecondary }}
+                          >
                             📅{" "}
                             {new Date(dream.targetDate).toLocaleDateString(
                               "pt-BR"
@@ -469,16 +539,26 @@ const MetasSonhos = () => {
           onClick={() => setShowDreamModal(false)}
         >
           <div
-            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
+            className="rounded-2xl border p-8 w-full max-w-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2
+              className="text-2xl font-bold mb-6"
+              style={{ color: colors.textPrimary }}
+            >
               {editingDreamId ? "✏️ Editar Sonho" : "✨ Novo Sonho"}
             </h2>
 
             <form onSubmit={saveDream}>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Tipo de Sonho
                 </label>
                 <select
@@ -486,7 +566,12 @@ const MetasSonhos = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, type: e.target.value })
                   }
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 >
                   <option value="travel">🌍 Viagem</option>
                   <option value="purchase">🛍️ Compra</option>
@@ -498,7 +583,10 @@ const MetasSonhos = () => {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Nome do Sonho
                 </label>
                 <input
@@ -509,13 +597,21 @@ const MetasSonhos = () => {
                   }
                   placeholder="Ex: Viagem para Paris"
                   required
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Valor Meta (R$)
                   </label>
                   <input
@@ -527,12 +623,20 @@ const MetasSonhos = () => {
                     }
                     placeholder="10000"
                     required
-                    className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                    style={{
+                      backgroundColor: colors.tertiary,
+                      borderColor: colors.border,
+                      color: colors.textPrimary,
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                  <label
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Valor Atual (R$)
                   </label>
                   <input
@@ -543,13 +647,21 @@ const MetasSonhos = () => {
                       setFormData({ ...formData, current: e.target.value })
                     }
                     placeholder="0"
-                    className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                    className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                    style={{
+                      backgroundColor: colors.tertiary,
+                      borderColor: colors.border,
+                      color: colors.textPrimary,
+                    }}
                   />
                 </div>
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Data Alvo (opcional)
                 </label>
                 <input
@@ -558,12 +670,20 @@ const MetasSonhos = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, targetDate: e.target.value })
                   }
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Descrição (opcional)
                 </label>
                 <textarea
@@ -573,12 +693,20 @@ const MetasSonhos = () => {
                   }
                   placeholder="Descreva seu sonho..."
                   rows="3"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all resize-y"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all resize-y"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   URL da Imagem (opcional)
                 </label>
                 <input
@@ -588,14 +716,22 @@ const MetasSonhos = () => {
                     setFormData({ ...formData, imageUrl: e.target.value })
                   }
                   placeholder="https://exemplo.com/imagem.jpg"
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 
               {formData.type === "travel" && (
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                    <label
+                      className="block text-sm font-semibold mb-2"
+                      style={{ color: colors.textSecondary }}
+                    >
                       País
                     </label>
                     <select
@@ -603,7 +739,12 @@ const MetasSonhos = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, country: e.target.value })
                       }
-                      className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
                     >
                       <option value="">Selecione...</option>
                       {Object.entries(countryCoordinates).map(
@@ -617,7 +758,10 @@ const MetasSonhos = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                    <label
+                      className="block text-sm font-semibold mb-2"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Cidade
                     </label>
                     <input
@@ -627,7 +771,12 @@ const MetasSonhos = () => {
                         setFormData({ ...formData, city: e.target.value })
                       }
                       placeholder="Ex: Paris"
-                      className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                      className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
                     />
                   </div>
                 </div>
@@ -637,7 +786,8 @@ const MetasSonhos = () => {
                 <button
                   type="button"
                   onClick={() => setShowDreamModal(false)}
-                  className="flex-1 px-6 py-3 bg-[#5a6c7d] hover:bg-[#4a5c6d] text-white text-sm font-bold transition-all duration-200 rounded-xl border-none cursor-pointer"
+                  className="flex-1 px-6 py-3 text-white text-sm font-bold transition-all duration-200 rounded-xl border-none cursor-pointer"
+                  style={{ backgroundColor: "#5a6c7d" }}
                 >
                   Cancelar
                 </button>
@@ -660,8 +810,12 @@ const MetasSonhos = () => {
           onClick={() => setShowDetailModal(false)}
         >
           <div
-            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] w-full max-w-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
+            className="rounded-2xl border w-full max-w-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
           >
             <div
               className={`h-[250px] ${
@@ -695,35 +849,71 @@ const MetasSonhos = () => {
 
             <div className="p-8">
               {selectedDream.description && (
-                <p className="text-[#8b92a7] mb-6">
+                <p style={{ color: colors.textSecondary }} className="mb-6">
                   {selectedDream.description}
                 </p>
               )}
 
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
-                  <div className="text-[13px] text-[#8b92a7] mb-2 uppercase tracking-wide">
+                <div
+                  className="p-4 rounded-[10px] text-center border"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <div
+                    className="text-[13px] mb-2 uppercase tracking-wide"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Meta
                   </div>
-                  <div className="text-[16px] font-bold text-white">
+                  <div
+                    className="text-[16px] font-bold"
+                    style={{ color: colors.textPrimary }}
+                  >
                     {formatCurrency(selectedDream.target)}
                   </div>
                 </div>
 
-                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
-                  <div className="text-[13px] text-[#8b92a7] mb-2 uppercase tracking-wide">
+                <div
+                  className="p-4 rounded-[10px] text-center border"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <div
+                    className="text-[13px] mb-2 uppercase tracking-wide"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Economizado
                   </div>
-                  <div className="text-[16px] font-bold text-[#27ae60]">
+                  <div
+                    className="text-[16px] font-bold"
+                    style={{ color: colors.success }}
+                  >
                     {formatCurrency(selectedDream.current)}
                   </div>
                 </div>
 
-                <div className="bg-[#1e2738] p-4 rounded-[10px] text-center border border-[#2a2f3e]">
-                  <div className="text-[13px] text-[#8b92a7] mb-2 uppercase tracking-wide">
+                <div
+                  className="p-4 rounded-[10px] text-center border"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <div
+                    className="text-[13px] mb-2 uppercase tracking-wide"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Falta
                   </div>
-                  <div className="text-[16px] font-bold text-[#f39c12]">
+                  <div
+                    className="text-[16px] font-bold"
+                    style={{ color: colors.warning }}
+                  >
                     {formatCurrency(
                       Math.max(0, selectedDream.target - selectedDream.current)
                     )}
@@ -733,8 +923,8 @@ const MetasSonhos = () => {
 
               <div className="my-6">
                 <div className="flex justify-between mb-2">
-                  <span className="text-[#8b92a7]">Progresso</span>
-                  <span className="text-[#27ae60] font-bold">
+                  <span style={{ color: colors.textSecondary }}>Progresso</span>
+                  <span className="font-bold" style={{ color: colors.success }}>
                     {(
                       (selectedDream.current / selectedDream.target) *
                       100
@@ -742,7 +932,10 @@ const MetasSonhos = () => {
                     %
                   </span>
                 </div>
-                <div className="h-4 bg-[#252b3b] rounded-[20px] overflow-hidden">
+                <div
+                  className="h-4 rounded-[20px] overflow-hidden"
+                  style={{ backgroundColor: colors.tertiary }}
+                >
                   <div
                     className="h-full bg-gradient-to-r from-[#27ae60] to-[#2ecc71] transition-[width] duration-1000"
                     style={{
@@ -756,9 +949,14 @@ const MetasSonhos = () => {
               </div>
 
               {selectedDream.targetDate && (
-                <div className="text-center my-5 p-3 bg-[#1e2738] rounded-lg">
-                  <span className="text-[#8b92a7]">Data Alvo: </span>
-                  <strong className="text-white">
+                <div
+                  className="text-center my-5 p-3 rounded-lg"
+                  style={{ backgroundColor: colors.tertiary }}
+                >
+                  <span style={{ color: colors.textSecondary }}>
+                    Data Alvo:{" "}
+                  </span>
+                  <strong style={{ color: colors.textPrimary }}>
                     {new Date(selectedDream.targetDate).toLocaleDateString(
                       "pt-BR"
                     )}
@@ -804,16 +1002,26 @@ const MetasSonhos = () => {
           onClick={() => setShowAddAmountModal(false)}
         >
           <div
-            className="bg-[#1a1f2e] rounded-2xl border border-[#2a2f3e] p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+            className="rounded-2xl border p-8 w-full max-w-md shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
             onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">
+            <h2
+              className="text-2xl font-bold mb-6"
+              style={{ color: colors.textPrimary }}
+            >
               💰 Adicionar Valor ao Sonho
             </h2>
 
             <form onSubmit={saveAmount}>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Valor (R$)
                 </label>
                 <input
@@ -825,12 +1033,20 @@ const MetasSonhos = () => {
                   }
                   placeholder="Ex: 500.00"
                   required
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-[#8b92a7] mb-2">
+                <label
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Data
                 </label>
                 <input
@@ -840,7 +1056,12 @@ const MetasSonhos = () => {
                     setAmountData({ ...amountData, date: e.target.value })
                   }
                   required
-                  className="w-full px-4 py-3 bg-[#252b3b] border border-[#2a2f3e] rounded-lg text-white outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                 />
               </div>
 

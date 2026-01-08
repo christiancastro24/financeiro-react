@@ -1,6 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const Investimentos = () => {
+  // --- LÓGICA DE TEMA ---
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("financeapp_theme") || "dark";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
+      setTheme(savedTheme);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const colors = {
+    primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
+    secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
+    tertiary: theme === "dark" ? "#252b3b" : "#f1f3f5",
+    border: theme === "dark" ? "#2a2f3e" : "#dee2e6",
+    textPrimary: theme === "dark" ? "#ffffff" : "#1a1f2e",
+    textSecondary: theme === "dark" ? "#8b92a7" : "#6c757d",
+  };
+
   const [activeView, setActiveView] = useState("my-investments");
   const myInvestmentChartRef = useRef(null);
   const simulatorChartRef = useRef(null);
@@ -176,14 +199,16 @@ const Investimentos = () => {
               display: true,
               position: "top",
               labels: {
-                color: "#e4e6eb",
+                color: colors.textPrimary, // AJUSTE DINÂMICO
                 font: { size: 13, weight: "600" },
                 padding: 15,
                 usePointStyle: true,
               },
             },
             tooltip: {
-              backgroundColor: "rgba(44, 62, 80, 0.95)",
+              backgroundColor: colors.secondary, // AJUSTE DINÂMICO
+              titleColor: colors.textPrimary,
+              bodyColor: colors.textPrimary,
               padding: 12,
               callbacks: {
                 label: function (context) {
@@ -203,16 +228,19 @@ const Investimentos = () => {
                 callback: function (value) {
                   return "R$ " + formatCurrency(value);
                 },
-                color: "#8b92a7",
+                color: colors.textSecondary, // AJUSTE DINÂMICO
                 font: { size: 11 },
               },
               grid: {
-                color: "rgba(255, 255, 255, 0.05)",
+                color:
+                  theme === "dark"
+                    ? "rgba(255, 255, 255, 0.05)"
+                    : "rgba(0, 0, 0, 0.05)",
               },
             },
             x: {
               ticks: {
-                color: "#8b92a7",
+                color: colors.textSecondary, // AJUSTE DINÂMICO
                 font: { size: 11 },
               },
               grid: {
@@ -229,7 +257,7 @@ const Investimentos = () => {
         myInvestmentChartInstance.current.destroy();
       }
     };
-  }, [activeView, totalInvested]);
+  }, [activeView, totalInvested, theme]);
 
   useEffect(() => {
     if (activeView === "simulator" && simulatorChartRef.current) {
@@ -273,14 +301,16 @@ const Investimentos = () => {
               display: true,
               position: "top",
               labels: {
-                color: "#e4e6eb",
+                color: colors.textPrimary, // AJUSTE DINÂMICO
                 font: { size: 13, weight: "600" },
                 padding: 15,
                 usePointStyle: true,
               },
             },
             tooltip: {
-              backgroundColor: "rgba(44, 62, 80, 0.95)",
+              backgroundColor: colors.secondary, // AJUSTE DINÂMICO
+              titleColor: colors.textPrimary,
+              bodyColor: colors.textPrimary,
               padding: 12,
               callbacks: {
                 label: function (context) {
@@ -300,16 +330,19 @@ const Investimentos = () => {
                 callback: function (value) {
                   return "R$ " + formatCurrency(value);
                 },
-                color: "#8b92a7",
+                color: colors.textSecondary, // AJUSTE DINÂMICO
                 font: { size: 11 },
               },
               grid: {
-                color: "rgba(255, 255, 255, 0.05)",
+                color:
+                  theme === "dark"
+                    ? "rgba(255, 255, 255, 0.05)"
+                    : "rgba(0, 0, 0, 0.05)",
               },
             },
             x: {
               ticks: {
-                color: "#8b92a7",
+                color: colors.textSecondary, // AJUSTE DINÂMICO
                 font: { size: 11 },
                 maxRotation: 45,
                 minRotation: 45,
@@ -334,16 +367,23 @@ const Investimentos = () => {
     monthlyAmount,
     investmentPeriod,
     cdiPercentage,
+    theme,
   ]);
 
   return (
-    <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+    <div
+      className="ml-[260px] flex-1 p-10 transition-colors duration-300"
+      style={{ backgroundColor: colors.primary }}
+    >
       <div className="flex justify-between items-center mb-9">
         <div>
-          <h2 className="text-[28px] font-bold text-white mb-1.5">
+          <h2
+            className="text-[28px] font-bold mb-1.5"
+            style={{ color: colors.textPrimary }}
+          >
             Investimentos
           </h2>
-          <div className="text-[#8b92a7] text-sm">
+          <div className="text-sm" style={{ color: colors.textSecondary }}>
             Gestão de receitas e despesas
           </div>
         </div>
@@ -355,8 +395,17 @@ const Investimentos = () => {
           className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
             activeView === "my-investments"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
-              : "bg-[#1a1f2e] border border-[#2a2f3e] text-[#8b92a7] hover:border-[#5b8def]"
+              : "border hover:border-[#5b8def]"
           }`}
+          style={
+            activeView !== "my-investments"
+              ? {
+                  backgroundColor: colors.secondary,
+                  borderColor: colors.border,
+                  color: colors.textSecondary,
+                }
+              : {}
+          }
         >
           💎 Meus Investimentos
         </button>
@@ -365,8 +414,17 @@ const Investimentos = () => {
           className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
             activeView === "simulator"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
-              : "bg-[#1a1f2e] border border-[#2a2f3e] text-[#8b92a7] hover:border-[#5b8def]"
+              : "border hover:border-[#5b8def]"
           }`}
+          style={
+            activeView !== "simulator"
+              ? {
+                  backgroundColor: colors.secondary,
+                  borderColor: colors.border,
+                  color: colors.textSecondary,
+                }
+              : {}
+          }
         >
           🧮 Simulador
         </button>
@@ -375,25 +433,46 @@ const Investimentos = () => {
       {activeView === "my-investments" && (
         <div>
           <div className="grid grid-cols-3 gap-3 mb-9">
-            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+            <div
+              className="rounded-2xl border overflow-hidden"
+              style={{
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
+              }}
+            >
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px]">💰</div>
-                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
+                  <div
+                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Total Investido
                   </div>
                 </div>
-                <div className="text-[32px] font-bold text-white tracking-tight">
+                <div
+                  className="text-[32px] font-bold tracking-tight"
+                  style={{ color: colors.textPrimary }}
+                >
                   R$ {formatCurrency(totalInvested)}
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+            <div
+              className="rounded-2xl border overflow-hidden"
+              style={{
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
+              }}
+            >
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px]">📊</div>
-                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
+                  <div
+                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Projeção 12 meses
                   </div>
                 </div>
@@ -406,11 +485,20 @@ const Investimentos = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#2a2f3e] overflow-hidden bg-gradient-to-br from-[#1a1f2e] to-[#252b3b]">
+            <div
+              className="rounded-2xl border overflow-hidden"
+              style={{
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
+              }}
+            >
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="text-[35px] pl-4">📈</div>
-                  <div className="text-[#8b92a7] text-[13px] uppercase font-bold tracking-wide pl-1">
+                  <div
+                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    style={{ color: colors.textSecondary }}
+                  >
                     Rentabilidade (CDI)
                   </div>
                 </div>
@@ -421,8 +509,17 @@ const Investimentos = () => {
             </div>
           </div>
 
-          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
-            <h3 className="text-lg font-bold text-white mb-5">
+          <div
+            className="rounded-xl border p-7 mb-8"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-5"
+              style={{ color: colors.textPrimary }}
+            >
               📈 Projeção de Crescimento - Meus Investimentos
             </h3>
             <canvas
@@ -431,27 +528,54 @@ const Investimentos = () => {
             ></canvas>
           </div>
 
-          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
-            <h3 className="text-lg font-bold text-white mb-5">
+          <div
+            className="rounded-xl border p-7 mb-8"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-5"
+              style={{ color: colors.textPrimary }}
+            >
               📊 Tabela de Projeção Mensal
             </h3>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#2a2f3e]">
-                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
+                  <tr
+                    className="border-b"
+                    style={{ borderColor: colors.border }}
+                  >
+                    <th
+                      className="text-left text-xs uppercase p-3 font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Mês
                     </th>
-                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
+                    <th
+                      className="text-left text-xs uppercase p-3 font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Juros
                     </th>
-                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
+                    <th
+                      className="text-left text-xs uppercase p-3 font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Total Investido
                     </th>
-                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
+                    <th
+                      className="text-left text-xs uppercase p-3 font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Total Juros
                     </th>
-                    <th className="text-left text-[#8b92a7] text-xs uppercase p-3 font-bold">
+                    <th
+                      className="text-left text-xs uppercase p-3 font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
                       Total Acumulado
                     </th>
                   </tr>
@@ -461,15 +585,25 @@ const Investimentos = () => {
                     <tr>
                       <td
                         colSpan="5"
-                        className="text-center text-[#8b92a7] py-10"
+                        className="text-center py-10"
+                        style={{ color: colors.textSecondary }}
                       >
                         Nenhum investimento registrado ainda.
                       </td>
                     </tr>
                   ) : (
                     projectionTable.map((row) => (
-                      <tr key={row.month} className="border-b border-[#2a2f3e]">
-                        <td className="text-white p-3">{row.month}</td>
+                      <tr
+                        key={row.month}
+                        className="border-b"
+                        style={{ borderColor: colors.border }}
+                      >
+                        <td
+                          className="p-3"
+                          style={{ color: colors.textPrimary }}
+                        >
+                          {row.month}
+                        </td>
                         <td className="text-[#27ae60] p-3">
                           R$ {formatCurrency(row.interest)}
                         </td>
@@ -490,18 +624,27 @@ const Investimentos = () => {
             </div>
           </div>
 
-          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7">
-            <h3 className="text-lg font-bold text-white mb-5">
+          <div
+            className="rounded-xl border p-7"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-5"
+              style={{ color: colors.textPrimary }}
+            >
               💼 Histórico de Investimentos
             </h3>
             {investments.length === 0 ? (
-              <div className="text-center bg-[#252b3b] rounded-lg py-15 px-5">
+              <div
+                className="text-center rounded-lg py-15 px-5"
+                style={{ backgroundColor: colors.tertiary }}
+              >
                 <div className="text-5xl mb-4">💎</div>
-                <p className="text-[#8b92a7]">
+                <p style={{ color: colors.textSecondary }}>
                   Nenhum investimento registrado ainda.
-                  <br />
-                  Cadastre investimentos na categoria "Investimentos" no
-                  Dashboard.
                 </p>
               </div>
             ) : (
@@ -511,11 +654,23 @@ const Investimentos = () => {
                   .map((inv) => (
                     <div
                       key={inv.id}
-                      className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] hover:border-[#5b8def] transition-all p-5"
+                      className="rounded-lg border transition-all p-5"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                      }}
                     >
                       <div className="flex justify-between items-start mb-3">
-                        <div className="text-white font-bold">{inv.title}</div>
-                        <div className="text-[#8b92a7] text-xs">
+                        <div
+                          className="font-bold"
+                          style={{ color: colors.textPrimary }}
+                        >
+                          {inv.title}
+                        </div>
+                        <div
+                          className="text-xs"
+                          style={{ color: colors.textSecondary }}
+                        >
                           {new Date(inv.date).toLocaleDateString("pt-BR")}
                         </div>
                       </div>
@@ -535,13 +690,25 @@ const Investimentos = () => {
 
       {activeView === "simulator" && (
         <div>
-          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 mb-8">
-            <h3 className="text-lg font-bold text-white mb-5">
+          <div
+            className="rounded-xl border p-7 mb-8"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-5"
+              style={{ color: colors.textPrimary }}
+            >
               💡 Simulador de Investimentos
             </h3>
             <div className="grid grid-cols-4 gap-4 mb-6">
               <div>
-                <label className="text-[#8b92a7] text-[13px] block mb-2">
+                <label
+                  className="text-[13px] block mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Aporte Inicial (R$)
                 </label>
                 <input
@@ -550,13 +717,21 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInitialAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                   step="100"
                   min="0"
                 />
               </div>
               <div>
-                <label className="text-[#8b92a7] text-[13px] block mb-2">
+                <label
+                  className="text-[13px] block mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Aporte Mensal (R$)
                 </label>
                 <input
@@ -565,13 +740,21 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setMonthlyAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                   step="50"
                   min="0"
                 />
               </div>
               <div>
-                <label className="text-[#8b92a7] text-[13px] block mb-2">
+                <label
+                  className="text-[13px] block mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   Período (meses)
                 </label>
                 <input
@@ -580,13 +763,21 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInvestmentPeriod(parseInt(e.target.value) || 12)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                   min="1"
                   max="360"
                 />
               </div>
               <div>
-                <label className="text-[#8b92a7] text-[13px] block mb-2">
+                <label
+                  className="text-[13px] block mb-2"
+                  style={{ color: colors.textSecondary }}
+                >
                   % do CDI
                 </label>
                 <input
@@ -595,7 +786,12 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setCdiPercentage(parseInt(e.target.value) || 100)
                   }
-                  className="w-full bg-[#252b3b] border border-[#2a2f3e] text-white rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  style={{
+                    backgroundColor: colors.tertiary,
+                    borderColor: colors.border,
+                    color: colors.textPrimary,
+                  }}
                   step="5"
                   min="0"
                   max="150"
@@ -604,24 +800,54 @@ const Investimentos = () => {
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(91,141,239,0.15)] to-[rgba(91,141,239,0.05)] border border-[rgba(91,141,239,0.2)]">
-                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
+              <div
+                className="text-center rounded-2xl overflow-hidden p-6 border"
+                style={{
+                  backgroundColor: "rgba(91,141,239,0.05)",
+                  borderColor: "rgba(91,141,239,0.2)",
+                }}
+              >
+                <div
+                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  style={{ color: colors.textSecondary }}
+                >
                   Total Investido:
                 </div>
-                <div className="text-white text-[28px] font-bold tracking-tight">
+                <div
+                  className="text-[28px] font-bold tracking-tight"
+                  style={{ color: colors.textPrimary }}
+                >
                   R$ {formatCurrency(simTotalInvested)}
                 </div>
               </div>
-              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(39,174,96,0.15)] to-[rgba(39,174,96,0.05)] border border-[rgba(39,174,96,0.2)]">
-                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
+              <div
+                className="text-center rounded-2xl overflow-hidden p-6 border"
+                style={{
+                  backgroundColor: "rgba(39,174,96,0.05)",
+                  borderColor: "rgba(39,174,96,0.2)",
+                }}
+              >
+                <div
+                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  style={{ color: colors.textSecondary }}
+                >
                   Rendimento:
                 </div>
                 <div className="text-[#27ae60] text-[28px] font-bold tracking-tight">
                   R$ {formatCurrency(simEarnings)}
                 </div>
               </div>
-              <div className="text-center rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-[rgba(155,89,182,0.2)] to-[rgba(155,89,182,0.08)] border border-[rgba(155,89,182,0.3)]">
-                <div className="text-[#8b92a7] text-[11px] uppercase font-bold mb-3 tracking-wide">
+              <div
+                className="text-center rounded-2xl overflow-hidden p-6 border"
+                style={{
+                  backgroundColor: "rgba(155,89,182,0.08)",
+                  borderColor: "rgba(155,89,182,0.3)",
+                }}
+              >
+                <div
+                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  style={{ color: colors.textSecondary }}
+                >
                   Montante Final:
                 </div>
                 <div className="text-[#9b59b6] text-[28px] font-bold tracking-tight">
@@ -631,8 +857,17 @@ const Investimentos = () => {
             </div>
           </div>
 
-          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7">
-            <h3 className="text-lg font-bold text-white mb-5">
+          <div
+            className="rounded-xl border p-7"
+            style={{
+              backgroundColor: colors.secondary,
+              borderColor: colors.border,
+            }}
+          >
+            <h3
+              className="text-lg font-bold mb-5"
+              style={{ color: colors.textPrimary }}
+            >
               📈 Projeção de Crescimento - Simulador
             </h3>
             <canvas ref={simulatorChartRef} className="max-h-[400px]"></canvas>

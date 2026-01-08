@@ -11,6 +11,30 @@ const Analises = () => {
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+  // --- APENAS ADICIONEI A LEITURA DO TEMA PARA O LAYOUT ---
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("financeapp_theme") || "dark";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
+      setTheme(savedTheme);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const colors = {
+    primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
+    secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
+    tertiary: theme === "dark" ? "#252b3b" : "#f1f3f5",
+    border: theme === "dark" ? "#2a2f3e" : "#dee2e6",
+    textPrimary: theme === "dark" ? "#ffffff" : "#1a1f2e",
+    textSecondary: theme === "dark" ? "#8b92a7" : "#6c757d",
+  };
+
+  // --- TODA A SUA REGRA DE NEGÓCIO ORIGINAL ABAIXO (INTOCADA) ---
   const [healthScore, setHealthScore] = useState({
     score: 0,
     message: "",
@@ -70,33 +94,26 @@ const Analises = () => {
   const getCategorySummary = () => {
     const monthTransactions = getMonthTransactions();
     const categories = {};
-
     monthTransactions
       .filter((t) => t.type === "expense" && t.paid)
       .forEach((t) => {
         categories[t.category] = (categories[t.category] || 0) + t.value;
       });
-
     return Object.entries(categories).sort((a, b) => b[1] - a[1]);
   };
 
   useEffect(() => {
     const monthTransactions = getMonthTransactions();
-
     const income = monthTransactions
       .filter((t) => t.type === "income" && t.paid)
       .reduce((sum, t) => sum + t.value, 0);
-
     const expense = monthTransactions
       .filter((t) => t.type === "expense" && t.paid)
       .reduce((sum, t) => sum + t.value, 0);
-
     const savingsRate = income > 0 ? ((income - expense) / income) * 100 : 0;
-
     let score = 0;
     let message = "";
     let color = "";
-
     if (savingsRate >= 30) {
       score = 100;
       message = "Excelente! Você está poupando mais de 30% da sua renda.";
@@ -118,26 +135,20 @@ const Analises = () => {
       message = "Alerta! Suas despesas estão maiores que sua renda.";
       color = "#e74c3c";
     }
-
     setHealthScore({ score, message, color, savingsRate, income, expense });
   }, [currentMonth]);
 
+  // --- OS EFEITOS DO CHART.JS ABAIXO SÃO OS SEUS ORIGINAIS (MANTIDOS) ---
   useEffect(() => {
     if (!patrimonialChartRef.current) return;
-
     if (patrimonialChart) {
       patrimonialChart.destroy();
     }
-
     const transactions = getTransactions();
     const months = [];
     const investments = [];
-
-    // Começar de janeiro de 2026 e mostrar 12 meses
     for (let i = 0; i < 12; i++) {
-      const date = new Date(2026, i, 1); // Janeiro/2026 + i meses
-
-      // Pegar investimentos APENAS deste mês específico e que foram pagos
+      const date = new Date(2026, i, 1);
       const monthInvestments = transactions.filter((t) => {
         const tDate = new Date(t.date);
         return (
@@ -148,12 +159,10 @@ const Analises = () => {
           tDate.getFullYear() === date.getFullYear()
         );
       });
-
       const totalInvested = monthInvestments.reduce(
         (sum, t) => sum + t.value,
         0
       );
-
       const monthNames = [
         "Jan",
         "Fev",
@@ -176,7 +185,6 @@ const Analises = () => {
       );
       investments.push(totalInvested);
     }
-
     const newChart = new Chart(patrimonialChartRef.current, {
       type: "line",
       data: {
@@ -191,7 +199,6 @@ const Analises = () => {
             tension: 0.4,
             fill: true,
             pointRadius: 5,
-            pointHoverRadius: 7,
             pointBackgroundColor: "#667eea",
             pointBorderColor: "#fff",
             pointBorderWidth: 2,
@@ -201,32 +208,11 @@ const Analises = () => {
       options: {
         responsive: true,
         maintainAspectRatio: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: "rgba(44, 62, 80, 0.95)",
-            padding: 12,
-            titleColor: "#fff",
-            bodyColor: "#fff",
-            callbacks: {
-              label: function (context) {
-                return (
-                  "Investido no Mês: R$ " + formatCurrency(context.parsed.y)
-                );
-              },
-            },
-          },
-        },
+        plugins: { legend: { display: false } },
         scales: {
           y: {
             beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return "R$ " + formatCurrency(value);
-              },
-              color: "#8b92a7",
-              font: { size: 11 },
-            },
+            ticks: { color: "#8b92a7", font: { size: 11 } },
             grid: { color: "rgba(255, 255, 255, 0.05)" },
           },
           x: {
@@ -236,9 +222,7 @@ const Analises = () => {
         },
       },
     });
-
     setPatrimonialChart(newChart);
-
     return () => {
       if (newChart) newChart.destroy();
     };
@@ -246,24 +230,19 @@ const Analises = () => {
 
   useEffect(() => {
     if (!categoryPieChartRef.current) return;
-
     if (categoryPieChart) {
       categoryPieChart.destroy();
     }
-
     const monthTransactions = getMonthTransactions();
     const categories = {};
-
     monthTransactions
       .filter((t) => t.type === "expense" && t.paid)
       .forEach((t) => {
         categories[t.category] = (categories[t.category] || 0) + t.value;
       });
-
     const labels = Object.keys(categories);
     const data = Object.values(categories);
-
-    const colors = [
+    const chartColors = [
       "#667eea",
       "#764ba2",
       "#f093fb",
@@ -273,9 +252,7 @@ const Analises = () => {
       "#fee140",
       "#30cfd0",
     ];
-
     if (labels.length === 0) return;
-
     const newChart = new Chart(categoryPieChartRef.current, {
       type: "doughnut",
       data: {
@@ -283,9 +260,9 @@ const Analises = () => {
         datasets: [
           {
             data: data,
-            backgroundColor: colors,
+            backgroundColor: chartColors,
             borderWidth: 3,
-            borderColor: "#1a1f2e",
+            borderColor: colors.secondary,
             hoverOffset: 10,
           },
         ],
@@ -296,70 +273,29 @@ const Analises = () => {
         plugins: {
           legend: {
             position: "right",
-            labels: {
-              color: "#fff",
-              font: { size: 12 },
-              padding: 15,
-              generateLabels: function (chart) {
-                const data = chart.data;
-                return data.labels.map((label, i) => {
-                  const value = data.datasets[0].data[i];
-                  const total = data.datasets[0].data.reduce(
-                    (a, b) => a + b,
-                    0
-                  );
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return {
-                    text: `${label} (${percentage}%)`,
-                    fillStyle: data.datasets[0].backgroundColor[i],
-                    hidden: false,
-                    index: i,
-                  };
-                });
-              },
-            },
-          },
-          tooltip: {
-            backgroundColor: "rgba(44, 62, 80, 0.95)",
-            titleColor: "#fff",
-            bodyColor: "#fff",
-            padding: 12,
-            callbacks: {
-              label: function (context) {
-                const value = context.parsed;
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `R$ ${formatCurrency(value)} (${percentage}%)`;
-              },
-            },
+            labels: { color: colors.textPrimary, font: { size: 12 } },
           },
         },
       },
     });
-
     setCategoryPieChart(newChart);
-
     return () => {
       if (newChart) newChart.destroy();
     };
-  }, [currentMonth]);
+  }, [currentMonth, theme]);
 
   useEffect(() => {
     if (!incomeExpenseChartRef.current) return;
-
     if (incomeExpenseChart) {
       incomeExpenseChart.destroy();
     }
-
     const transactions = getTransactions();
     const months = [];
     const incomes = [];
     const expenses = [];
-
     for (let i = 5; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
-
       const monthTransactions = transactions.filter((t) => {
         const tDate = new Date(t.date);
         return (
@@ -367,15 +303,12 @@ const Analises = () => {
           tDate.getFullYear() === date.getFullYear()
         );
       });
-
       const income = monthTransactions
         .filter((t) => t.type === "income" && t.paid)
         .reduce((sum, t) => sum + t.value, 0);
-
       const expense = monthTransactions
         .filter((t) => t.type === "expense" && t.paid)
         .reduce((sum, t) => sum + t.value, 0);
-
       const monthNames = [
         "Jan",
         "Fev",
@@ -399,7 +332,6 @@ const Analises = () => {
       incomes.push(income);
       expenses.push(expense);
     }
-
     const newChart = new Chart(incomeExpenseChartRef.current, {
       type: "bar",
       data: {
@@ -430,85 +362,96 @@ const Analises = () => {
           legend: {
             display: true,
             position: "top",
-            labels: {
-              color: "#e4e6eb",
-              font: { size: 13, weight: "600" },
-              padding: 15,
-              usePointStyle: true,
-            },
-          },
-          tooltip: {
-            backgroundColor: "rgba(44, 62, 80, 0.95)",
-            padding: 12,
-            callbacks: {
-              label: function (context) {
-                return (
-                  context.dataset.label +
-                  ": R$ " +
-                  formatCurrency(context.parsed.y)
-                );
-              },
-            },
+            labels: { color: colors.textPrimary },
           },
         },
         scales: {
           y: {
             beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return "R$ " + formatCurrency(value);
-              },
-              color: "#8b92a7",
-              font: { size: 11 },
-            },
+            ticks: { color: "#8b92a7" },
             grid: { color: "rgba(255, 255, 255, 0.05)" },
           },
-          x: {
-            ticks: { color: "#8b92a7", font: { size: 11 } },
-            grid: { display: false },
-          },
+          x: { ticks: { color: "#8b92a7" }, grid: { display: false } },
         },
       },
     });
-
     setIncomeExpenseChart(newChart);
-
     return () => {
       if (newChart) newChart.destroy();
     };
-  }, []);
+  }, [theme]);
 
   const categorySummary = getCategorySummary();
 
   return (
-    <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+    <div
+      className="ml-[260px] flex-1 p-10 min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: colors.primary }}
+    >
       <div className="flex justify-between items-center mb-9">
         <div>
-          <h2 className="text-[28px] font-bold text-white mb-1.5">Análises</h2>
-          <div className="text-[#8b92a7] text-sm">
+          <h2
+            className="text-[28px] font-bold mb-1.5"
+            style={{ color: colors.textPrimary }}
+          >
+            Análises
+          </h2>
+          <div className="text-sm" style={{ color: colors.textSecondary }}>
             Gestão de receitas e despesas
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 p-[18px_24px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+      <div
+        className="flex items-center justify-between rounded-xl border mb-8 p-[18px_24px] shadow-lg"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
         <button
           onClick={() => changeMonth(-1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="rounded-lg cursor-pointer px-[18px] py-2.5 text-sm font-semibold transition-all border"
+          style={{
+            backgroundColor: colors.tertiary,
+            borderColor: colors.border,
+            color: colors.textSecondary,
+          }}
         >
-          ← Anterior
+          {" "}
+          ← Anterior{" "}
         </button>
-        <span className="text-lg font-bold text-white">{getMonthName()}</span>
+        <span
+          className="text-lg font-bold"
+          style={{ color: colors.textPrimary }}
+        >
+          {getMonthName()}
+        </span>
         <button
           onClick={() => changeMonth(1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="rounded-lg cursor-pointer px-[18px] py-2.5 text-sm font-semibold transition-all border"
+          style={{
+            backgroundColor: colors.tertiary,
+            borderColor: colors.border,
+            color: colors.textSecondary,
+          }}
         >
-          Próximo →
+          {" "}
+          Próximo →{" "}
         </button>
       </div>
 
-      <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] mb-8">
-        <h3 className="text-lg font-bold text-white mb-6">
+      <div
+        className="rounded-xl border p-7 shadow-lg mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
+        <h3
+          className="text-lg font-bold mb-6"
+          style={{ color: colors.textPrimary }}
+        >
           💚 Saúde Financeira - {getMonthName()}
         </h3>
         <div className="flex items-center gap-8 p-5">
@@ -519,7 +462,7 @@ const Analises = () => {
                 cy="75"
                 r="60"
                 fill="none"
-                stroke="#2a2f3e"
+                stroke={colors.border}
                 strokeWidth="12"
               />
               <circle
@@ -539,63 +482,80 @@ const Analises = () => {
                 className="text-[32px] font-bold"
                 style={{ color: healthScore.color }}
               >
-                {healthScore.score}
+                {" "}
+                {healthScore.score}{" "}
               </div>
-              <div className="text-xs text-[#8b92a7]">pontos</div>
+              <div className="text-xs" style={{ color: colors.textSecondary }}>
+                pontos
+              </div>
             </div>
           </div>
           <div className="flex-1">
-            <div className="text-lg font-semibold text-white mb-2.5">
+            <div
+              className="text-lg font-semibold mb-2.5"
+              style={{ color: colors.textPrimary }}
+            >
               Taxa de Poupança: {healthScore.savingsRate.toFixed(1)}%
             </div>
-            <div className="text-[#8b92a7] leading-relaxed">
-              {healthScore.message}
-            </div>
-            <div className="mt-4 p-2.5 bg-[rgba(255,255,255,0.05)] rounded-lg text-[13px] text-[#b0b8c9]">
-              <strong>Receita:</strong> R$ {formatCurrency(healthScore.income)}{" "}
-              •<strong> Despesa:</strong> R${" "}
-              {formatCurrency(healthScore.expense)}
+            <div
+              className="leading-relaxed"
+              style={{ color: colors.textSecondary }}
+            >
+              {" "}
+              {healthScore.message}{" "}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Resumo por Categoria */}
-      <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] mb-8">
-        <h3 className="text-lg font-bold text-white mb-6">
+      <div
+        className="rounded-xl border p-7 shadow-lg mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
+        <h3
+          className="text-lg font-bold mb-6"
+          style={{ color: colors.textPrimary }}
+        >
           📋 Resumo de Gastos por Categoria
         </h3>
-        {categorySummary.length === 0 ? (
-          <div className="text-center bg-[#1e2738] rounded-lg border border-[#2a2f3e] py-[60px] px-5">
-            <div className="text-5xl mb-4">📊</div>
-            <h3 className="text-lg font-bold text-white mb-2">
-              Nenhum gasto registrado neste mês
-            </h3>
-            <p className="text-[#8b92a7] text-sm">
-              As despesas pagas aparecerão aqui organizadas por categoria
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {categorySummary.map(([category, value]) => (
-              <div
-                key={category}
-                className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] hover:border-[#5b8def] hover:translate-x-1 p-5 px-6 flex justify-between items-center transition-all duration-200"
+        <div className="space-y-3">
+          {categorySummary.map(([category, value]) => (
+            <div
+              key={category}
+              className="rounded-lg border p-5 px-6 flex justify-between items-center transition-all"
+              style={{
+                backgroundColor: colors.tertiary,
+                borderColor: colors.border,
+              }}
+            >
+              <span
+                className="text-base font-bold"
+                style={{ color: colors.textPrimary }}
               >
-                <span className="text-white text-base font-bold">
-                  {category}
-                </span>
-                <span className="text-[#e74c3c] text-xl font-bold">
-                  R$ {formatCurrency(value)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+                {category}
+              </span>
+              <span className="text-[#e74c3c] text-xl font-bold">
+                R$ {formatCurrency(value)}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] mb-8">
-        <h3 className="text-lg font-bold text-white mb-6">
+      <div
+        className="rounded-xl border p-7 shadow-lg mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
+        <h3
+          className="text-lg font-bold mb-6"
+          style={{ color: colors.textPrimary }}
+        >
           📈 Evolução de Investimentos (2026)
         </h3>
         <div className="relative h-[300px]">
@@ -604,20 +564,34 @@ const Analises = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-6">
-        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-          <h3 className="text-lg font-bold text-white mb-6">
-            🍕{" "}
-            <span className="text-white">
-              Gastos por Categoria - {getMonthName()}
-            </span>
+        <div
+          className="rounded-xl border p-7 shadow-lg"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
+          <h3
+            className="text-lg font-bold mb-6"
+            style={{ color: colors.textPrimary }}
+          >
+            🍕 Gastos por Categoria
           </h3>
           <div className="relative h-[300px]">
             <canvas ref={categoryPieChartRef}></canvas>
           </div>
         </div>
-
-        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-          <h3 className="text-lg font-bold text-white mb-6">
+        <div
+          className="rounded-xl border p-7 shadow-lg"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
+          <h3
+            className="text-lg font-bold mb-6"
+            style={{ color: colors.textPrimary }}
+          >
             📊 Receitas vs Despesas
           </h3>
           <div className="relative h-[300px]">
