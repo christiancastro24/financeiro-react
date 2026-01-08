@@ -24,13 +24,13 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "analises", label: "Análises", icon: "📈" },
-    { id: "orcamento", label: "Orçamento Diário", icon: "📅" },
-    { id: "cartoes", label: "Cartões", icon: "💳" },
-    { id: "investimentos", label: "Investimentos", icon: "💎" },
-    { id: "aposentadoria", label: "Aposentadoria", icon: "🎯" },
-    { id: "metas", label: "Metas & Sonhos", icon: "✨" },
-    { id: "configuracoes", label: "Configurações", icon: "⚙️" },
+    { id: "analysis", label: "Análises", icon: "📈" },
+    { id: "budget", label: "Orçamento Diário", icon: "📅" },
+    { id: "cards", label: "Cartões", icon: "💳" },
+    { id: "investments", label: "Investimentos", icon: "💎" },
+    { id: "retirement", label: "Aposentadoria", icon: "🎯" },
+    { id: "goals", label: "Metas & Sonhos", icon: "✨" },
+    { id: "settings", label: "Configurações", icon: "⚙️" },
   ];
 
   return (
@@ -42,7 +42,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
           </div>
           <span className="text-[22px] font-bold text-white">FinanceApp</span>
         </div>
-        <p className="text-[#8b92a7] text-[13px] m-0">Controle Financeiro</p>
+        <p className="text-[#8b92a7] text-[13px] m-0">Financial Control</p>
       </div>
 
       <div className="flex-1 p-0 overflow-y-auto">
@@ -68,7 +68,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
           className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-[#252b3b] border border-[#2a2f3e] rounded-[10px] text-[#ef4444] font-semibold text-[15px] cursor-pointer transition-all hover:bg-[#2a2f3e] hover:border-[#ef4444]"
         >
           <LogOut size={18} />
-          Sair
+          Logout
         </button>
       </div>
     </div>

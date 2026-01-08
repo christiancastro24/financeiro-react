@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import Analises from "./pages/Analises";
-import OrcamentoDiario from "./pages/OrcamentoDiario";
-import Investimentos from "./pages/Investimentos";
-import Aposentadoria from "./pages/Aposentadoria";
-import MetasSonhos from "./pages/MetasSonhos";
-import Configuracoes from "./pages/Configuracoes";
+import Analysis from "./pages/Analysis";
+import DailyBudget from "./pages/DailyBudget";
+import Investments from "./pages/Investments";
+import Retirement from "./pages/Retirement";
+import Goals from "./pages/Goals";
+import Settings from "./pages/Settings";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
-import AIAssistant from "./pages/AssistenteFinanceiro";
-import Cartoes from "./pages/Cartoes";
+import FinancialAssistant from "./pages/FinancialAssistant";
+import Cards from "./pages/Cards";
 
 // --- FUNÇÕES AUXILIARES (Sem 'export' = HMR Seguro) ---
 function getCookie(name) {
@@ -38,7 +38,9 @@ function App() {
     return authCookie === "true";
   });
 
-  const [currentRoute, setCurrentRoute] = useState(() => window.location.pathname);
+  const [currentRoute, setCurrentRoute] = useState(
+    () => window.location.pathname
+  );
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const navigate = useCallback((path) => {
@@ -78,7 +80,8 @@ function App() {
 
   const renderPage = () => {
     if (currentRoute === "/") return <LandingPage onNavigate={navigate} />;
-    if (currentRoute === "/login") return <LoginPage onLogin={handleLogin} onNavigate={navigate} />;
+    if (currentRoute === "/login")
+      return <LoginPage onLogin={handleLogin} onNavigate={navigate} />;
 
     if (currentRoute === "/dashboard") {
       if (!isAuthenticated) {
@@ -88,24 +91,37 @@ function App() {
 
       const pageContent = () => {
         switch (activeTab) {
-          case "dashboard": return <Dashboard />;
-          case "analises": return <Analises />;
-          case "orcamento": return <OrcamentoDiario />;
-          case "investimentos": return <Investimentos />;
-          case "aposentadoria": return <Aposentadoria />;
-          case "metas": return <MetasSonhos />;
-          case "cartoes": return <Cartoes />;
-          case "configuracoes": return <Configuracoes />;
-          default: return <Dashboard />;
+          case "dashboard":
+            return <Dashboard />;
+          case "analysis":
+            return <Analysis />;
+          case "budget":
+            return <DailyBudget />;
+          case "investments":
+            return <Investments />;
+          case "retirement":
+            return <Retirement />;
+          case "goals":
+            return <Goals />;
+          case "cards":
+            return <Cards />;
+          case "settings":
+            return <Settings />;
+          default:
+            return <Dashboard />;
         }
       };
 
       return (
         <>
-          <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
+          <Layout
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onLogout={handleLogout}
+          >
             {pageContent()}
           </Layout>
-          <AIAssistant />
+          <FinancialAssistant />
         </>
       );
     }
@@ -114,12 +130,7 @@ function App() {
     return <LandingPage onNavigate={navigate} />;
   };
 
-  // Ajustado o retorno para não ficar vazio
-  return (
-    <div className="app-container">
-      {renderPage()}
-    </div>
-  );
+  return <div className="app-container">{renderPage()}</div>;
 }
 
 export default App;
