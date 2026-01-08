@@ -25,8 +25,8 @@ export default function AIAssistant() {
       localStorage.getItem("financialData") || "[]"
     );
     const dreams = JSON.parse(localStorage.getItem("dreams") || "[]");
-    const jornada100k = JSON.parse(
-      localStorage.getItem("jornada100k_data") || "null"
+    const aposentadoria = JSON.parse(
+      localStorage.getItem("aposentadoria_data") || "null"
     );
 
     const now = new Date();
@@ -81,6 +81,21 @@ export default function AIAssistant() {
       )
       .reduce((sum, t) => sum + t.value, 0);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const twoDaysFromNow = new Date(today);
+    twoDaysFromNow.setDate(today.getDate() + 2);
+
+    const upcomingBills = transactions.filter((t) => {
+      if (t.paid || t.type !== "expense") return false;
+      const dueDate = new Date(t.date);
+      dueDate.setHours(0, 0, 0, 0);
+      const timeDiff = dueDate.getTime() - today.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      return daysDiff >= 0 && daysDiff <= 2;
+    });
+
     return {
       income,
       expenses,
@@ -90,13 +105,21 @@ export default function AIAssistant() {
       categories: sortedCategories,
       totalInvested,
       dreams,
-      jornada100k,
+      aposentadoria,
+      upcomingBills,
     };
   };
 
   const generateInsights = () => {
     const insights = [];
     const data = analyzeFinancialData();
+
+    if (data.upcomingBills.length > 0) {
+      insights.push({
+        title: "⚠️ Contas próximas do vencimento",
+        message: `${data.upcomingBills.length} conta(s) vence(m) nos próximos 2 dias!`,
+      });
+    }
 
     if (data.savingsRate < 10) {
       insights.push({
@@ -127,28 +150,14 @@ export default function AIAssistant() {
       }
     }
 
-    if (data.lastMonthExpenses > 0) {
-      const diff = data.expenses - data.lastMonthExpenses;
-      const percentChange = (diff / data.lastMonthExpenses) * 100;
-
-      if (percentChange > 15) {
-        insights.push({
-          title: "📈 Gastos aumentaram",
-          message: `Seus gastos subiram ${percentChange.toFixed(
-            0
-          )}% (+R$ ${diff.toFixed(2)}).`,
-        });
-      } else if (percentChange < -10) {
-        insights.push({
-          title: "📉 Economia em alta!",
-          message: `Economizou ${Math.abs(percentChange).toFixed(
-            0
-          )}% (-R$ ${Math.abs(diff).toFixed(2)})!`,
-        });
-      }
-    }
-
     return insights;
+  };
+
+  const formatCurrency = (value) => {
+    return value.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   const showWelcomeMessage = () => {
@@ -168,6 +177,135 @@ export default function AIAssistant() {
   const processQuestion = (question) => {
     const q = question.toLowerCase().trim();
     const data = analyzeFinancialData();
+
+    if (
+      q.includes("investido") ||
+      q.includes("investimento total") ||
+      q.includes("quanto tenho investido")
+    ) {
+      const investimentosPorMes = {};
+      const transactions = JSON.parse(
+        localStorage.getItem("financialData") || "[]"
+      );
+
+      transactions
+        .filter(
+          (t) =>
+            t.type === "expense" && t.category === "Investimentos" && t.paid
+        )
+        .forEach((t) => {
+          const date = new Date(t.date);
+          const mesAno = `${date.getMonth() + 1}/${date.getFullYear()}`;
+          investimentosPorMes[mesAno] =
+            (investimentosPorMes[mesAno] || 0) + t.value;
+        });
+
+      const top5Meses = Object.entries(investimentosPorMes)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      return `💎 Análise de Investimentos:\n\n• Total investido: R$ ${formatCurrency(
+        data.totalInvested
+      )}\n• Saldo disponível: R$ ${formatCurrency(
+        data.balance
+      )}\n\n📊 Top 5 meses com mais investimentos:\n${
+        top5Meses.length > 0
+          ? top5Meses
+              .map(
+                ([mes, valor], idx) =>
+                  `${idx + 1}. ${mes}: R$ ${formatCurrency(valor)}`
+              )
+              .join("\n")
+          : "Nenhum investimento registrado ainda."
+      }\n\n💡 ${
+        data.balance > 500
+          ? "Continue investindo regularmente!"
+          : "Tente poupar mais para aumentar seus investimentos."
+      }`;
+    }
+
+    if (
+      q.includes("aposentadoria") ||
+      q.includes("aposentar") ||
+      q.includes("previdência")
+    ) {
+      if (!data.aposentadoria) {
+        return `🎯 Você ainda não configurou seu plano de aposentadoria!\n\nVá na aba "Aposentadoria" para:\n• Definir sua meta de aposentadoria\n• Calcular quanto precisa investir\n• Acompanhar seu progresso`;
+      }
+
+      const progress =
+        (data.aposentadoria.valorAtual / data.aposentadoria.metaTotal) * 100;
+      const faltam =
+        data.aposentadoria.metaTotal - data.aposentadoria.valorAtual;
+      const anosRestantes = data.aposentadoria.anosParaAposentar || 0;
+
+      return `🎯 Seu Plano de Aposentadoria:\n\n• Meta total: R$ ${formatCurrency(
+        data.aposentadoria.metaTotal
+      )}\n• Já acumulado: R$ ${formatCurrency(
+        data.aposentadoria.valorAtual
+      )}\n• Faltam: R$ ${formatCurrency(
+        faltam
+      )}\n• Progresso: ${progress.toFixed(
+        1
+      )}%\n• Anos restantes: ${anosRestantes}\n\n${
+        progress >= 50
+          ? "✅ Você está no caminho certo!"
+          : progress >= 25
+          ? "⚡ Continue investindo consistentemente!"
+          : "⚠️ Considere aumentar seus aportes mensais."
+      }`;
+    }
+
+    if (
+      q.includes("vencer") ||
+      q.includes("pendente") ||
+      q.includes("conta") ||
+      q.includes("pagar")
+    ) {
+      if (data.upcomingBills.length === 0) {
+        return `✅ Parabéns! Você não tem contas pendentes para os próximos 2 dias.\n\n💡 Mantenha suas finanças em dia!`;
+      }
+
+      const billsByDay = {};
+      data.upcomingBills.forEach((bill) => {
+        const dueDate = new Date(bill.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const daysDiff = Math.ceil((dueDate - today) / (1000 * 3600 * 24));
+
+        const label =
+          daysDiff === 0
+            ? "Hoje"
+            : daysDiff === 1
+            ? "Amanhã"
+            : `Em ${daysDiff} dias`;
+
+        if (!billsByDay[label]) billsByDay[label] = [];
+        billsByDay[label].push(bill);
+      });
+
+      let response = `⚠️ Contas Próximas do Vencimento:\n\n`;
+
+      Object.entries(billsByDay).forEach(([dia, contas]) => {
+        response += `📅 ${dia}:\n`;
+        contas.forEach((conta) => {
+          response += `   • ${conta.title}: R$ ${formatCurrency(
+            conta.value
+          )}\n`;
+        });
+        response += "\n";
+      });
+
+      const totalPendente = data.upcomingBills.reduce(
+        (sum, bill) => sum + bill.value,
+        0
+      );
+      response += `💰 Total a pagar: R$ ${formatCurrency(
+        totalPendente
+      )}\n\n⚡ Não se esqueça de pagar em dia!`;
+
+      return response;
+    }
 
     const meses = {
       janeiro: 0,
@@ -213,7 +351,6 @@ export default function AIAssistant() {
           (sum, t) => sum + t.value,
           0
         );
-
         const categories = {};
         monthTransactions.forEach((t) => {
           categories[t.category] = (categories[t.category] || 0) + t.value;
@@ -229,33 +366,37 @@ export default function AIAssistant() {
         return `💰 Gastos em ${
           mesNomeCapitalizado.charAt(0).toUpperCase() +
           mesNomeCapitalizado.slice(1)
-        }/${targetYear}:\n\n• Total: R$ ${totalGasto.toFixed(
-          2
+        }/${targetYear}:\n\n• Total: R$ ${formatCurrency(
+          totalGasto
         )}\n• Maior categoria: ${
           sortedCategories[0]
             ? sortedCategories[0][0] +
               " (R$ " +
-              sortedCategories[0][1].toFixed(2) +
+              formatCurrency(sortedCategories[0][1]) +
               ")"
             : "N/A"
         }\n\n📊 Top 5 categorias:\n${sortedCategories
           .slice(0, 5)
-          .map(([cat, val], idx) => `${idx + 1}. ${cat}: R$ ${val.toFixed(2)}`)
+          .map(
+            ([cat, val], idx) => `${idx + 1}. ${cat}: R$ ${formatCurrency(val)}`
+          )
           .join("\n")}`;
       }
 
-      return `💰 Seus gastos este mês:\n\n• Total: R$ ${data.expenses.toFixed(
-        2
+      return `💰 Seus gastos este mês:\n\n• Total: R$ ${formatCurrency(
+        data.expenses
       )}\n• Maior categoria: ${
         data.categories[0]
           ? data.categories[0][0] +
             " (R$ " +
-            data.categories[0][1].toFixed(2) +
+            formatCurrency(data.categories[0][1]) +
             ")"
           : "N/A"
       }\n\n📊 Top 5 categorias:\n${data.categories
         .slice(0, 5)
-        .map(([cat, val], idx) => `${idx + 1}. ${cat}: R$ ${val.toFixed(2)}`)
+        .map(
+          ([cat, val], idx) => `${idx + 1}. ${cat}: R$ ${formatCurrency(val)}`
+        )
         .join("\n")}`;
     }
 
@@ -280,12 +421,12 @@ export default function AIAssistant() {
       if (data.savingsRate < 10) health = "🔴 Precisa melhorar";
       else if (data.savingsRate < 20) health = "🟡 Regular";
 
-      return `💚 Análise de Saúde Financeira:\n\nStatus: ${health}\n\n📊 Resumo:\n• Receitas: R$ ${data.income.toFixed(
-        2
-      )}\n• Despesas: R$ ${data.expenses.toFixed(
-        2
-      )}\n• Saldo: R$ ${data.balance.toFixed(
-        2
+      return `💚 Análise de Saúde Financeira:\n\nStatus: ${health}\n\n📊 Resumo:\n• Receitas: R$ ${formatCurrency(
+        data.income
+      )}\n• Despesas: R$ ${formatCurrency(
+        data.expenses
+      )}\n• Saldo: R$ ${formatCurrency(
+        data.balance
       )}\n• Taxa de poupança: ${data.savingsRate.toFixed(1)}%\n\n${
         data.savingsRate >= 20
           ? "✅ Parabéns! Você está no caminho certo!"
@@ -298,21 +439,11 @@ export default function AIAssistant() {
         .slice(0, 5)
         .map(([cat, val], idx) => {
           const percent = (val / data.expenses) * 100;
-          return `${idx + 1}. ${cat}: R$ ${val.toFixed(2)} (${percent.toFixed(
-            0
-          )}%)`;
+          return `${idx + 1}. ${cat}: R$ ${formatCurrency(
+            val
+          )} (${percent.toFixed(0)}%)`;
         })
         .join("\n")}`;
-    }
-
-    if (q.includes("investimento") || q.includes("investir")) {
-      return `💎 Análise de Investimentos:\n\n• Total investido: R$ ${data.totalInvested.toFixed(
-        2
-      )}\n• Disponível: R$ ${data.balance.toFixed(2)}\n\n💡 Sugestões:\n${
-        data.balance > 500
-          ? "✅ Você tem condições de investir!\n• Tesouro Direto\n• CDB\n• Fundos de investimento"
-          : "⚠️ Foque em aumentar sua poupança."
-      }`;
     }
 
     if (q.includes("sonho") || q.includes("meta") || q.includes("objetivo")) {
@@ -324,29 +455,14 @@ export default function AIAssistant() {
           const progress = (dream.current / dream.target) * 100;
           return `${idx + 1}. ${dream.name}\n   ${progress.toFixed(
             0
-          )}% completo (R$ ${dream.current.toFixed(
-            2
-          )} de R$ ${dream.target.toFixed(2)})`;
+          )}% completo (R$ ${formatCurrency(
+            dream.current
+          )} de R$ ${formatCurrency(dream.target)})`;
         })
         .join("\n\n")}`;
     }
 
-    if (q.includes("100k") || q.includes("jornada")) {
-      if (!data.jornada100k) {
-        return `🚀 Você ainda não iniciou a Jornada 100k!\n\nVá na aba "Jornada 100k" para configurar.`;
-      }
-      const progress = (data.jornada100k.currentAmount / 100000) * 100;
-      const remaining = 100000 - data.jornada100k.currentAmount;
-      return `🚀 Jornada 100k:\n\n• Progresso: ${progress.toFixed(
-        1
-      )}%\n• Acumulado: R$ ${data.jornada100k.currentAmount.toFixed(
-        2
-      )}\n• Falta: R$ ${remaining.toFixed(
-        2
-      )}\n\n💪 Continue depositando mensalmente!`;
-    }
-
-    return `🤔 Desculpe, não entendi.\n\nTente perguntar sobre:\n• "Quanto gastei este mês?"\n• "Quanto gastei em janeiro?"\n• "Como posso economizar?"\n• "Analise minha saúde financeira"\n• "Quais são meus sonhos?"\n• "Como está a Jornada 100k?"`;
+    return `🤔 Desculpe, não entendi.\n\nTente perguntar sobre:\n• "Quanto tenho investido?"\n• "Como está minha aposentadoria?"\n• "Tenho contas a vencer?"\n• "Quanto gastei este mês?"\n• "Como posso economizar?"\n• "Analise minha saúde financeira"\n• "Quais são meus sonhos?"`;
   };
 
   const addMessage = (role, content, showQuickActions = false) => {
@@ -371,8 +487,11 @@ export default function AIAssistant() {
     setTimeout(() => handleSend(), 100);
   };
 
+  // COLOCAR ESTE JSX NO RETURN DO COMPONENTE
+
   return (
     <>
+      {/* Botão Flutuante */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-4 w-14 h-14 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50 ${
@@ -394,11 +513,13 @@ export default function AIAssistant() {
         </svg>
       </button>
 
+      {/* Chat Window */}
       <div
         className={`fixed bottom-6 right-4 w-[380px] h-[600px] bg-[#1a1f2e] rounded-2xl shadow-2xl border border-[#2a2f3e] flex flex-col transition-all duration-300 z-50 ${
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
         }`}
       >
+        {/* Header */}
         <div className="bg-gradient-to-br from-[#667eea] to-[#764ba2] p-4 rounded-t-2xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-2xl">
@@ -432,6 +553,7 @@ export default function AIAssistant() {
           </button>
         </div>
 
+        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((msg, idx) => (
             <div key={idx}>
@@ -450,7 +572,7 @@ export default function AIAssistant() {
                   {msg.role === "assistant" ? "🤖" : "👤"}
                 </div>
                 <div
-                  className={`max-w-[75%] rounded-2xl p-3 whitespace-pre-line ${
+                  className={`max-w-[75%] rounded-2xl p-3 whitespace-pre-line text-sm ${
                     msg.role === "assistant"
                       ? "bg-[#252b3b] text-white"
                       : "bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white"
@@ -460,19 +582,34 @@ export default function AIAssistant() {
                 </div>
               </div>
 
+              {/* Quick Actions */}
               {msg.showQuickActions && (
                 <div className="flex flex-wrap gap-2 mt-3 ml-11">
+                  <button
+                    onClick={() => handleQuickAction("Quanto tenho investido?")}
+                    className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
+                  >
+                    💎 Investimentos
+                  </button>
+                  <button
+                    onClick={() =>
+                      handleQuickAction("Como está minha aposentadoria?")
+                    }
+                    className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
+                  >
+                    🎯 Aposentadoria
+                  </button>
+                  <button
+                    onClick={() => handleQuickAction("Tenho contas a vencer?")}
+                    className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
+                  >
+                    ⚠️ Contas
+                  </button>
                   <button
                     onClick={() => handleQuickAction("Quanto gastei este mês?")}
                     className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
                   >
-                    💰 Gastos do mês
-                  </button>
-                  <button
-                    onClick={() => handleQuickAction("Como posso economizar?")}
-                    className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
-                  >
-                    💡 Dicas de economia
+                    💰 Gastos
                   </button>
                   <button
                     onClick={() =>
@@ -480,7 +617,7 @@ export default function AIAssistant() {
                     }
                     className="px-3 py-1.5 bg-[#252b3b] hover:bg-[#2d3548] text-white text-xs rounded-lg transition-colors border border-[#2a2f3e]"
                   >
-                    📊 Saúde financeira
+                    📊 Saúde
                   </button>
                 </div>
               )}
@@ -489,6 +626,7 @@ export default function AIAssistant() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input */}
         <div className="p-4 border-t border-[#2a2f3e]">
           <div className="flex gap-2">
             <input

@@ -6,9 +6,11 @@ import OrcamentoDiario from "./pages/OrcamentoDiario";
 import Investimentos from "./pages/Investimentos";
 import Aposentadoria from "./pages/Aposentadoria";
 import MetasSonhos from "./pages/MetasSonhos";
+import Configuracoes from "./pages/Configuracoes";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import AIAssistant from "./pages/AssistenteFinanceiro";
+import Cartoes from "./pages/Cartoes";
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;
@@ -108,6 +110,10 @@ function App() {
             return <Aposentadoria />;
           case "metas":
             return <MetasSonhos />;
+          case "cartoes":
+            return <Cartoes />;
+          case "configuracoes":
+            return <Configuracoes />;
           default:
             return <Dashboard />;
         }

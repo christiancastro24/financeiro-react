@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Mail, Lock, AlertCircle, Eye, EyeOff, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Lock,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+} from "lucide-react";
 
 const LoginPage = ({ onLogin, onNavigate }) => {
   const [username, setUsername] = useState("");
@@ -52,7 +60,10 @@ const LoginPage = ({ onLogin, onNavigate }) => {
 
       {/* Background gradients */}
       <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#667eea]/5 rounded-full blur-[150px] animate-pulse" />
-      <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#764ba2]/5 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
+      <div
+        className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#764ba2]/5 rounded-full blur-[150px] animate-pulse"
+        style={{ animationDelay: "1s" }}
+      />
 
       <button
         onClick={() => onNavigate("/")}
@@ -71,7 +82,7 @@ const LoginPage = ({ onLogin, onNavigate }) => {
               💰
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-[#667eea] to-[#764ba2] leading-tight">
               Sua Jornada
@@ -80,7 +91,7 @@ const LoginPage = ({ onLogin, onNavigate }) => {
               Começa Aqui
             </h2>
           </div>
-          
+
           <div className="flex items-center justify-center gap-2 mt-6 text-[#8b92a7]">
             <Sparkles size={16} className="text-[#667eea]" />
             <p className="text-base">

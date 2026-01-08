@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -30,6 +30,110 @@ const Dashboard = () => {
       maximumFractionDigits: 2,
     });
   };
+
+  const sendWhatsAppNotification = async (dueTransactions) => {
+    // Buscando os dados das variáveis de ambiente (.env)
+    const TWILIO_ACCOUNT_SID = import.meta.env.VITE_TWILIO_ACCOUNT_SID;
+    const TWILIO_AUTH_TOKEN = import.meta.env.VITE_TWILIO_AUTH_TOKEN;
+    const TWILIO_WHATSAPP_NUMBER = import.meta.env.VITE_TWILIO_WHATSAPP_NUMBER;
+
+    // Verificação de segurança para o console
+    if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+      console.error(
+        "❌ Erro: Credenciais do Twilio não encontradas no arquivo .env"
+      );
+      return;
+    }
+
+    let message = "🔔 Lembrete de Contas 🔔\n\n";
+    message += "As seguintes contas vencem amanhã:\n\n";
+
+    dueTransactions.forEach((t, index) => {
+      const date = new Date(t.date).toLocaleDateString("pt-BR");
+      message += `${index + 1}. ${t.title}\n`;
+      message += `💰 R$ ${formatCurrency(t.value)}\n`;
+      message += `📅 ${date}\n`;
+      message += `🏷 ${t.category}\n\n`;
+    });
+
+    message += "Não esqueça de realizar os pagamentos! 💳";
+
+    const whatsappNumber = localStorage.getItem("financeapp_whatsapp");
+    const toNumber = "whatsapp:+" + whatsappNumber;
+
+    console.log("📤 [DEBUG] Iniciando envio via Twilio...");
+
+    try {
+      const response = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization:
+              "Basic " + btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`),
+          },
+          body: new URLSearchParams({
+            From: TWILIO_WHATSAPP_NUMBER,
+            To: toNumber,
+            Body: message,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("✅ [DEBUG] Mensagem enviada com sucesso!", result.sid);
+      } else {
+        const errorData = await response.json();
+        console.error("❌ [DEBUG] Erro API Twilio:", errorData.message);
+      }
+    } catch (error) {
+      console.error("❌ [DEBUG] Erro na requisição fetch:", error);
+    }
+  };
+
+  useEffect(() => {
+    const notificationsEnabled =
+      localStorage.getItem("financeapp_notifications") === "true";
+    const whatsappNumber = localStorage.getItem("financeapp_whatsapp");
+
+    if (!notificationsEnabled || !whatsappNumber) return;
+
+    const checkDueTransactions = () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const dueSoon = transactions.filter((t) => {
+        if (t.paid || t.type !== "expense") return false;
+
+        const dueDate = new Date(t.date);
+        dueDate.setHours(0, 0, 0, 0);
+
+        return dueDate.getTime() === tomorrow.getTime();
+      });
+
+      if (dueSoon.length > 0) {
+        const lastCheck = localStorage.getItem(
+          "financeapp_last_notification_check"
+        );
+        const today_str = today.toDateString();
+
+        if (lastCheck !== today_str) {
+          sendWhatsAppNotification(dueSoon);
+          localStorage.setItem("financeapp_last_notification_check", today_str);
+        }
+      }
+    };
+
+    checkDueTransactions();
+    const interval = setInterval(checkDueTransactions, 6 * 60 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [transactions]);
 
   const getMonthTransactions = () => {
     return transactions.filter((t) => {
@@ -99,7 +203,6 @@ const Dashboard = () => {
         ][date.getMonth()]
       } ${date.getFullYear()}`;
 
-      // Não incluir o mês atual
       if (
         !(
           date.getMonth() === currentMonth.getMonth() &&
@@ -194,7 +297,7 @@ const Dashboard = () => {
   };
 
   const saveTransaction = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
 
     const transaction = {
       id:
@@ -243,18 +346,29 @@ const Dashboard = () => {
   });
 
   const availableMonths = getAvailableMonths();
+  const notificationsEnabled =
+    localStorage.getItem("financeapp_notifications") === "true";
+
+  // JSX DO DASHBOARD - COLOCAR NO RETURN DO COMPONENTE
 
   return (
     <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+      {/* Header */}
       <div className="flex justify-between items-center mb-9">
         <div>
           <h2 className="text-[28px] font-bold text-white mb-1.5">Dashboard</h2>
-          <div className="text-[#8b92a7] text-sm">
+          <div className="text-[#8b92a7] text-sm flex items-center gap-2">
             Gestão de receitas e despesas
+            {notificationsEnabled && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#25D366]/20 text-[#25D366] text-xs rounded-full">
+                <span>🔔</span> Alertas ativos
+              </span>
+            )}
           </div>
         </div>
       </div>
 
+      {/* Navegação de Mês */}
       <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 py-4 px-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => changeMonth(-1)}
@@ -271,6 +385,7 @@ const Dashboard = () => {
         </button>
       </div>
 
+      {/* Cards de Resumo */}
       <div className="grid grid-cols-3 gap-6 mb-9">
         <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#27ae60] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
           <h3 className="flex items-center gap-2 text-xs font-bold text-[#8b92a7] uppercase tracking-wide mb-3.5">
@@ -309,6 +424,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Header da Lista de Transações */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-bold text-white">Transações do Mês</h3>
         <div className="flex gap-3">
@@ -329,6 +445,7 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Lista de Transações */}
       <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] max-h-[600px] overflow-y-auto transactions-list">
         {sortedTransactions.length === 0 ? (
           <div className="text-center text-[#8b92a7] rounded-lg py-15 px-5 text-[16px]">
@@ -403,6 +520,7 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* Modal de Nova/Editar Transação */}
       {isModalOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
@@ -439,6 +557,7 @@ const Dashboard = () => {
                 </label>
                 <input
                   type="text"
+                  required
                   value={formData.title}
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
@@ -454,6 +573,7 @@ const Dashboard = () => {
                 <input
                   type="number"
                   step="0.01"
+                  required
                   value={formData.value}
                   onChange={(e) =>
                     setFormData({ ...formData, value: e.target.value })
@@ -493,6 +613,7 @@ const Dashboard = () => {
                 </label>
                 <input
                   type="date"
+                  required
                   value={formData.date}
                   onChange={(e) =>
                     setFormData({ ...formData, date: e.target.value })
@@ -503,6 +624,7 @@ const Dashboard = () => {
 
               <div className="flex gap-3 pt-4">
                 <button
+                  type="button"
                   onClick={closeModal}
                   className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
                 >
@@ -520,6 +642,7 @@ const Dashboard = () => {
         </div>
       )}
 
+      {/* Modal de Importar Transações */}
       {isImportModalOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"

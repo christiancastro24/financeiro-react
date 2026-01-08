@@ -1,4 +1,12 @@
 import React, { useState } from "react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  DollarSign,
+  Target,
+  AlertCircle,
+} from "lucide-react";
 
 const OrcamentoDiario = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -112,6 +120,7 @@ const OrcamentoDiario = () => {
         daySpent,
         available,
         isNegative,
+        dailyBudget,
       });
     }
 
@@ -128,10 +137,14 @@ const OrcamentoDiario = () => {
       }
     }
 
+    const percentSpent = (totalSpent / budget) * 100;
+
     return {
       rows,
       totalSpent,
       availableToday: isCurrentMonth ? availableToday : accumulated,
+      percentSpent,
+      dailyBudget,
     };
   };
 
@@ -139,162 +152,292 @@ const OrcamentoDiario = () => {
 
   return (
     <div className="ml-[260px] flex-1 bg-[#0f1419] p-10">
+      {/* Header */}
       <div className="flex justify-between items-center mb-9">
         <div>
-          <h2 className="text-[28px] font-bold text-white mb-1.5">
+          <h2 className="text-[28px] font-bold text-white mb-1.5 flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#f39c12] to-[#e67e22] rounded-xl flex items-center justify-center">
+              <Calendar className="text-white" size={22} />
+            </div>
             Orçamento Diário
           </h2>
           <div className="text-[#8b92a7] text-sm">
-            Gestão de receitas e despesas
+            Controle seus gastos dia a dia e acumule saldo disponível
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 p-[18px_24px] shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+      {/* Navegação de Mês */}
+      <div className="flex items-center justify-between bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] mb-8 py-4 px-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
         <button
           onClick={() => changeMonth(-1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
         >
           ← Anterior
         </button>
         <span className="text-lg font-bold text-white">{getMonthName()}</span>
         <button
           onClick={() => changeMonth(1)}
-          className="bg-[#252b3b] text-white border border-[#2a2f3e] rounded-lg cursor-pointer hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def] px-[18px] py-2.5 text-sm font-semibold transition-all duration-200"
+          className="bg-[#252b3b] text-white border border-[#2a2f3e] text-[#8b92a7] rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:bg-[#2d3548] hover:border-[#5b8def] hover:text-[#5b8def]"
         >
           Próximo →
         </button>
       </div>
 
-      <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-7 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h3 className="text-lg font-bold text-white mb-2">
-              Orçamento Mensal - Gastos Gerais
-            </h3>
-            <p className="text-[#8b92a7] text-sm">
-              Registre manualmente os gastos de cada dia. O saldo disponível
-              acumula automaticamente.
-            </p>
+      {budget === 0 ? (
+        // Estado Vazio
+        <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-12 shadow-[0_4px_12px_rgba(0,0,0,0.3)] text-center">
+          <div className="w-20 h-20 bg-[#f39c12]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Target className="text-[#f39c12]" size={40} />
           </div>
-          {budget > 0 && (
-            <div className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] p-4 px-6 min-w-[200px]">
-              <div className="text-[#8b92a7] text-xs uppercase tracking-wider mb-1.5">
-                Orçamento Mensal
+          <h3 className="text-2xl font-bold text-white mb-3">
+            Configure seu orçamento mensal
+          </h3>
+          <p className="text-[#8b92a7] text-base mb-8 max-w-md mx-auto">
+            Cadastre uma despesa com categoria "Gastos Gerais" no Dashboard para
+            definir seu orçamento mensal e começar a controlar seus gastos
+            diários.
+          </p>
+          <button className="bg-gradient-to-r from-[#5b8def] to-[#0063f7] text-white rounded-lg px-8 py-4 text-sm font-bold shadow-[0_4px_12px_rgba(91,141,239,0.4)] transition-all hover:shadow-[0_6px_20px_rgba(91,141,239,0.5)] hover:-translate-y-0.5">
+            Ir para Dashboard
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Cards de Resumo */}
+          <div className="grid grid-cols-4 gap-6 mb-8">
+            {/* Orçamento Mensal */}
+            <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#5b8def] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 bg-[#5b8def]/20 rounded-lg flex items-center justify-center">
+                  <Target size={20} className="text-[#5b8def]" />
+                </div>
+                <div className="text-xs font-bold text-[#8b92a7] uppercase tracking-wide">
+                  Orçamento
+                </div>
               </div>
-              <div className="text-2xl font-bold text-[#5b8def]">
+              <div className="text-2xl font-bold text-white mb-1">
                 R$ {formatCurrency(budget)}
               </div>
+              <div className="text-xs text-[#8b92a7]">
+                R$ {formatCurrency(budgetData?.dailyBudget || 0)}/dia
+              </div>
             </div>
-          )}
-        </div>
 
-        {budget === 0 ? (
-          <div className="text-center bg-[#1e2738] rounded-lg border border-[#2a2f3e] py-[60px] px-5">
-            <div className="text-5xl mb-4">💰</div>
-            <h3 className="text-lg font-bold text-white mb-2">
-              Nenhum orçamento definido
-            </h3>
-            <p className="text-[#8b92a7] text-sm mb-5">
-              Cadastre uma despesa com categoria "Gastos Gerais" no Dashboard
-              para começar.
-            </p>
-            <button className="bg-[#5b8def] text-white rounded-lg cursor-pointer hover:bg-[#4a7dd9] px-6 py-3 text-sm font-bold border-none shadow-[0_4px_12px_rgba(91,141,239,0.3)] transition-all duration-200">
-              Ir para Dashboard
-            </button>
+            {/* Total Gasto */}
+            <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#e74c3c] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 bg-[#e74c3c]/20 rounded-lg flex items-center justify-center">
+                  <TrendingDown size={20} className="text-[#e74c3c]" />
+                </div>
+                <div className="text-xs font-bold text-[#8b92a7] uppercase tracking-wide">
+                  Gasto
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-[#e74c3c] mb-1">
+                R$ {formatCurrency(budgetData?.totalSpent || 0)}
+              </div>
+              <div className="text-xs text-[#8b92a7]">
+                {budgetData?.percentSpent.toFixed(1)}% do orçamento
+              </div>
+            </div>
+
+            {/* Disponível Hoje */}
+            <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#27ae60] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 bg-[#27ae60]/20 rounded-lg flex items-center justify-center">
+                  <TrendingUp size={20} className="text-[#27ae60]" />
+                </div>
+                <div className="text-xs font-bold text-[#8b92a7] uppercase tracking-wide">
+                  Disponível
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-[#27ae60] mb-1">
+                R${" "}
+                {formatCurrency(Math.max(0, budgetData?.availableToday || 0))}
+              </div>
+              <div className="text-xs text-[#8b92a7]">Saldo acumulado</div>
+            </div>
+
+            {/* Economia */}
+            <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] border-l-4 border-l-[#f39c12] p-6 shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all hover:-translate-y-1">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 bg-[#f39c12]/20 rounded-lg flex items-center justify-center">
+                  <DollarSign size={20} className="text-[#f39c12]" />
+                </div>
+                <div className="text-xs font-bold text-[#8b92a7] uppercase tracking-wide">
+                  Economia
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-[#f39c12] mb-1">
+                R${" "}
+                {formatCurrency(
+                  Math.max(0, budget - (budgetData?.totalSpent || 0))
+                )}
+              </div>
+              <div className="text-xs text-[#8b92a7]">Restante do mês</div>
+            </div>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] p-4">
-                <div className="text-[#8b92a7] text-xs uppercase mb-2 tracking-wider">
-                  Orçamento Total
-                </div>
-                <div className="text-xl font-bold text-white">
-                  R$ {formatCurrency(budget)}
-                </div>
+
+          {/* Barra de Progresso */}
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] p-6 mb-8 shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-white">
+                Uso do Orçamento
+              </span>
+              <span className="text-sm font-bold text-[#5b8def]">
+                {budgetData?.percentSpent.toFixed(1)}%
+              </span>
+            </div>
+            <div className="w-full h-3 bg-[#252b3b] rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  budgetData?.percentSpent > 90
+                    ? "bg-gradient-to-r from-[#e74c3c] to-[#c0392b]"
+                    : budgetData?.percentSpent > 70
+                    ? "bg-gradient-to-r from-[#f39c12] to-[#e67e22]"
+                    : "bg-gradient-to-r from-[#27ae60] to-[#229954]"
+                }`}
+                style={{
+                  width: `${Math.min(budgetData?.percentSpent || 0, 100)}%`,
+                }}
+              />
+            </div>
+            {budgetData?.percentSpent > 90 && (
+              <div className="flex items-center gap-2 mt-3 text-xs text-[#e74c3c]">
+                <AlertCircle size={14} />
+                <span>
+                  Atenção: Você já utilizou mais de 90% do orçamento mensal!
+                </span>
               </div>
-              <div className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] p-4">
-                <div className="text-[#8b92a7] text-xs uppercase mb-2 tracking-wider">
-                  Total Gasto
-                </div>
-                <div className="text-xl font-bold text-[#e74c3c]">
-                  R$ {formatCurrency(budgetData?.totalSpent || 0)}
-                </div>
-              </div>
-              <div className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] p-4">
-                <div className="text-[#8b92a7] text-xs uppercase mb-2 tracking-wider">
-                  Disponível Hoje
-                </div>
-                <div className="text-xl font-bold text-[#27ae60]">
-                  R${" "}
-                  {formatCurrency(Math.max(0, budgetData?.availableToday || 0))}
-                </div>
-              </div>
+            )}
+          </div>
+
+          {/* Tabela de Dias */}
+          <div className="bg-[#1a1f2e] rounded-xl border border-[#2a2f3e] overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+            <div className="p-6 border-b border-[#2a2f3e]">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Calendar size={20} className="text-[#5b8def]" />
+                Controle Diário
+              </h3>
+              <p className="text-sm text-[#8b92a7] mt-1">
+                Registre seus gastos diários e acompanhe o saldo acumulado
+              </p>
             </div>
 
-            <div className="bg-[#252b3b] rounded-lg border border-[#2a2f3e] max-h-[500px] overflow-y-auto">
+            <div className="max-h-[500px] overflow-y-auto transactions-list">
               <table className="w-full">
-                <thead className="sticky top-0 bg-[#252b3b]">
+                <thead className="sticky top-0 bg-[#252b3b] z-10">
                   <tr className="border-b border-[#2a2f3e]">
-                    <th className="text-left text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider w-[100px]">
+                    <th className="text-left text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider">
                       Dia
                     </th>
-                    <th className="text-center text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider w-[200px]">
-                      Gasto no Dia
+                    <th className="text-center text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider">
+                      Orçamento do Dia
                     </th>
-                    <th className="text-right text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider w-[180px]">
-                      Disponível Acumulado
+                    <th className="text-center text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider">
+                      Gasto Realizado
+                    </th>
+                    <th className="text-right text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider">
+                      Saldo Acumulado
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {budgetData?.rows.map(
-                    ({ day, daySpent, available, isNegative }) => (
-                      <tr
-                        key={day}
-                        className={`border-b border-[#2a2f3e] ${
-                          daySpent > 0 ? "bg-[#1a1f2e]" : ""
-                        }`}
-                      >
-                        <td className="font-bold text-white p-3 px-4">
-                          Dia {day}
-                        </td>
-                        <td className="py-2.5 px-3 text-center">
-                          <div className="inline-block relative w-[140px]">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#95a5a6] text-sm pointer-events-none">
-                              R$
-                            </span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              value={daySpent || ""}
-                              placeholder="0,00"
-                              onChange={(e) =>
-                                updateDailySpending(day, e.target.value)
-                              }
-                              className="w-full py-2.5 px-3 pl-8 border border-[#2a2f3e] rounded-md text-sm text-right bg-[#1a1f2e] text-white transition-all duration-200"
-                            />
-                          </div>
-                        </td>
-                        <td
-                          className={`text-right font-bold p-3 pr-5 pl-3 text-[15px] ${
-                            isNegative ? "text-[#e74c3c]" : "text-[#27ae60]"
+                    ({ day, daySpent, available, isNegative, dailyBudget }) => {
+                      const today = new Date().getDate();
+                      const isCurrentMonth =
+                        currentMonth.getMonth() === new Date().getMonth() &&
+                        currentMonth.getFullYear() === new Date().getFullYear();
+                      const isToday = isCurrentMonth && day === today;
+
+                      return (
+                        <tr
+                          key={day}
+                          className={`border-b border-[#2a2f3e] transition-all hover:bg-[#252b3b]/50 ${
+                            isToday
+                              ? "bg-[#5b8def]/10"
+                              : daySpent > 0
+                              ? "bg-[#1e2738]"
+                              : ""
                           }`}
                         >
-                          {isNegative ? "- " : ""}R${" "}
-                          {formatCurrency(Math.abs(available))}
-                        </td>
-                      </tr>
-                    )
+                          <td className="p-4">
+                            <div className="flex items-center gap-3">
+                              {isToday && (
+                                <div className="w-2 h-2 bg-[#5b8def] rounded-full animate-pulse" />
+                              )}
+                              <span className="font-bold text-white">
+                                Dia {day}
+                                {isToday && (
+                                  <span className="text-[#5b8def] text-xs ml-2">
+                                    (Hoje)
+                                  </span>
+                                )}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className="text-[#8b92a7] text-sm">
+                              R$ {formatCurrency(dailyBudget)}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <div className="inline-flex items-center justify-center">
+                              <div className="relative group">
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8b92a7] text-sm font-medium pointer-events-none">
+                                  R$
+                                </div>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  value={daySpent || ""}
+                                  placeholder="0,00"
+                                  onChange={(e) =>
+                                    updateDailySpending(day, e.target.value)
+                                  }
+                                  className="w-44 py-3 pl-12 pr-4 border border-[#2a2f3e] rounded-lg text-sm text-right bg-[#1e2738] text-white focus:border-[#5b8def] focus:bg-[#252b3b] focus:outline-none focus:ring-2 focus:ring-[#5b8def]/20 transition-all placeholder:text-[#5a6c7d] group-hover:border-[#5b8def]/50"
+                                />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {isNegative ? (
+                                <TrendingDown
+                                  size={16}
+                                  className="text-[#e74c3c]"
+                                />
+                              ) : (
+                                <TrendingUp
+                                  size={16}
+                                  className="text-[#27ae60]"
+                                />
+                              )}
+                              <span
+                                className={`font-bold text-base ${
+                                  isNegative
+                                    ? "text-[#e74c3c]"
+                                    : "text-[#27ae60]"
+                                }`}
+                              >
+                                {isNegative ? "- " : ""}R${" "}
+                                {formatCurrency(Math.abs(available))}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    }
                   )}
                 </tbody>
               </table>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

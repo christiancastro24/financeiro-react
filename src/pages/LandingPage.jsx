@@ -88,26 +88,29 @@ const LandingPage = ({ onNavigate }) => {
                 ✨ Controle Financeiro Inteligente
               </span>
             </div>
-            
+
             <h1 className="text-6xl font-extrabold text-white leading-tight">
               Transforme sua{" "}
               <span className="bg-gradient-to-br from-[#667eea] to-[#764ba2] bg-clip-text text-transparent">
                 Vida Financeira
               </span>
             </h1>
-            
+
             <p className="text-xl text-[#8b92a7] leading-relaxed">
               Gerencie suas finanças de forma inteligente, planeje seu futuro e
               alcance seus sonhos com o FinanceApp.
             </p>
-            
+
             <div className="flex gap-4 pt-4">
               <button
                 onClick={() => onNavigate("/login")}
                 className="group px-9 py-4 bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white rounded-xl font-semibold text-base border-none cursor-pointer flex items-center gap-2 shadow-[0_10px_30px_rgba(102,126,234,0.3)] transition-all hover:shadow-[0_15px_40px_rgba(102,126,234,0.4)] hover:-translate-y-1"
               >
                 Começar Agora
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight
+                  size={20}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
               </button>
             </div>
           </div>
@@ -121,7 +124,9 @@ const LandingPage = ({ onNavigate }) => {
                   <span className="text-[#8b92a7] text-sm font-semibold">
                     SALDO TOTAL
                   </span>
-                  <span className="text-2xl animate-[bounce_2s_ease-in-out_infinite]">💰</span>
+                  <span className="text-2xl animate-[bounce_2s_ease-in-out_infinite]">
+                    💰
+                  </span>
                 </div>
                 <p className="text-4xl font-bold text-[#27ae60] m-0">
                   R$ 12.450,00
@@ -129,12 +134,20 @@ const LandingPage = ({ onNavigate }) => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#252b3b] rounded-xl p-5 border border-[#2a2f3e] hover:border-[#27ae60] transition-all hover:translate-y-[-2px]">
-                  <div className="text-[#8b92a7] text-[13px] mb-2">Receitas</div>
-                  <div className="text-[#27ae60] text-xl font-bold">+R$ 8.000</div>
+                  <div className="text-[#8b92a7] text-[13px] mb-2">
+                    Receitas
+                  </div>
+                  <div className="text-[#27ae60] text-xl font-bold">
+                    +R$ 8.000
+                  </div>
                 </div>
                 <div className="bg-[#252b3b] rounded-xl p-5 border border-[#2a2f3e] hover:border-[#e74c3c] transition-all hover:translate-y-[-2px]">
-                  <div className="text-[#8b92a7] text-[13px] mb-2">Despesas</div>
-                  <div className="text-[#e74c3c] text-xl font-bold">-R$ 3.500</div>
+                  <div className="text-[#8b92a7] text-[13px] mb-2">
+                    Despesas
+                  </div>
+                  <div className="text-[#e74c3c] text-xl font-bold">
+                    -R$ 3.500
+                  </div>
                 </div>
               </div>
             </div>
@@ -153,14 +166,18 @@ const LandingPage = ({ onNavigate }) => {
                 onMouseLeave={() => setHoveredStat(null)}
                 className="text-center transform transition-all duration-300 hover:scale-110 cursor-pointer"
               >
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all ${
-                  hoveredStat === i 
-                    ? 'bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white shadow-[0_8px_20px_rgba(102,126,234,0.4)]' 
-                    : 'bg-[#252b3b] text-[#667eea]'
-                }`}>
+                <div
+                  className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all ${
+                    hoveredStat === i
+                      ? "bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white shadow-[0_8px_20px_rgba(102,126,234,0.4)]"
+                      : "bg-[#252b3b] text-[#667eea]"
+                  }`}
+                >
                   {stat.icon}
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-3xl font-bold text-white mb-2">
+                  {stat.value}
+                </div>
                 <div className="text-sm text-[#8b92a7]">{stat.label}</div>
               </div>
             ))}
@@ -211,8 +228,12 @@ const LandingPage = ({ onNavigate }) => {
                 key={i}
                 className="group bg-[#1a1f2e] p-8 rounded-2xl border border-[#2a2f3e] transition-all cursor-pointer hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:border-[#667eea] relative overflow-hidden"
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity`} />
-                <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center mb-5 bg-gradient-to-br ${feature.gradient} text-white shadow-lg`}>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity`}
+                />
+                <div
+                  className={`relative w-16 h-16 rounded-2xl flex items-center justify-center mb-5 bg-gradient-to-br ${feature.gradient} text-white shadow-lg`}
+                >
                   {feature.icon}
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2 relative">
@@ -253,13 +274,22 @@ const LandingPage = ({ onNavigate }) => {
             </div>
 
             <button
-              onClick={() => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
+              onClick={() =>
+                setCurrentTestimonial(
+                  (prev) =>
+                    (prev - 1 + testimonials.length) % testimonials.length
+                )
+              }
               className="absolute left-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#252b3b] border border-[#2a2f3e] rounded-full flex items-center justify-center text-white hover:bg-[#667eea] transition-all cursor-pointer"
             >
               <ChevronLeft size={24} />
             </button>
             <button
-              onClick={() => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)}
+              onClick={() =>
+                setCurrentTestimonial(
+                  (prev) => (prev + 1) % testimonials.length
+                )
+              }
               className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-12 h-12 bg-[#252b3b] border border-[#2a2f3e] rounded-full flex items-center justify-center text-white hover:bg-[#667eea] transition-all cursor-pointer"
             >
               <ChevronRight size={24} />
@@ -271,7 +301,9 @@ const LandingPage = ({ onNavigate }) => {
                   key={i}
                   onClick={() => setCurrentTestimonial(i)}
                   className={`w-2 h-2 rounded-full transition-all border-none cursor-pointer ${
-                    i === currentTestimonial ? 'bg-[#667eea] w-8' : 'bg-[#2a2f3e]'
+                    i === currentTestimonial
+                      ? "bg-[#667eea] w-8"
+                      : "bg-[#2a2f3e]"
                   }`}
                 />
               ))}
@@ -286,13 +318,14 @@ const LandingPage = ({ onNavigate }) => {
           <div className="absolute inset-0 bg-gradient-to-br from-[#667eea]/10 to-[#764ba2]/10" />
           <div className="absolute top-0 left-1/4 w-[300px] h-[300px] bg-[#667eea]/20 rounded-full blur-[100px]" />
           <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-[#764ba2]/20 rounded-full blur-[100px]" />
-          
+
           <div className="relative z-10">
             <h2 className="text-5xl font-extrabold text-white mb-6">
               Comece sua jornada financeira hoje
             </h2>
             <p className="text-xl text-[#8b92a7] mb-10 max-w-2xl mx-auto">
-              Junte-se a milhares de usuários que já transformaram suas vidas financeiras
+              Junte-se a milhares de usuários que já transformaram suas vidas
+              financeiras
             </p>
             <button
               onClick={() => onNavigate("/login")}

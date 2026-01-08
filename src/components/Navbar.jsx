@@ -26,9 +26,11 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
     { id: "dashboard", label: "Dashboard", icon: "📊" },
     { id: "analises", label: "Análises", icon: "📈" },
     { id: "orcamento", label: "Orçamento Diário", icon: "📅" },
+    { id: "cartoes", label: "Cartões", icon: "💳" },
     { id: "investimentos", label: "Investimentos", icon: "💎" },
     { id: "aposentadoria", label: "Aposentadoria", icon: "🎯" },
     { id: "metas", label: "Metas & Sonhos", icon: "✨" },
+    { id: "configuracoes", label: "Configurações", icon: "⚙️" },
   ];
 
   return (
