@@ -12,9 +12,9 @@ import LoginPage from "./pages/LoginPage";
 import FinancialAssistant from "./pages/FinancialAssistant";
 import Cards from "./pages/Cards";
 import OpenFinance from "./pages/OpenFinance";
-import OpenFinanceAnalysis from "./pages/OpenFinanceAnalysis"; // Importe o componente de análises
+import OpenFinanceAnalysis from "./pages/OpenFinanceAnalysis";
 
-// --- FUNÇÕES AUXILIARES (Sem 'export' = HMR Seguro) ---
+// --- FUNÇÕES AUXILIARES ---
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -44,6 +44,10 @@ function App() {
     () => window.location.pathname
   );
   const [activeTab, setActiveTab] = useState("dashboard");
+
+  // Verificar se está em ambiente de produção
+  const isProduction = window.location.hostname.includes("vercel.app") || 
+                       window.location.hostname.includes("financeiro-react");
 
   const navigate = useCallback((path) => {
     setCurrentRoute(path);
@@ -100,8 +104,18 @@ function App() {
       case "settings":
         return <Settings />;
       case "openfinance":
+        // Se for produção, redireciona para dashboard
+        if (isProduction) {
+          setActiveTab("dashboard");
+          return <Dashboard />;
+        }
         return <OpenFinance />;
       case "openfinance-analysis":
+        // Se for produção, redireciona para dashboard
+        if (isProduction) {
+          setActiveTab("dashboard");
+          return <Dashboard />;
+        }
         return <OpenFinanceAnalysis />;
       default:
         return <Dashboard />;
@@ -125,7 +139,7 @@ function App() {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onLogout={handleLogout}
-            navigate={navigate} // Passe a função navigate para o Layout
+            navigate={navigate}
           >
             {renderDashboardContent()}
           </Layout>
@@ -133,6 +147,15 @@ function App() {
         </>
       );
     }
+    
+    // Se alguém tentar acessar Open Finance diretamente pela URL em produção
+    if (currentRoute === "/openfinance" || currentRoute === "/openfinance-analysis") {
+      if (isProduction) {
+        navigate("/dashboard");
+        return null;
+      }
+    }
+
     return <LandingPage onNavigate={navigate} />;
   };
 
