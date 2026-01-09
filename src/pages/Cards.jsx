@@ -592,35 +592,35 @@ const Cartoes = () => {
 
   return (
     <div
-      className="ml-[260px] flex-1 min-h-screen transition-colors duration-300 p-8"
+      className="ml-[260px] flex-1 min-h-screen transition-colors duration-300 p-6"
       style={{ backgroundColor: colors.primary }}
     >
-      <div className="max-w-7xl mx-auto">
-        {/* HEADER COM GLASSMORPHISM */}
-        <header className="relative mb-12 mt-6">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl -z-10" />
+      <div className="max-w-6xl mx-auto">
+        {/* HEADER */}
+        <header className="relative mb-8 mt-4">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl -z-10" />
 
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 blur-lg opacity-50" />
-                  <div className="relative p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-xl">
-                    <Wallet className="text-white" size={22} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 blur-md opacity-50" />
+                  <div className="relative p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                    <Wallet className="text-white" size={18} />
                   </div>
                 </div>
                 <div>
                   <h1
-                    className="text-2xl font-black tracking-tight"
+                    className="text-xl font-bold tracking-tight"
                     style={{ color: colors.textPrimary }}
                   >
                     Meus Cartões
                   </h1>
                   <p
-                    className="text-xs mt-0.5 flex items-center gap-1.5"
+                    className="text-xs mt-0.5 flex items-center gap-1"
                     style={{ color: colors.textSecondary }}
                   >
-                    <Sparkles size={12} className="text-yellow-400" />
+                    <Sparkles size={10} className="text-yellow-400" />
                     Controle financeiro automatizado via PDF
                   </p>
                 </div>
@@ -630,62 +630,58 @@ const Cartoes = () => {
             {!activeCardId && (
               <button
                 onClick={openBankModal}
-                className="group relative overflow-hidden px-8 py-4 rounded-2xl font-black text-white transition-all duration-500 hover:scale-105 hover:shadow-2xl shadow-lg"
+                className="group relative overflow-hidden px-6 py-3 rounded-xl font-bold text-white transition-all duration-400 hover:scale-[1.02] hover:shadow-lg shadow-md text-sm"
                 style={{
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative z-10 flex items-center gap-3">
-                  <Upload size={22} />
-                  <span className="text-sm tracking-wider">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                <div className="relative z-10 flex items-center gap-2">
+                  <Upload size={18} />
+                  <span className="text-xs tracking-wider">
                     IMPORTAR FATURA
                   </span>
                   <ArrowUpRight
-                    size={18}
-                    className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300"
+                    size={14}
+                    className="opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
                   />
-                </div>
-                <div className="absolute inset-0 -z-10">
-                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700" />
                 </div>
               </button>
             )}
           </div>
 
-          {/* STATS CARDS - Só aparece quando tem cartões */}
+          {/* STATS CARDS */}
           {!activeCardId && cards.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
-              {/* Total de Cartões */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-6">
               <div
-                className="relative group overflow-hidden p-5 rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+                className="relative group overflow-hidden p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] cursor-pointer"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
                 }}
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-xl" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-500/10 to-transparent rounded-full blur-lg" />
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <span
-                      className="text-[10px] uppercase tracking-widest font-bold"
+                      className="text-[9px] uppercase tracking-wider font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Total Cartões
                     </span>
-                    <div className="p-2 rounded-lg bg-blue-500/10">
-                      <CreditCard size={16} className="text-blue-500" />
+                    <div className="p-1.5 rounded-md bg-blue-500/10">
+                      <CreditCard size={14} className="text-blue-500" />
                     </div>
                   </div>
                   <p
-                    className="text-3xl font-black mb-1"
+                    className="text-2xl font-bold mb-1"
                     style={{ color: colors.textPrimary }}
                   >
                     {cards.length}
                   </p>
                   <p
-                    className="text-[10px]"
+                    className="text-[9px]"
                     style={{ color: colors.textSecondary }}
                   >
                     {cards.length === 1 ? "cartão ativo" : "cartões ativos"}
@@ -693,28 +689,27 @@ const Cartoes = () => {
                 </div>
               </div>
 
-              {/* Total Gasto */}
               <div
-                className="relative group overflow-hidden p-5 rounded-2xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
+                className="relative group overflow-hidden p-4 rounded-xl border backdrop-blur-xl transition-all duration-300 hover:scale-[1.01] cursor-pointer"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
                 }}
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-500/10 to-transparent rounded-full blur-xl" />
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-500/10 to-transparent rounded-full blur-lg" />
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-2">
                     <span
-                      className="text-[10px] uppercase tracking-widest font-bold"
+                      className="text-[9px] uppercase tracking-wider font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Total Gasto
                     </span>
-                    <div className="p-2 rounded-lg bg-red-500/10">
-                      <TrendingUp size={16} className="text-red-500" />
+                    <div className="p-1.5 rounded-md bg-red-500/10">
+                      <TrendingUp size={14} className="text-red-500" />
                     </div>
                   </div>
-                  <p className="text-3xl font-black mb-1 text-red-500">
+                  <p className="text-2xl font-bold mb-1 text-red-500">
                     R${" "}
                     {cards
                       .reduce((acc, card) => {
@@ -729,7 +724,7 @@ const Cartoes = () => {
                       .toFixed(2)}
                   </p>
                   <p
-                    className="text-[10px]"
+                    className="text-[9px]"
                     style={{ color: colors.textSecondary }}
                   >
                     soma de todas as faturas
@@ -743,110 +738,102 @@ const Cartoes = () => {
         {/* ERROR ALERT */}
         {error && (
           <div
-            className="mb-8 p-5 border rounded-2xl flex justify-between items-center text-sm backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300"
+            className="mb-6 p-4 border rounded-xl flex justify-between items-center text-xs backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300"
             style={{
               backgroundColor: "rgba(239,68,68,0.1)",
               borderColor: "rgba(239,68,68,0.3)",
               color: "#ef4444",
             }}
           >
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-red-500/20">
-                <AlertCircle size={18} />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-md bg-red-500/20">
+                <AlertCircle size={16} />
               </div>
               <span className="font-semibold">{error}</span>
             </div>
             <button
-              className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+              className="p-1.5 hover:bg-red-500/20 rounded-md transition-colors"
               onClick={() => setError(null)}
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
         )}
 
         {/* LISTA DE CARTÕES */}
         {!activeCardId ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {cards.map((card, index) => (
               <div
                 key={card.id}
                 onClick={() => setActiveCardId(card.id)}
-                className="group relative overflow-hidden rounded-xl cursor-pointer transition-all duration-500 hover:scale-[1.02] hover:shadow-xl"
+                className="group relative overflow-hidden rounded-lg cursor-pointer transition-all duration-400 hover:scale-[1.01] hover:shadow-lg"
                 style={{
                   background: `linear-gradient(135deg, ${card.color}15 0%, ${card.color}05 100%)`,
                   border: `1px solid ${colors.border}`,
-                  animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`,
-                  minHeight: "200px",
+                  animation: `fadeInUp 0.5s ease-out ${index * 0.1}s both`,
+                  minHeight: "160px",
                 }}
               >
-                {/* Efeito de brilho */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                {/* Botão de deletar */}
                 <button
                   onClick={(e) => deleteCard(e, card.id)}
-                  className="absolute top-3 right-3 z-20 p-2 rounded-lg bg-black/20 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:scale-110 transition-all duration-300"
+                  className="absolute top-2 right-2 z-20 p-1.5 rounded-md bg-black/20 backdrop-blur-md text-white opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:scale-110 transition-all duration-300"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={12} />
                 </button>
 
-                {/* Conteúdo do cartão */}
-                <div className="relative p-5 h-full flex flex-col justify-between">
-                  {/* Header do cartão */}
+                <div className="relative p-4 h-full flex flex-col justify-between">
                   <div className="flex justify-between items-start">
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-base">
                           {bankOptions.find((b) => b.name === card.bank)
                             ?.icon || "💳"}
                         </span>
                         <span
-                          className="font-black text-[10px] uppercase tracking-widest"
+                          className="font-bold text-[9px] uppercase tracking-widest"
                           style={{ color: card.color }}
                         >
                           {card.bank}
                         </span>
                       </div>
                       <h3
-                        className="text-lg font-black leading-none"
+                        className="text-base font-bold leading-none"
                         style={{ color: colors.textPrimary }}
                       >
                         {card.brand.toUpperCase()}
                       </h3>
                     </div>
                     <div
-                      className="p-2 rounded-lg"
+                      className="p-1.5 rounded-md"
                       style={{ backgroundColor: `${card.color}20` }}
                     >
-                      <CreditCard size={16} style={{ color: card.color }} />
+                      <CreditCard size={14} style={{ color: card.color }} />
                     </div>
                   </div>
 
-                  {/* Número do cartão */}
-                  <div className="my-5">
+                  <div className="my-3">
                     <p
-                      className="text-base font-mono tracking-[0.3em] font-bold"
+                      className="text-sm font-mono tracking-[0.2em] font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       •••• {card.lastDigits}
                     </p>
                   </div>
 
-                  {/* Footer do cartão */}
                   <div
-                    className="flex justify-between items-end pt-4 border-t"
+                    className="flex justify-between items-end pt-3 border-t"
                     style={{ borderColor: colors.border }}
                   >
                     <div>
                       <p
-                        className="text-[9px] font-bold uppercase tracking-wider mb-1"
+                        className="text-[8px] font-semibold uppercase tracking-wider mb-0.5"
                         style={{ color: colors.textSecondary }}
                       >
                         Total
                       </p>
                       <p
-                        className="text-base font-black leading-none"
+                        className="text-sm font-bold leading-none"
                         style={{ color: colors.textPrimary }}
                       >
                         R${" "}
@@ -856,12 +843,12 @@ const Cartoes = () => {
                       </p>
                     </div>
                     <div
-                      className="flex items-center gap-1.5 text-[10px] font-bold uppercase"
+                      className="flex items-center gap-1 text-[9px] font-semibold uppercase"
                       style={{ color: colors.textSecondary }}
                     >
                       <span>{card.transactions.length}</span>
                       <ArrowUpRight
-                        size={12}
+                        size={10}
                         className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300"
                       />
                     </div>
@@ -872,47 +859,47 @@ const Cartoes = () => {
           </div>
         ) : (
           /* DETALHES DO CARTÃO */
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-400">
             <button
               onClick={() => setActiveCardId(null)}
-              className="flex items-center gap-2 font-bold text-sm uppercase tracking-wider transition-all hover:gap-3 hover:text-blue-500"
+              className="flex items-center gap-1.5 font-semibold text-xs uppercase tracking-wider transition-all hover:gap-2 hover:text-blue-500"
               style={{ color: colors.textSecondary }}
             >
-              <ChevronLeft size={20} /> Voltar para a lista
+              <ChevronLeft size={16} /> Voltar para a lista
             </button>
 
             {/* Card Info Header */}
             <div
-              className="p-6 rounded-2xl border backdrop-blur-xl"
+              className="p-5 rounded-xl border backdrop-blur-xl"
               style={{
                 backgroundColor: colors.secondary,
                 borderColor: colors.border,
                 background: `linear-gradient(135deg, ${activeCard.color}10 0%, ${colors.secondary} 50%)`,
               }}
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                <div className="flex items-center gap-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="flex items-center gap-3">
                   <div
-                    className="p-4 rounded-xl"
+                    className="p-3 rounded-lg"
                     style={{ backgroundColor: `${activeCard.color}20` }}
                   >
-                    <CreditCard size={28} style={{ color: activeCard.color }} />
+                    <CreditCard size={24} style={{ color: activeCard.color }} />
                   </div>
                   <div>
                     <h2
-                      className="text-2xl font-black mb-1"
+                      className="text-xl font-bold mb-1"
                       style={{ color: colors.textPrimary }}
                     >
                       {activeCard.brand.toUpperCase()}
                     </h2>
                     <p
-                      className="text-base font-mono tracking-widest"
+                      className="text-sm font-mono tracking-widest"
                       style={{ color: colors.textSecondary }}
                     >
                       •••• {activeCard.lastDigits}
                     </p>
                     <p
-                      className="text-[10px] uppercase tracking-wider font-bold mt-1"
+                      className="text-[9px] uppercase tracking-wider font-semibold mt-0.5"
                       style={{ color: activeCard.color }}
                     >
                       {activeCard.bank}
@@ -921,22 +908,22 @@ const Cartoes = () => {
                 </div>
                 <div className="text-right">
                   <p
-                    className="text-[10px] uppercase tracking-wider font-bold mb-1.5"
+                    className="text-[9px] uppercase tracking-wider font-semibold mb-1"
                     style={{ color: colors.textSecondary }}
                   >
                     Total da Fatura
                   </p>
-                  <p className="text-3xl font-black text-red-500">
+                  <p className="text-2xl font-bold text-red-500">
                     R${" "}
                     {activeCard.transactions
                       .reduce((acc, t) => acc + parseFloat(t.value), 0)
                       .toFixed(2)}
                   </p>
                   <p
-                    className="text-xs mt-1.5"
+                    className="text-xs mt-1"
                     style={{ color: colors.textSecondary }}
                   >
-                    {activeCard.transactions.length} transações registradas
+                    {activeCard.transactions.length} transações
                   </p>
                 </div>
               </div>
@@ -944,25 +931,24 @@ const Cartoes = () => {
 
             {/* Tabela de Transações */}
             <div
-              className="border rounded-2xl overflow-hidden backdrop-blur-xl"
+              className="border rounded-xl overflow-hidden backdrop-blur-xl"
               style={{
                 backgroundColor: colors.secondary,
                 borderColor: colors.border,
               }}
             >
-              {/* Header da tabela */}
               <div
-                className="p-5 border-b backdrop-blur-sm"
+                className="p-4 border-b backdrop-blur-sm"
                 style={{
                   borderColor: colors.border,
                   backgroundColor: "rgba(255,255,255,0.02)",
                 }}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="relative flex-1 max-w-md">
                     <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2"
-                      size={16}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2"
+                      size={14}
                       style={{ color: colors.textSecondary }}
                     />
                     <input
@@ -970,7 +956,7 @@ const Cartoes = () => {
                       placeholder="Buscar por descrição..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full border rounded-lg pl-10 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                      className="w-full border rounded-lg pl-9 pr-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                       style={{
                         backgroundColor: colors.tertiary,
                         borderColor: colors.border,
@@ -979,10 +965,10 @@ const Cartoes = () => {
                     />
                   </div>
                   <div
-                    className="flex items-center gap-2 text-xs font-bold"
+                    className="flex items-center gap-1.5 text-xs font-semibold"
                     style={{ color: colors.textSecondary }}
                   >
-                    <BarChart3 size={16} />
+                    <BarChart3 size={14} />
                     <span>
                       {
                         activeCard.transactions.filter((t) =>
@@ -997,21 +983,20 @@ const Cartoes = () => {
                 </div>
               </div>
 
-              {/* Tabela com Scroll */}
-              <div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
+              <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
                 <table className="w-full">
                   <thead className="sticky top-0 z-10">
                     <tr
-                      className="text-[10px] uppercase tracking-wider font-black"
+                      className="text-[9px] uppercase tracking-wider font-semibold"
                       style={{
                         borderColor: "rgba(255,255,255,0.03)",
                         backgroundColor: colors.secondary,
                         color: colors.textSecondary,
                       }}
                     >
-                      <th className="px-6 py-3 text-left">Data</th>
-                      <th className="px-4 py-3 text-left">Descrição</th>
-                      <th className="px-6 py-3 text-right">Valor</th>
+                      <th className="px-4 py-2.5 text-left">Data</th>
+                      <th className="px-3 py-2.5 text-left">Descrição</th>
+                      <th className="px-4 py-2.5 text-right">Valor</th>
                     </tr>
                   </thead>
                   <tbody
@@ -1029,36 +1014,36 @@ const Cartoes = () => {
                           key={i}
                           className="group hover:bg-white/[0.02] transition-colors"
                           style={{
-                            animation: `fadeInUp 0.4s ease-out ${
-                              i * 0.03
+                            animation: `fadeInUp 0.3s ease-out ${
+                              i * 0.02
                             }s both`,
                           }}
                         >
-                          <td className="px-6 py-5">
-                            <div className="flex items-center gap-2.5">
-                              <div className="p-2 rounded-lg bg-blue-500/10">
-                                <Calendar size={14} className="text-blue-500" />
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="p-1.5 rounded-md bg-blue-500/10">
+                                <Calendar size={12} className="text-blue-500" />
                               </div>
                               <span
-                                className="text-sm font-mono font-bold"
+                                className="text-xs font-mono font-semibold"
                                 style={{ color: colors.textSecondary }}
                               >
                                 {t.date}
                               </span>
                             </div>
                           </td>
-                          <td className="px-4 py-5">
+                          <td className="px-3 py-3">
                             <span
-                              className="text-sm font-semibold"
+                              className="text-sm font-medium"
                               style={{ color: colors.textPrimary }}
                             >
                               {t.description}
                             </span>
                           </td>
-                          <td className="px-6 py-5 text-right">
-                            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10">
-                              <DollarSign size={14} className="text-red-500" />
-                              <span className="text-sm font-black text-red-500">
+                          <td className="px-4 py-3 text-right">
+                            <div className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-red-500/10">
+                              <DollarSign size={12} className="text-red-500" />
+                              <span className="text-xs font-bold text-red-500">
                                 R$ {t.value}
                               </span>
                             </div>
@@ -1075,11 +1060,11 @@ const Cartoes = () => {
         {/* MODAL DE IMPORTAÇÃO */}
         {showBankModal && (
           <div
-            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300"
             onClick={() => !isExtracting && setShowBankModal(false)}
           >
             <div
-              className="rounded-3xl border p-10 w-full max-w-2xl shadow-2xl animate-in slide-in-from-bottom-8 duration-500"
+              className="rounded-2xl border p-8 w-full max-w-xl shadow-xl animate-in slide-in-from-bottom-8 duration-400"
               onClick={(e) => e.stopPropagation()}
               style={{
                 backgroundColor: colors.secondary,
@@ -1087,20 +1072,20 @@ const Cartoes = () => {
               }}
             >
               {/* Header do Modal */}
-              <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600">
-                    <Zap className="text-white" size={28} />
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
+                    <Zap className="text-white" size={22} />
                   </div>
                   <div>
                     <h2
-                      className="text-3xl font-black"
+                      className="text-xl font-bold"
                       style={{ color: colors.textPrimary }}
                     >
                       Importar Fatura
                     </h2>
                     <p
-                      className="text-sm mt-1"
+                      className="text-xs mt-0.5"
                       style={{ color: colors.textSecondary }}
                     >
                       Extraia dados automaticamente do PDF
@@ -1109,29 +1094,29 @@ const Cartoes = () => {
                 </div>
                 {!isExtracting && (
                   <button
-                    className="p-3 hover:bg-red-500/20 rounded-xl transition-all hover:scale-110"
+                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all hover:scale-110"
                     onClick={() => setShowBankModal(false)}
                   >
-                    <X size={24} style={{ color: colors.textSecondary }} />
+                    <X size={20} style={{ color: colors.textSecondary }} />
                   </button>
                 )}
               </div>
 
               {/* Seleção de Banco */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <label
-                  className="block text-sm font-black uppercase tracking-wider mb-4"
+                  className="block text-xs font-semibold uppercase tracking-wider mb-3"
                   style={{ color: colors.textPrimary }}
                 >
                   1. Selecione o Banco
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {bankOptions.map((bank) => (
                     <button
                       key={bank.id}
                       onClick={() => setSelectedBank(bank.id)}
                       disabled={isExtracting}
-                      className={`relative group p-6 rounded-2xl border-2 transition-all duration-300 hover:scale-105 ${
+                      className={`relative group p-4 rounded-xl border transition-all duration-300 hover:scale-105 ${
                         selectedBank === bank.id ? "scale-105" : ""
                       }`}
                       style={{
@@ -1143,10 +1128,10 @@ const Cartoes = () => {
                             : colors.tertiary,
                       }}
                     >
-                      <div className="flex flex-col items-center gap-3">
-                        <span className="text-4xl">{bank.icon}</span>
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-2xl">{bank.icon}</span>
                         <span
-                          className="text-xs font-black uppercase tracking-wider"
+                          className="text-xs font-semibold uppercase tracking-wider"
                           style={{
                             color:
                               selectedBank === bank.id
@@ -1158,10 +1143,10 @@ const Cartoes = () => {
                         </span>
                         {selectedBank === bank.id && (
                           <div
-                            className="absolute top-2 right-2 p-1.5 rounded-full"
+                            className="absolute top-1.5 right-1.5 p-1 rounded-full"
                             style={{ backgroundColor: bank.color }}
                           >
-                            <Check size={14} className="text-white" />
+                            <Check size={12} className="text-white" />
                           </div>
                         )}
                       </div>
@@ -1171,15 +1156,15 @@ const Cartoes = () => {
               </div>
 
               {/* Upload de Arquivo */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <label
-                  className="block text-sm font-black uppercase tracking-wider mb-4"
+                  className="block text-xs font-semibold uppercase tracking-wider mb-3"
                   style={{ color: colors.textPrimary }}
                 >
                   2. Envie o PDF da Fatura
                 </label>
                 <label
-                  className={`group block border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                  className={`group block border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:scale-[1.01] ${
                     selectedFile
                       ? "border-green-500 bg-green-500/10"
                       : "hover:border-blue-500 hover:bg-blue-500/5"
@@ -1188,26 +1173,26 @@ const Cartoes = () => {
                     borderColor: selectedFile ? "#10b981" : colors.border,
                   }}
                 >
-                  <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-col items-center gap-3">
                     <div
-                      className={`p-6 rounded-2xl transition-all duration-300 ${
+                      className={`p-4 rounded-xl transition-all duration-300 ${
                         selectedFile
                           ? "bg-green-500/20"
                           : "bg-blue-500/10 group-hover:bg-blue-500/20"
                       }`}
                     >
                       {selectedFile ? (
-                        <FileText size={40} className="text-green-500" />
+                        <FileText size={32} className="text-green-500" />
                       ) : (
                         <Upload
-                          size={40}
+                          size={32}
                           className="text-blue-500 group-hover:scale-110 transition-transform"
                         />
                       )}
                     </div>
                     <div>
                       <span
-                        className="text-lg font-black block mb-2"
+                        className="text-base font-semibold block mb-1.5"
                         style={{ color: colors.textPrimary }}
                       >
                         {selectedFile
@@ -1215,7 +1200,7 @@ const Cartoes = () => {
                           : "Arraste ou Clique para Selecionar"}
                       </span>
                       <span
-                        className="text-sm"
+                        className="text-xs"
                         style={{ color: colors.textSecondary }}
                       >
                         {selectedFile ? fileName : "Arquivos PDF até 10MB"}
@@ -1233,11 +1218,11 @@ const Cartoes = () => {
               </div>
 
               {/* Botões de Ação */}
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <button
                   onClick={() => setShowBankModal(false)}
                   disabled={isExtracting}
-                  className="flex-1 px-8 py-4 text-sm font-black uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-105"
+                  className="flex-1 px-6 py-3 text-xs font-semibold uppercase tracking-wider rounded-lg transition-all duration-300 hover:scale-105"
                   style={{
                     backgroundColor: colors.tertiary,
                     color: colors.textPrimary,
@@ -1248,16 +1233,16 @@ const Cartoes = () => {
                 <button
                   onClick={handleImport}
                   disabled={!selectedBank || !selectedFile || isExtracting}
-                  className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-sm font-black uppercase tracking-wider shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-xs font-semibold uppercase tracking-wider shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {isExtracting ? (
                     <>
-                      <Loader2 className="animate-spin" size={20} />
+                      <Loader2 className="animate-spin" size={16} />
                       Processando...
                     </>
                   ) : (
                     <>
-                      <Sparkles size={20} />
+                      <Sparkles size={16} />
                       Importar Agora
                     </>
                   )}
@@ -1267,14 +1252,14 @@ const Cartoes = () => {
               {/* Error no Modal */}
               {error && (
                 <div
-                  className="mt-6 p-4 border rounded-xl flex items-center gap-3 text-sm animate-in slide-in-from-top-2 duration-300"
+                  className="mt-4 p-3 border rounded-lg flex items-center gap-2 text-xs animate-in slide-in-from-top-2 duration-300"
                   style={{
                     backgroundColor: "rgba(239,68,68,0.1)",
                     borderColor: "rgba(239,68,68,0.3)",
                     color: "#ef4444",
                   }}
                 >
-                  <AlertCircle size={18} />
+                  <AlertCircle size={16} />
                   <span className="font-semibold">{error}</span>
                 </div>
               )}
@@ -1283,15 +1268,11 @@ const Cartoes = () => {
         )}
       </div>
 
-      {/* CSS para animações */}
       <style>{`
-  tr {
-    border-color: ${theme === "dark" ? "rgb(35, 46, 58)" : "rgba(0,0,0,0.1)"} !important;
-  }
       @keyframes fadeInUp {
         from {
           opacity: 0;
-          transform: translateY(30px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
@@ -1299,21 +1280,20 @@ const Cartoes = () => {
         }
       }
 
-      /* Custom Scrollbar */
       .custom-scrollbar::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
       }
 
       .custom-scrollbar::-webkit-scrollbar-track {
         background: ${
           theme === "dark" ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"
         };
-        border-radius: 10px;
+        border-radius: 8px;
       }
 
       .custom-scrollbar::-webkit-scrollbar-thumb {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
+        border-radius: 8px;
       }
 
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {

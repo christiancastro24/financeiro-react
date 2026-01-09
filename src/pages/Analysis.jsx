@@ -388,22 +388,22 @@ const Analises = () => {
       className="ml-[260px] flex-1 p-10 min-h-screen transition-colors duration-300"
       style={{ backgroundColor: colors.primary }}
     >
-      <div className="flex justify-between items-center mb-9">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2
-            className="text-[28px] font-bold mb-1.5"
+            className="text-xl font-bold mb-1"
             style={{ color: colors.textPrimary }}
           >
             Análises
           </h2>
-          <div className="text-sm" style={{ color: colors.textSecondary }}>
+          <div className="text-xs" style={{ color: colors.textSecondary }}>
             Gestão de receitas e despesas
           </div>
         </div>
       </div>
 
       <div
-        className="flex items-center justify-between rounded-xl border mb-8 p-[18px_24px] shadow-lg"
+        className="flex items-center justify-between rounded-lg border mb-5 py-2.5 px-4 shadow"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
@@ -411,133 +411,132 @@ const Analises = () => {
       >
         <button
           onClick={() => changeMonth(-1)}
-          className="rounded-lg cursor-pointer px-[18px] py-2.5 text-sm font-semibold transition-all border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
             color: colors.textSecondary,
           }}
         >
-          {" "}
-          ← Anterior{" "}
+          ← Anterior
         </button>
         <span
-          className="text-lg font-bold"
+          className="text-base font-bold"
           style={{ color: colors.textPrimary }}
         >
           {getMonthName()}
         </span>
         <button
           onClick={() => changeMonth(1)}
-          className="rounded-lg cursor-pointer px-[18px] py-2.5 text-sm font-semibold transition-all border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
             color: colors.textSecondary,
           }}
         >
-          {" "}
-          Próximo →{" "}
+          Próximo →
         </button>
       </div>
 
       <div
-        className="rounded-xl border p-7 shadow-lg mb-8"
+        className="rounded-lg border p-5 shadow mb-6"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
         }}
       >
         <h3
-          className="text-lg font-bold mb-6"
+          className="text-base font-bold mb-4"
           style={{ color: colors.textPrimary }}
         >
           💚 Saúde Financeira - {getMonthName()}
         </h3>
-        <div className="flex items-center gap-8 p-5">
-          <div className="relative w-[150px] h-[150px]">
-            <svg width="150" height="150" className="rotate-[-90deg]">
+        <div className="flex items-center gap-6 p-4">
+          <div className="relative w-[120px] h-[120px]">
+            <svg width="120" height="120" className="rotate-[-90deg]">
               <circle
-                cx="75"
-                cy="75"
-                r="60"
+                cx="60"
+                cy="60"
+                r="48"
                 fill="none"
                 stroke={colors.border}
-                strokeWidth="12"
+                strokeWidth="10"
               />
               <circle
-                cx="75"
-                cy="75"
-                r="60"
+                cx="60"
+                cy="60"
+                r="48"
                 fill="none"
                 stroke={healthScore.color}
-                strokeWidth="12"
-                strokeDasharray={`${(healthScore.score / 100) * 377} 377`}
+                strokeWidth="10"
+                strokeDasharray={`${(healthScore.score / 100) * 301.6} 301.6`}
                 strokeLinecap="round"
                 className="transition-all duration-1000"
               />
             </svg>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
               <div
-                className="text-[32px] font-bold"
+                className="text-2xl font-bold"
                 style={{ color: healthScore.color }}
               >
-                {" "}
-                {healthScore.score}{" "}
+                {healthScore.score}
               </div>
-              <div className="text-xs" style={{ color: colors.textSecondary }}>
+              <div
+                className="text-[10px]"
+                style={{ color: colors.textSecondary }}
+              >
                 pontos
               </div>
             </div>
           </div>
           <div className="flex-1">
             <div
-              className="text-lg font-semibold mb-2.5"
+              className="text-base font-semibold mb-2"
               style={{ color: colors.textPrimary }}
             >
               Taxa de Poupança: {healthScore.savingsRate.toFixed(1)}%
             </div>
             <div
-              className="leading-relaxed"
+              className="text-sm leading-relaxed"
               style={{ color: colors.textSecondary }}
             >
-              {" "}
-              {healthScore.message}{" "}
+              {healthScore.message}
             </div>
           </div>
         </div>
       </div>
 
       <div
-        className="rounded-xl border p-7 shadow-lg mb-8"
+        className="rounded-lg border p-5 shadow mb-6"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
         }}
       >
         <h3
-          className="text-lg font-bold mb-6"
+          className="text-base font-bold mb-4"
           style={{ color: colors.textPrimary }}
         >
           📋 Resumo de Gastos por Categoria
         </h3>
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {categorySummary.map(([category, value]) => (
             <div
               key={category}
-              className="rounded-lg border p-5 px-6 flex justify-between items-center transition-all"
+              className="rounded-lg border p-3.5 px-4 flex justify-between items-center transition-all"
               style={{
                 backgroundColor: colors.tertiary,
                 borderColor: colors.border,
               }}
             >
               <span
-                className="text-base font-bold"
+                className="text-sm font-bold"
                 style={{ color: colors.textPrimary }}
               >
                 {category}
               </span>
-              <span className="text-[#e74c3c] text-xl font-bold">
+              <span className="text-[#e74c3c] text-base font-bold">
                 R$ {formatCurrency(value)}
               </span>
             </div>
@@ -546,55 +545,55 @@ const Analises = () => {
       </div>
 
       <div
-        className="rounded-xl border p-7 shadow-lg mb-8"
+        className="rounded-lg border p-5 shadow mb-6"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
         }}
       >
         <h3
-          className="text-lg font-bold mb-6"
+          className="text-base font-bold mb-4"
           style={{ color: colors.textPrimary }}
         >
           📈 Evolução de Investimentos (2026)
         </h3>
-        <div className="relative h-[300px]">
+        <div className="relative h-[250px]">
           <canvas ref={patrimonialChartRef}></canvas>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-4">
         <div
-          className="rounded-xl border p-7 shadow-lg"
+          className="rounded-lg border p-5 shadow"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
           <h3
-            className="text-lg font-bold mb-6"
+            className="text-base font-bold mb-4"
             style={{ color: colors.textPrimary }}
           >
             🍕 Gastos por Categoria
           </h3>
-          <div className="relative h-[300px]">
+          <div className="relative h-[250px]">
             <canvas ref={categoryPieChartRef}></canvas>
           </div>
         </div>
         <div
-          className="rounded-xl border p-7 shadow-lg"
+          className="rounded-lg border p-5 shadow"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
           <h3
-            className="text-lg font-bold mb-6"
+            className="text-base font-bold mb-4"
             style={{ color: colors.textPrimary }}
           >
             📊 Receitas vs Despesas
           </h3>
-          <div className="relative h-[300px]">
+          <div className="relative h-[250px]">
             <canvas ref={incomeExpenseChartRef}></canvas>
           </div>
         </div>

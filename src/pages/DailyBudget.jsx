@@ -163,18 +163,15 @@ const OrcamentoDiario = () => {
       style={{ backgroundColor: colors.primary }}
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-9">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2
-            className="text-[28px] font-bold mb-1.5 flex items-center gap-3"
+            className="text-xl font-bold mb-1 flex items-center gap-2.5"
             style={{ color: colors.textPrimary }}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-[#f39c12] to-[#e67e22] rounded-xl flex items-center justify-center">
-              <Calendar className="text-white" size={22} />
-            </div>
             Orçamento Diário
           </h2>
-          <div style={{ color: colors.textSecondary }} className="text-sm">
+          <div style={{ color: colors.textSecondary }} className="text-xs">
             Controle seus gastos dia a dia e acumule saldo disponível
           </div>
         </div>
@@ -182,7 +179,7 @@ const OrcamentoDiario = () => {
 
       {/* Navegação de Mês */}
       <div
-        className="flex items-center justify-between rounded-xl border mb-8 py-4 px-6 shadow-lg"
+        className="flex items-center justify-between rounded-lg border mb-5 py-2.5 px-4 shadow"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
@@ -190,67 +187,63 @@ const OrcamentoDiario = () => {
       >
         <button
           onClick={() => changeMonth(-1)}
-          className="rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
             color: colors.textSecondary,
           }}
         >
-          {" "}
-          ← Anterior{" "}
+          ← Anterior
         </button>
         <span
-          className="text-lg font-bold"
+          className="text-base font-bold"
           style={{ color: colors.textPrimary }}
         >
           {getMonthName()}
         </span>
         <button
           onClick={() => changeMonth(1)}
-          className="rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
             color: colors.textSecondary,
           }}
         >
-          {" "}
-          Próximo →{" "}
+          Próximo →
         </button>
       </div>
 
       {budget === 0 ? (
         <div
-          className="rounded-xl border p-12 shadow-lg text-center"
+          className="rounded-lg border p-10 shadow text-center"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
-          <div className="w-20 h-20 bg-[#f39c12]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Target className="text-[#f39c12]" size={40} />
+          <div className="w-16 h-16 bg-[#f39c12]/10 rounded-full flex items-center justify-center mx-auto mb-5">
+            <Target className="text-[#f39c12]" size={32} />
           </div>
           <h3
-            className="text-2xl font-bold mb-3"
+            className="text-xl font-bold mb-2.5"
             style={{ color: colors.textPrimary }}
           >
-            {" "}
-            Configure seu orçamento mensal{" "}
+            Configure seu orçamento mensal
           </h3>
           <p
-            className="text-base mb-8 max-w-md mx-auto"
+            className="text-sm mb-6 max-w-md mx-auto"
             style={{ color: colors.textSecondary }}
           >
-            {" "}
             Cadastre uma despesa com categoria "Gastos Gerais" no Dashboard para
-            definir seu orçamento mensal.{" "}
+            definir seu orçamento mensal.
           </p>
         </div>
       ) : (
         <>
           {/* Cards de Resumo */}
-          <div className="grid grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-4 gap-4 mb-6">
             {[
               {
                 label: "Orçamento",
@@ -287,29 +280,29 @@ const OrcamentoDiario = () => {
             ].map((card, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-l-4 p-6 shadow-md transition-all hover:-translate-y-1"
+                className="rounded-lg border border-l-4 p-4 shadow transition-all hover:-translate-y-1"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
                   borderLeftColor: card.color,
                 }}
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${card.color}20` }}
                   >
-                    <card.icon size={20} style={{ color: card.color }} />
+                    <card.icon size={16} style={{ color: card.color }} />
                   </div>
                   <div
-                    className="text-xs font-bold uppercase tracking-wide"
+                    className="text-[10px] font-bold uppercase tracking-wide"
                     style={{ color: colors.textSecondary }}
                   >
                     {card.label}
                   </div>
                 </div>
                 <div
-                  className="text-2xl font-bold mb-1"
+                  className="text-lg font-bold mb-1"
                   style={{
                     color:
                       i === 1
@@ -324,7 +317,7 @@ const OrcamentoDiario = () => {
                   {card.value}
                 </div>
                 <div
-                  className="text-xs"
+                  className="text-[10px]"
                   style={{ color: colors.textSecondary }}
                 >
                   {card.sub}
@@ -335,25 +328,25 @@ const OrcamentoDiario = () => {
 
           {/* Barra de Progresso */}
           <div
-            className="rounded-xl border p-6 mb-8 shadow-md"
+            className="rounded-lg border p-4 mb-6 shadow"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2.5">
               <span
-                className="text-sm font-semibold"
+                className="text-xs font-semibold"
                 style={{ color: colors.textPrimary }}
               >
                 Uso do Orçamento
               </span>
-              <span className="text-sm font-bold text-[#5b8def]">
+              <span className="text-xs font-bold text-[#5b8def]">
                 {budgetData?.percentSpent.toFixed(1)}%
               </span>
             </div>
             <div
-              className="w-full h-3 rounded-full overflow-hidden"
+              className="w-full h-2.5 rounded-full overflow-hidden"
               style={{ backgroundColor: colors.tertiary }}
             >
               <div
@@ -373,26 +366,26 @@ const OrcamentoDiario = () => {
 
           {/* Tabela de Dias */}
           <div
-            className="rounded-xl border overflow-hidden shadow-lg"
+            className="rounded-lg border overflow-hidden shadow"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <div
-              className="p-6 border-b"
+              className="p-4 border-b"
               style={{ borderColor: colors.border }}
             >
               <h3
-                className="text-lg font-bold flex items-center gap-2"
+                className="text-base font-bold flex items-center gap-2"
                 style={{ color: colors.textPrimary }}
               >
-                <Calendar size={20} className="text-[#5b8def]" /> Controle
+                <Calendar size={16} className="text-[#5b8def]" /> Controle
                 Diário
               </h3>
             </div>
 
-            <div className="max-h-[500px] overflow-y-auto">
+            <div className="max-h-[450px] overflow-y-auto transactions-list">
               <table className="w-full border-collapse">
                 <thead
                   className="sticky top-0 z-10"
@@ -407,7 +400,7 @@ const OrcamentoDiario = () => {
                     ].map((h, i) => (
                       <th
                         key={h}
-                        className={`text-[#8b92a7] text-xs uppercase font-bold p-4 tracking-wider ${
+                        className={`text-[#8b92a7] text-[10px] uppercase font-bold p-3 tracking-wider ${
                           i === 0
                             ? "text-left"
                             : i === 3
@@ -440,26 +433,26 @@ const OrcamentoDiario = () => {
                           }}
                         >
                           <td
-                            className="p-4 font-bold"
+                            className="p-3 font-bold text-sm"
                             style={{ color: colors.textPrimary }}
                           >
                             Dia {day}{" "}
                             {isToday && (
-                              <span className="text-[#5b8def] text-xs ml-2">
+                              <span className="text-[#5b8def] text-[10px] ml-2">
                                 (Hoje)
                               </span>
                             )}
                           </td>
                           <td
-                            className="p-4 text-center"
+                            className="p-3 text-center text-xs"
                             style={{ color: colors.textSecondary }}
                           >
                             R$ {formatCurrency(dailyBudget)}
                           </td>
-                          <td className="p-4 text-center">
+                          <td className="p-3 text-center">
                             <div className="relative inline-block">
                               <span
-                                className="absolute left-3 top-1/2 -translate-y-1/2 text-xs"
+                                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px]"
                                 style={{ color: colors.textSecondary }}
                               >
                                 R$
@@ -471,7 +464,7 @@ const OrcamentoDiario = () => {
                                 onChange={(e) =>
                                   updateDailySpending(day, e.target.value)
                                 }
-                                className="w-32 py-2 pl-8 pr-3 border rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-[#5b8def]/20 transition-all"
+                                className="w-28 py-1.5 pl-7 pr-2 border rounded-lg text-xs text-right focus:outline-none focus:ring-2 focus:ring-[#5b8def]/20 transition-all"
                                 style={{
                                   backgroundColor: colors.inputBg,
                                   borderColor: colors.border,
@@ -481,7 +474,7 @@ const OrcamentoDiario = () => {
                             </div>
                           </td>
                           <td
-                            className="p-4 text-right font-bold text-base"
+                            className="p-3 text-right font-bold text-sm"
                             style={{
                               color: isNegative ? "#e74c3c" : "#27ae60",
                             }}

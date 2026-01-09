@@ -494,7 +494,7 @@ export default function AIAssistant() {
       {/* Botão Flutuante */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-4 w-14 h-14 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50 ${
+        className={`fixed bottom-2 right-4 w-12 h-12 bg-gradient-to-br from-[#667eea] to-[#764ba2] text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50 ${
           isOpen ? "scale-0" : "scale-100"
         }`}
       >
@@ -515,7 +515,7 @@ export default function AIAssistant() {
 
       {/* Chat Window */}
       <div
-        className={`fixed bottom-6 right-4 w-[380px] h-[600px] bg-[#1a1f2e] rounded-2xl shadow-2xl border border-[#2a2f3e] flex flex-col transition-all duration-300 z-50 ${
+        className={`fixed bottom-4 right-4 w-[380px] h-[600px] bg-[#1a1f2e] rounded-2xl shadow-2xl border border-[#2a2f3e] flex flex-col transition-all duration-300 z-50 ${
           isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0"
         }`}
       >

@@ -34,41 +34,41 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
   ];
 
   return (
-    <div className="w-[260px] h-screen fixed left-0 top-0 bg-[#1a1f2e] border-r border-[#2a2f3e] flex flex-col shadow-[2px_0_20px_rgba(0,0,0,0.5)]">
-      <div className="py-[30px] px-6 border-b border-[#2a2f3e]">
+    <div className="w-[270px] h-screen fixed left-0 top-0 bg-[#1a1d29] border-r border-[#2a2d3a] flex flex-col">
+      <div className="p-6 pb-5 border-b border-[#2a2d3a]">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#5b8def] to-[#0063f7] rounded-[10px] flex items-center justify-center text-xl">
+          <div className="w-10 h-10 bg-[#2563eb] rounded-lg flex items-center justify-center text-lg">
             💰
           </div>
-          <span className="text-[22px] font-bold text-white">FinanceApp</span>
+          <span className="text-lg font-semibold text-white">FinanceApp</span>
         </div>
-        <p className="text-[#8b92a7] text-[13px] m-0">Financial Control</p>
+        <p className="text-[#6b7280] text-xs pl-[52px]">Financial Control</p>
       </div>
 
-      <div className="flex-1 p-0 overflow-y-auto">
+      <div className="flex-1 px-3 py-4 overflow-y-auto">
         {menuItems.map((item) => (
-          <div
+          <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={`flex items-center gap-3 py-3.5 px-[30px] cursor-pointer transition-all font-medium text-[15px] border-l-[3px] ${
+            className={`w-full flex items-center gap-3 py-2.5 px-3 mb-1 rounded-lg cursor-pointer transition-all font-medium text-sm ${
               activeTab === item.id
-                ? "bg-[#1e2738] text-[#5b8def] border-l-[#5b8def]"
-                : "bg-transparent text-[#8b92a7] border-l-transparent hover:bg-[#252b3b] hover:text-[#e4e6eb]"
+                ? "bg-[#2563eb] text-white"
+                : "bg-transparent text-[#9ca3af] hover:bg-[#252833] hover:text-white"
             }`}
           >
-            <span className="text-lg w-6 text-center">{item.icon}</span>
+            <span className="text-base">{item.icon}</span>
             <span>{item.label}</span>
-          </div>
+          </button>
         ))}
       </div>
 
-      <div className="py-5 px-6 border-t border-[#2a2f3e]">
+      <div className="p-4 border-t border-[#2a2d3a]">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-[#252b3b] border border-[#2a2f3e] rounded-[10px] text-[#ef4444] font-semibold text-[15px] cursor-pointer transition-all hover:bg-[#2a2f3e] hover:border-[#ef4444]"
+          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#252833] border border-[#2a2d3a] rounded-lg text-[#9ca3af] font-medium text-sm cursor-pointer transition-all hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626]"
         >
-          <LogOut size={18} />
-          Logout
+          <LogOut size={16} />
+          Sair
         </button>
       </div>
     </div>

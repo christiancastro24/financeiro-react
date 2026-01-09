@@ -218,60 +218,60 @@ const Aposentadoria = () => {
 
   return (
     <div
-      className="ml-[260px] min-h-screen transition-colors duration-300 p-10"
+      className="ml-[260px] min-h-screen transition-colors duration-300 p-6"
       style={{ backgroundColor: colors.primary }}
     >
       <div
-        className="rounded-2xl border p-8 mb-8"
+        className="rounded-xl border p-6 mb-6"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
         }}
       >
-        <h2 className="text-[28px] font-bold mb-3 text-[#667eea]">
+        <h2 className="text-xl font-bold mb-2 text-[#667eea]">
           🎯 Minha Aposentadoria aos {retirementData.retirementAge} Anos
         </h2>
-        <p className="text-sm" style={{ color: colors.textSecondary }}>
+        <p className="text-xs" style={{ color: colors.textSecondary }}>
           Idade Atual: {retirementData.currentAge} anos • Faltam{" "}
           {remainingYears} anos ({remainingMonths} meses)
         </p>
-        <p className="text-sm mt-2" style={{ color: colors.textSecondary }}>
+        <p className="text-xs mt-1" style={{ color: colors.textSecondary }}>
           Meta: {formatCurrency(retirementData.targetIncome)}/mês em poder de
           compra
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div
-          className="rounded-2xl border p-9"
+          className="rounded-xl border p-5"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2.5 text-[#667eea]">
+          <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-[#667eea]">
             📊 Situação Atual
           </h3>
-          <div className="mb-5">
+          <div className="mb-4">
             <div
-              className="text-sm mb-2 mt-8"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Patrimônio Acumulado
             </div>
-            <div className="text-[32px] font-bold text-[#667eea]">
+            <div className="text-xl font-bold text-[#667eea]">
               {formatCurrency(currentBalance)}
             </div>
           </div>
-          <div className="mb-5">
+          <div className="mb-4">
             <div
-              className="text-sm mb-2 mt-5"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Aportes Realizados
             </div>
             <div
-              className="text-[32px] font-bold"
+              className="text-xl font-bold"
               style={{ color: colors.textPrimary }}
             >
               {formatCurrency(totalContributed)}
@@ -279,81 +279,81 @@ const Aposentadoria = () => {
           </div>
           <div>
             <div
-              className="text-sm mb-2 mt-5"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Rendimento até agora
             </div>
-            <div className="text-[32px] font-bold text-[#27ae60]">
+            <div className="text-xl font-bold text-[#27ae60]">
               {formatCurrency(earnings)}
             </div>
           </div>
         </div>
 
         <div
-          className="rounded-2xl border p-9"
+          className="rounded-xl border p-5"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-2.5 text-[#667eea]">
+          <h3 className="text-base font-bold mb-4 flex items-center gap-2 text-[#667eea]">
             🎯 Meta e Projeção
           </h3>
-          <div className="mb-5">
+          <div className="mb-4">
             <div
-              className="text-sm mb-2 mt-2.5"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Patrimônio Necessário
             </div>
             <div
-              className="text-[32px] font-bold"
+              className="text-xl font-bold"
               style={{ color: colors.textPrimary }}
             >
               {formatCurrency(targetAmount)}
             </div>
             <div
-              className="text-xs mt-1"
+              className="text-xs mt-0.5"
               style={{ color: colors.textSecondary }}
             >
               (Rendimento de {retirementData.interestRate}% a.a. ={" "}
               {formatCurrency(retirementData.targetIncome)}/mês)
             </div>
           </div>
-          <div className="mb-5">
+          <div className="mb-4">
             <div
-              className="text-sm mb-2"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Tempo restante
             </div>
             <div
-              className="text-[32px] font-bold"
+              className="text-xl font-bold"
               style={{ color: colors.textPrimary }}
             >
               {remainingYears} anos
             </div>
-            <div className="text-sm" style={{ color: colors.textSecondary }}>
+            <div className="text-xs" style={{ color: colors.textSecondary }}>
               ({remainingMonths} meses)
             </div>
           </div>
-          <div className="mb-5">
+          <div className="mb-4">
             <div
-              className="text-sm mb-2"
+              className="text-xs mb-1.5"
               style={{ color: colors.textSecondary }}
             >
               Aporte Ideal por Mês
             </div>
-            <div className="text-[32px] font-bold text-[#f39c12]">
+            <div className="text-xl font-bold text-[#f39c12]">
               {formatCurrency(idealMonthly)}
             </div>
           </div>
           <div
-            className={`rounded p-4 mt-5 text-sm ${
+            className={`rounded p-3 mt-3 text-xs ${
               idealMonthly === 0
-                ? "bg-[#d1fae5] border-l-4 border-l-[#10b981] text-[#065f46]"
-                : "bg-[rgba(59,130,246,0.1)] border-l-4 border-l-[#3b82f6]"
+                ? "bg-[#d1fae5] border-l-2 border-l-[#10b981] text-[#065f46]"
+                : "bg-[rgba(59,130,246,0.1)] border-l-2 border-l-[#3b82f6]"
             }`}
             style={idealMonthly !== 0 ? { color: colors.textPrimary } : {}}
           >
@@ -374,7 +374,7 @@ const Aposentadoria = () => {
           onClick={() => setShowContributionModal(false)}
         >
           <div
-            className="rounded-2xl border p-8 w-full max-w-md shadow-2xl"
+            className="rounded-xl border p-6 w-full max-w-sm shadow-xl"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
@@ -382,14 +382,14 @@ const Aposentadoria = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h2
-              className="text-2xl font-bold mb-6"
+              className="text-lg font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               💰 Novo Aporte
             </h2>
-            <div className="mb-4">
+            <div className="mb-3">
               <label
-                className="block text-sm font-semibold mb-2"
+                className="block text-xs font-semibold mb-1.5"
                 style={{ color: colors.textSecondary }}
               >
                 Valor do aporte (R$)
@@ -399,7 +399,7 @@ const Aposentadoria = () => {
                 value={monthlyAmount}
                 onChange={(e) => setMonthlyAmount(e.target.value)}
                 placeholder="Ex: 1500"
-                className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                className="w-full px-3 py-2 border rounded-md outline-none focus:border-[#667eea] transition-all text-sm"
                 style={{
                   backgroundColor: colors.tertiary,
                   borderColor: colors.border,
@@ -407,10 +407,10 @@ const Aposentadoria = () => {
                 }}
               />
             </div>
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-2 pt-3">
               <button
                 onClick={() => setShowContributionModal(false)}
-                className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
+                className="flex-1 px-4 py-2 bg-[#5a6c7d] text-white text-xs font-semibold rounded-md transition-all hover:bg-[#4a5c6d]"
               >
                 Cancelar
               </button>
@@ -419,9 +419,9 @@ const Aposentadoria = () => {
                   addContribution();
                   setShowContributionModal(false);
                 }}
-                className="flex-1 px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg shadow-lg transition-all hover:bg-[#5568d3]"
+                className="flex-1 px-4 py-2 bg-[#667eea] text-white text-xs font-semibold rounded-md shadow transition-all hover:bg-[#5568d3]"
               >
-                💾 Registrar Aporte
+                💾 Registrar
               </button>
             </div>
           </div>
@@ -434,7 +434,7 @@ const Aposentadoria = () => {
           onClick={() => setShowSettingsModal(false)}
         >
           <div
-            className="rounded-2xl border p-8 w-full max-w-md shadow-2xl"
+            className="rounded-xl border p-6 w-full max-w-sm shadow-xl"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
@@ -442,15 +442,15 @@ const Aposentadoria = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h2
-              className="text-2xl font-bold mb-6"
+              className="text-lg font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               ⚙️ Configurações
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <label
-                  className="block text-sm font-semibold mb-2"
+                  className="block text-xs font-semibold mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Idade Atual (anos)
@@ -464,7 +464,7 @@ const Aposentadoria = () => {
                       currentAge: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-3 py-2 border rounded-md outline-none focus:border-[#667eea] transition-all text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -474,7 +474,7 @@ const Aposentadoria = () => {
               </div>
               <div>
                 <label
-                  className="block text-sm font-semibold mb-2"
+                  className="block text-xs font-semibold mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Idade para Aposentar (anos)
@@ -488,7 +488,7 @@ const Aposentadoria = () => {
                       retirementAge: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-3 py-2 border rounded-md outline-none focus:border-[#667eea] transition-all text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -498,7 +498,7 @@ const Aposentadoria = () => {
               </div>
               <div>
                 <label
-                  className="block text-sm font-semibold mb-2"
+                  className="block text-xs font-semibold mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Renda mensal desejada (R$)
@@ -512,7 +512,7 @@ const Aposentadoria = () => {
                       targetIncome: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-3 py-2 border rounded-md outline-none focus:border-[#667eea] transition-all text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -522,7 +522,7 @@ const Aposentadoria = () => {
               </div>
               <div>
                 <label
-                  className="block text-sm font-semibold mb-2"
+                  className="block text-xs font-semibold mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Taxa real anual (%)
@@ -536,7 +536,7 @@ const Aposentadoria = () => {
                       interestRate: parseFloat(e.target.value),
                     })
                   }
-                  className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#667eea] transition-all"
+                  className="w-full px-3 py-2 border rounded-md outline-none focus:border-[#667eea] transition-all text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -544,28 +544,28 @@ const Aposentadoria = () => {
                   }}
                 />
               </div>
-              <div className="flex flex-col gap-3 pt-4">
+              <div className="flex flex-col gap-2 pt-3">
                 <button
                   onClick={() => {
                     recalculate();
                     setShowSettingsModal(false);
                   }}
-                  className="w-full px-6 py-3 bg-[#667eea] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#5568d3]"
+                  className="w-full px-4 py-2 bg-[#667eea] text-white text-xs font-semibold rounded-md transition-all hover:bg-[#5568d3]"
                 >
-                  🔄 Recalcular Tudo
+                  🔄 Recalcular
                 </button>
                 <button
                   onClick={() => {
                     resetData();
                     setShowSettingsModal(false);
                   }}
-                  className="w-full px-6 py-3 bg-[#ef4444] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#dc2626]"
+                  className="w-full px-4 py-2 bg-[#ef4444] text-white text-xs font-semibold rounded-md transition-all hover:bg-[#dc2626]"
                 >
                   🗑️ Resetar Dados
                 </button>
                 <button
                   onClick={() => setShowSettingsModal(false)}
-                  className="w-full px-6 py-3 bg-[#5a6c7d] text-white text-sm font-bold rounded-lg transition-all hover:bg-[#4a5c6d]"
+                  className="w-full px-4 py-2 bg-[#5a6c7d] text-white text-xs font-semibold rounded-md transition-all hover:bg-[#4a5c6d]"
                 >
                   Fechar
                 </button>
@@ -576,26 +576,26 @@ const Aposentadoria = () => {
       )}
 
       <div
-        className="rounded-2xl border p-9"
+        className="rounded-xl border p-6"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
         }}
       >
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-[22px] font-bold text-[#667eea]">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-base font-bold text-[#667eea]">
             📈 Histórico de Aportes
           </h3>
-          <div className="flex gap-3 mb-5">
+          <div className="flex gap-2">
             <button
               onClick={() => setShowContributionModal(true)}
-              className="bg-[#667eea] text-white rounded-full hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-lg border-none cursor-pointer"
+              className="bg-[#667eea] text-white rounded-full hover:scale-105 w-10 h-10 flex items-center justify-center text-lg shadow border-none cursor-pointer"
             >
               💰
             </button>
             <button
               onClick={() => setShowSettingsModal(true)}
-              className="rounded-full hover:scale-110 w-12 h-12 flex items-center justify-center text-xl shadow-lg border-none cursor-pointer"
+              className="rounded-full hover:scale-105 w-10 h-10 flex items-center justify-center text-lg shadow border-none cursor-pointer"
               style={{
                 backgroundColor: colors.border,
                 color: colors.textPrimary,
@@ -607,13 +607,13 @@ const Aposentadoria = () => {
         </div>
         {sortedContributions.length === 0 ? (
           <p
-            className="text-center py-8"
+            className="text-center py-6 text-sm"
             style={{ color: colors.textSecondary }}
           >
             Nenhum aporte registrado ainda
           </p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {sortedContributions.map((contribution, index) => {
               const originalIndex = retirementData.contributions.findIndex(
                 (c) =>
@@ -623,12 +623,12 @@ const Aposentadoria = () => {
               return (
                 <div
                   key={index}
-                  className="rounded flex justify-between items-center p-4 border-l-4 border-l-[#667eea]"
+                  className="rounded flex justify-between items-center p-3 border-l-2 border-l-[#667eea]"
                   style={{ backgroundColor: colors.cardItem }}
                 >
                   <div className="flex-1">
                     <div
-                      className="text-[13px]"
+                      className="text-xs"
                       style={{ color: colors.textSecondary }}
                     >
                       {contribution.date.toLocaleDateString("pt-BR", {
@@ -640,23 +640,23 @@ const Aposentadoria = () => {
                       })}
                     </div>
                     <div
-                      className="text-xl font-bold mt-1.5"
+                      className="text-base font-semibold mt-1"
                       style={{ color: colors.textPrimary }}
                     >
                       {formatCurrency(contribution.amount)}
                     </div>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => editContribution(originalIndex)}
-                      className="bg-transparent hover:bg-[rgba(91,141,239,0.1)] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
+                      className="bg-transparent hover:bg-[rgba(91,141,239,0.1)] rounded transition-all p-1.5 text-base border-none cursor-pointer"
                       style={{ color: colors.textSecondary }}
                     >
                       ✏️
                     </button>
                     <button
                       onClick={() => deleteContribution(originalIndex)}
-                      className="bg-transparent hover:bg-[rgba(231,76,60,0.1)] rounded transition-all p-2.5 text-lg border-none cursor-pointer"
+                      className="bg-transparent hover:bg-[rgba(231,76,60,0.1)] rounded transition-all p-1.5 text-base border-none cursor-pointer"
                       style={{ color: colors.textSecondary }}
                     >
                       🗑️

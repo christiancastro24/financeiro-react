@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const Investimentos = () => {
-  // --- LÓGICA DE TEMA ---
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("financeapp_theme") || "dark";
   });
@@ -199,17 +198,17 @@ const Investimentos = () => {
               display: true,
               position: "top",
               labels: {
-                color: colors.textPrimary, // AJUSTE DINÂMICO
-                font: { size: 13, weight: "600" },
-                padding: 15,
+                color: colors.textPrimary,
+                font: { size: 12, weight: "600" },
+                padding: 10,
                 usePointStyle: true,
               },
             },
             tooltip: {
-              backgroundColor: colors.secondary, // AJUSTE DINÂMICO
+              backgroundColor: colors.secondary,
               titleColor: colors.textPrimary,
               bodyColor: colors.textPrimary,
-              padding: 12,
+              padding: 10,
               callbacks: {
                 label: function (context) {
                   return (
@@ -228,8 +227,8 @@ const Investimentos = () => {
                 callback: function (value) {
                   return "R$ " + formatCurrency(value);
                 },
-                color: colors.textSecondary, // AJUSTE DINÂMICO
-                font: { size: 11 },
+                color: colors.textSecondary,
+                font: { size: 10 },
               },
               grid: {
                 color:
@@ -240,8 +239,8 @@ const Investimentos = () => {
             },
             x: {
               ticks: {
-                color: colors.textSecondary, // AJUSTE DINÂMICO
-                font: { size: 11 },
+                color: colors.textSecondary,
+                font: { size: 10 },
               },
               grid: {
                 display: false,
@@ -301,17 +300,17 @@ const Investimentos = () => {
               display: true,
               position: "top",
               labels: {
-                color: colors.textPrimary, // AJUSTE DINÂMICO
-                font: { size: 13, weight: "600" },
-                padding: 15,
+                color: colors.textPrimary,
+                font: { size: 12, weight: "600" },
+                padding: 10,
                 usePointStyle: true,
               },
             },
             tooltip: {
-              backgroundColor: colors.secondary, // AJUSTE DINÂMICO
+              backgroundColor: colors.secondary,
               titleColor: colors.textPrimary,
               bodyColor: colors.textPrimary,
-              padding: 12,
+              padding: 10,
               callbacks: {
                 label: function (context) {
                   return (
@@ -330,8 +329,8 @@ const Investimentos = () => {
                 callback: function (value) {
                   return "R$ " + formatCurrency(value);
                 },
-                color: colors.textSecondary, // AJUSTE DINÂMICO
-                font: { size: 11 },
+                color: colors.textSecondary,
+                font: { size: 10 },
               },
               grid: {
                 color:
@@ -342,8 +341,8 @@ const Investimentos = () => {
             },
             x: {
               ticks: {
-                color: colors.textSecondary, // AJUSTE DINÂMICO
-                font: { size: 11 },
+                color: colors.textSecondary,
+                font: { size: 10 },
                 maxRotation: 45,
                 minRotation: 45,
               },
@@ -372,27 +371,27 @@ const Investimentos = () => {
 
   return (
     <div
-      className="ml-[260px] flex-1 p-10 transition-colors duration-300"
+      className="ml-[260px] flex-1 p-6 transition-colors duration-300"
       style={{ backgroundColor: colors.primary }}
     >
-      <div className="flex justify-between items-center mb-9">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2
-            className="text-[28px] font-bold mb-1.5"
+            className="text-xl font-bold mb-1"
             style={{ color: colors.textPrimary }}
           >
             Investimentos
           </h2>
-          <div className="text-sm" style={{ color: colors.textSecondary }}>
+          <div className="text-xs" style={{ color: colors.textSecondary }}>
             Gestão de receitas e despesas
           </div>
         </div>
       </div>
 
-      <div className="flex gap-3 mb-8">
+      <div className="flex gap-2 mb-6">
         <button
           onClick={() => setActiveView("my-investments")}
-          className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
+          className={`flex-1 rounded-lg cursor-pointer transition-all py-2.5 px-4 text-sm font-semibold ${
             activeView === "my-investments"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
               : "border hover:border-[#5b8def]"
@@ -411,7 +410,7 @@ const Investimentos = () => {
         </button>
         <button
           onClick={() => setActiveView("simulator")}
-          className={`flex-1 rounded-lg cursor-pointer transition-all py-3.5 px-5 text-[15px] font-bold ${
+          className={`flex-1 rounded-lg cursor-pointer transition-all py-2.5 px-4 text-sm font-semibold ${
             activeView === "simulator"
               ? "bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white"
               : "border hover:border-[#5b8def]"
@@ -432,26 +431,26 @@ const Investimentos = () => {
 
       {activeView === "my-investments" && (
         <div>
-          <div className="grid grid-cols-3 gap-3 mb-9">
+          <div className="grid grid-cols-3 gap-3 mb-6">
             <div
-              className="rounded-2xl border overflow-hidden"
+              className="rounded-xl border overflow-hidden"
               style={{
                 backgroundColor: colors.secondary,
                 borderColor: colors.border,
               }}
             >
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="text-[35px]">💰</div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="text-2xl">💰</div>
                   <div
-                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    className="text-xs uppercase font-semibold tracking-wide pl-1"
                     style={{ color: colors.textSecondary }}
                   >
                     Total Investido
                   </div>
                 </div>
                 <div
-                  className="text-[32px] font-bold tracking-tight"
+                  className="text-xl font-bold tracking-tight"
                   style={{ color: colors.textPrimary }}
                 >
                   R$ {formatCurrency(totalInvested)}
@@ -460,49 +459,49 @@ const Investimentos = () => {
             </div>
 
             <div
-              className="rounded-2xl border overflow-hidden"
+              className="rounded-xl border overflow-hidden"
               style={{
                 backgroundColor: colors.secondary,
                 borderColor: colors.border,
               }}
             >
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="text-[35px]">📊</div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="text-2xl">📊</div>
                   <div
-                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    className="text-xs uppercase font-semibold tracking-wide pl-1"
                     style={{ color: colors.textSecondary }}
                   >
-                    Projeção 12 meses
+                    Projeção 12m
                   </div>
                 </div>
-                <div className="text-[32px] font-bold text-[#5b8def] tracking-tight">
+                <div className="text-xl font-bold text-[#5b8def] tracking-tight">
                   R$ {formatCurrency(projection12m)}
                 </div>
-                <div className="text-[#27ae60] text-xs font-bold mt-2">
+                <div className="text-[#27ae60] text-xs font-semibold mt-1">
                   +R$ {formatCurrency(gain12m)} de rendimento
                 </div>
               </div>
             </div>
 
             <div
-              className="rounded-2xl border overflow-hidden"
+              className="rounded-xl border overflow-hidden"
               style={{
                 backgroundColor: colors.secondary,
                 borderColor: colors.border,
               }}
             >
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="text-[35px] pl-4">📈</div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="text-2xl pl-4">📈</div>
                   <div
-                    className="text-[13px] uppercase font-bold tracking-wide pl-1"
+                    className="text-xs uppercase font-semibold tracking-wide pl-1"
                     style={{ color: colors.textSecondary }}
                   >
-                    Rentabilidade (CDI)
+                    Rentabilidade
                   </div>
                 </div>
-                <div className="text-[32px] font-bold text-[#9b59b6] tracking-tight pl-4">
+                <div className="text-xl font-bold text-[#9b59b6] tracking-tight pl-4">
                   100%
                 </div>
               </div>
@@ -510,33 +509,33 @@ const Investimentos = () => {
           </div>
 
           <div
-            className="rounded-xl border p-7 mb-8"
+            className="rounded-lg border p-5 mb-6"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <h3
-              className="text-lg font-bold mb-5"
+              className="text-base font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
-              📈 Projeção de Crescimento - Meus Investimentos
+              📈 Projeção de Crescimento
             </h3>
             <canvas
               ref={myInvestmentChartRef}
-              className="max-h-[300px]"
+              className="max-h-[250px]"
             ></canvas>
           </div>
 
           <div
-            className="rounded-xl border p-7 mb-8"
+            className="rounded-lg border p-5 mb-6"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <h3
-              className="text-lg font-bold mb-5"
+              className="text-base font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               📊 Tabela de Projeção Mensal
@@ -549,31 +548,31 @@ const Investimentos = () => {
                     style={{ borderColor: colors.border }}
                   >
                     <th
-                      className="text-left text-xs uppercase p-3 font-bold"
+                      className="text-left text-xs uppercase p-2.5 font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Mês
                     </th>
                     <th
-                      className="text-left text-xs uppercase p-3 font-bold"
+                      className="text-left text-xs uppercase p-2.5 font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Juros
                     </th>
                     <th
-                      className="text-left text-xs uppercase p-3 font-bold"
+                      className="text-left text-xs uppercase p-2.5 font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Total Investido
                     </th>
                     <th
-                      className="text-left text-xs uppercase p-3 font-bold"
+                      className="text-left text-xs uppercase p-2.5 font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Total Juros
                     </th>
                     <th
-                      className="text-left text-xs uppercase p-3 font-bold"
+                      className="text-left text-xs uppercase p-2.5 font-semibold"
                       style={{ color: colors.textSecondary }}
                     >
                       Total Acumulado
@@ -585,7 +584,7 @@ const Investimentos = () => {
                     <tr>
                       <td
                         colSpan="5"
-                        className="text-center py-10"
+                        className="text-center py-6"
                         style={{ color: colors.textSecondary }}
                       >
                         Nenhum investimento registrado ainda.
@@ -599,21 +598,21 @@ const Investimentos = () => {
                         style={{ borderColor: colors.border }}
                       >
                         <td
-                          className="p-3"
+                          className="p-2.5 text-sm"
                           style={{ color: colors.textPrimary }}
                         >
                           {row.month}
                         </td>
-                        <td className="text-[#27ae60] p-3">
+                        <td className="text-[#27ae60] p-2.5 text-sm">
                           R$ {formatCurrency(row.interest)}
                         </td>
-                        <td className="text-[#5b8def] p-3">
+                        <td className="text-[#5b8def] p-2.5 text-sm">
                           R$ {formatCurrency(row.totalInvested)}
                         </td>
-                        <td className="text-[#27ae60] p-3">
+                        <td className="text-[#27ae60] p-2.5 text-sm">
                           R$ {formatCurrency(row.totalInterest)}
                         </td>
-                        <td className="text-[#9b59b6] font-bold p-3">
+                        <td className="text-[#9b59b6] font-semibold p-2.5 text-sm">
                           R$ {formatCurrency(row.accumulated)}
                         </td>
                       </tr>
@@ -625,44 +624,44 @@ const Investimentos = () => {
           </div>
 
           <div
-            className="rounded-xl border p-7"
+            className="rounded-lg border p-5"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <h3
-              className="text-lg font-bold mb-5"
+              className="text-base font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               💼 Histórico de Investimentos
             </h3>
             {investments.length === 0 ? (
               <div
-                className="text-center rounded-lg py-15 px-5"
+                className="text-center rounded-md py-8 px-4"
                 style={{ backgroundColor: colors.tertiary }}
               >
-                <div className="text-5xl mb-4">💎</div>
-                <p style={{ color: colors.textSecondary }}>
+                <div className="text-4xl mb-3">💎</div>
+                <p className="text-sm" style={{ color: colors.textSecondary }}>
                   Nenhum investimento registrado ainda.
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {investments
                   .sort((a, b) => new Date(b.date) - new Date(a.date))
                   .map((inv) => (
                     <div
                       key={inv.id}
-                      className="rounded-lg border transition-all p-5"
+                      className="rounded-md border transition-all p-4"
                       style={{
                         backgroundColor: colors.tertiary,
                         borderColor: colors.border,
                       }}
                     >
-                      <div className="flex justify-between items-start mb-3">
+                      <div className="flex justify-between items-start mb-2">
                         <div
-                          className="font-bold"
+                          className="font-semibold text-sm"
                           style={{ color: colors.textPrimary }}
                         >
                           {inv.title}
@@ -674,10 +673,10 @@ const Investimentos = () => {
                           {new Date(inv.date).toLocaleDateString("pt-BR")}
                         </div>
                       </div>
-                      <div className="text-[#27ae60] text-xl font-bold mb-2">
+                      <div className="text-[#27ae60] text-base font-semibold mb-1.5">
                         R$ {formatCurrency(inv.value)}
                       </div>
-                      <div className="inline-block bg-[rgba(91,141,239,0.2)] text-[#5b8def] rounded text-xs py-1 px-2.5">
+                      <div className="inline-block bg-[rgba(91,141,239,0.2)] text-[#5b8def] rounded text-xs py-0.5 px-2">
                         {inv.category}
                       </div>
                     </div>
@@ -691,22 +690,22 @@ const Investimentos = () => {
       {activeView === "simulator" && (
         <div>
           <div
-            className="rounded-xl border p-7 mb-8"
+            className="rounded-lg border p-5 mb-6"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <h3
-              className="text-lg font-bold mb-5"
+              className="text-base font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               💡 Simulador de Investimentos
             </h3>
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
               <div>
                 <label
-                  className="text-[13px] block mb-2"
+                  className="text-xs block mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Aporte Inicial (R$)
@@ -717,7 +716,7 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInitialAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-md py-2 px-2.5 text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -729,7 +728,7 @@ const Investimentos = () => {
               </div>
               <div>
                 <label
-                  className="text-[13px] block mb-2"
+                  className="text-xs block mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Aporte Mensal (R$)
@@ -740,7 +739,7 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setMonthlyAmount(parseFloat(e.target.value) || 0)
                   }
-                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-md py-2 px-2.5 text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -752,7 +751,7 @@ const Investimentos = () => {
               </div>
               <div>
                 <label
-                  className="text-[13px] block mb-2"
+                  className="text-xs block mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Período (meses)
@@ -763,7 +762,7 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setInvestmentPeriod(parseInt(e.target.value) || 12)
                   }
-                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-md py-2 px-2.5 text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -775,7 +774,7 @@ const Investimentos = () => {
               </div>
               <div>
                 <label
-                  className="text-[13px] block mb-2"
+                  className="text-xs block mb-1.5"
                   style={{ color: colors.textSecondary }}
                 >
                   % do CDI
@@ -786,7 +785,7 @@ const Investimentos = () => {
                   onChange={(e) =>
                     setCdiPercentage(parseInt(e.target.value) || 100)
                   }
-                  className="w-full border rounded-lg py-2.5 px-3 text-sm"
+                  className="w-full border rounded-md py-2 px-2.5 text-sm"
                   style={{
                     backgroundColor: colors.tertiary,
                     borderColor: colors.border,
@@ -799,58 +798,58 @@ const Investimentos = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div
-                className="text-center rounded-2xl overflow-hidden p-6 border"
+                className="text-center rounded-xl overflow-hidden p-4 border"
                 style={{
                   backgroundColor: "rgba(91,141,239,0.05)",
                   borderColor: "rgba(91,141,239,0.2)",
                 }}
               >
                 <div
-                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  className="text-xs uppercase font-semibold mb-2 tracking-wide"
                   style={{ color: colors.textSecondary }}
                 >
                   Total Investido:
                 </div>
                 <div
-                  className="text-[28px] font-bold tracking-tight"
+                  className="text-xl font-bold tracking-tight"
                   style={{ color: colors.textPrimary }}
                 >
                   R$ {formatCurrency(simTotalInvested)}
                 </div>
               </div>
               <div
-                className="text-center rounded-2xl overflow-hidden p-6 border"
+                className="text-center rounded-xl overflow-hidden p-4 border"
                 style={{
                   backgroundColor: "rgba(39,174,96,0.05)",
                   borderColor: "rgba(39,174,96,0.2)",
                 }}
               >
                 <div
-                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  className="text-xs uppercase font-semibold mb-2 tracking-wide"
                   style={{ color: colors.textSecondary }}
                 >
                   Rendimento:
                 </div>
-                <div className="text-[#27ae60] text-[28px] font-bold tracking-tight">
+                <div className="text-[#27ae60] text-xl font-bold tracking-tight">
                   R$ {formatCurrency(simEarnings)}
                 </div>
               </div>
               <div
-                className="text-center rounded-2xl overflow-hidden p-6 border"
+                className="text-center rounded-xl overflow-hidden p-4 border"
                 style={{
                   backgroundColor: "rgba(155,89,182,0.08)",
                   borderColor: "rgba(155,89,182,0.3)",
                 }}
               >
                 <div
-                  className="text-[11px] uppercase font-bold mb-3 tracking-wide"
+                  className="text-xs uppercase font-semibold mb-2 tracking-wide"
                   style={{ color: colors.textSecondary }}
                 >
                   Montante Final:
                 </div>
-                <div className="text-[#9b59b6] text-[28px] font-bold tracking-tight">
+                <div className="text-[#9b59b6] text-xl font-bold tracking-tight">
                   R$ {formatCurrency(simFinalAmount)}
                 </div>
               </div>
@@ -858,19 +857,19 @@ const Investimentos = () => {
           </div>
 
           <div
-            className="rounded-xl border p-7"
+            className="rounded-lg border p-5"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
             }}
           >
             <h3
-              className="text-lg font-bold mb-5"
+              className="text-base font-bold mb-4"
               style={{ color: colors.textPrimary }}
             >
               📈 Projeção de Crescimento - Simulador
             </h3>
-            <canvas ref={simulatorChartRef} className="max-h-[400px]"></canvas>
+            <canvas ref={simulatorChartRef} className="max-h-[350px]"></canvas>
           </div>
         </div>
       )}

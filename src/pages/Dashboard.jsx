@@ -6,7 +6,6 @@ const Dashboard = () => {
     return localStorage.getItem("financeapp_theme") || "dark";
   });
 
-  // Escuta mudanças no localStorage (caso mude em outra aba ou componente)
   useEffect(() => {
     const handleStorageChange = () => {
       const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
@@ -16,7 +15,6 @@ const Dashboard = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Definição da paleta de cores baseada no seu layout original
   const colors = {
     primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
     secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
@@ -33,6 +31,10 @@ const Dashboard = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [selectedImportMonth, setSelectedImportMonth] = useState("");
   const [editingId, setEditingId] = useState(null);
+
+  // Estado para categorias (agora dinâmico)
+  const [availableCategories, setAvailableCategories] = useState([]);
+
   const [formData, setFormData] = useState({
     type: "expense",
     title: "",
@@ -45,6 +47,59 @@ const Dashboard = () => {
     const saved = localStorage.getItem("financialData");
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Carregar categorias do localStorage
+  useEffect(() => {
+    const loadCategories = () => {
+      const savedCategories = localStorage.getItem("financeapp_categories");
+      const defaultCategories = [
+        "Alimentação",
+        "Transporte",
+        "Moradia",
+        "Saúde",
+        "Educação",
+        "Lazer",
+        "Compras",
+        "Gastos Gerais",
+        "Salário",
+        "Investimentos",
+        "Outros",
+      ];
+
+      if (savedCategories) {
+        const customCategories = JSON.parse(savedCategories);
+        const customNames = customCategories.map((cat) => cat.name);
+        setAvailableCategories([...defaultCategories, ...customNames]);
+      } else {
+        setAvailableCategories(defaultCategories);
+      }
+    };
+
+    loadCategories();
+
+    // Listen for changes in categories
+    const handleStorageChange = (e) => {
+      if (e.key === "financeapp_categories") {
+        loadCategories();
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Atualizar categoria inicial quando as categorias são carregadas
+  useEffect(() => {
+    if (
+      availableCategories.length > 0 &&
+      !availableCategories.includes(formData.category)
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        category: availableCategories[0],
+      }));
+    }
+  }, [availableCategories]);
 
   const saveData = (newTransactions) => {
     localStorage.setItem("financialData", JSON.stringify(newTransactions));
@@ -222,7 +277,8 @@ const Dashboard = () => {
       type: "expense",
       title: "",
       value: "",
-      category: "Alimentação",
+      category:
+        availableCategories.length > 0 ? availableCategories[0] : "Alimentação",
       date: new Date().toISOString().split("T")[0],
     });
     setIsModalOpen(true);
@@ -286,21 +342,21 @@ const Dashboard = () => {
       style={{ backgroundColor: colors.primary }}
     >
       {/* Header */}
-      <div className="flex justify-between items-center mb-9">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h2
-            className="text-[28px] font-bold mb-1.5"
+            className="text-xl font-bold mb-1"
             style={{ color: colors.textPrimary }}
           >
             Dashboard
           </h2>
           <div
-            className="text-sm flex items-center gap-2"
+            className="text-xs flex items-center gap-2"
             style={{ color: colors.textSecondary }}
           >
             Gestão de receitas e despesas
             {notificationsEnabled && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#25D366]/20 text-[#25D366] text-xs rounded-full">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#25D366]/20 text-[#25D366] text-[10px] rounded-full font-bold">
                 <span>🔔</span> Alertas ativos
               </span>
             )}
@@ -310,7 +366,7 @@ const Dashboard = () => {
 
       {/* Navegação de Mês */}
       <div
-        className="flex items-center justify-between rounded-xl border mb-8 py-4 px-6 shadow-lg transition-colors duration-300"
+        className="flex items-center justify-between rounded-lg border mb-5 py-2.5 px-4 shadow transition-colors duration-300"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
@@ -318,7 +374,7 @@ const Dashboard = () => {
       >
         <button
           onClick={() => changeMonth(-1)}
-          className="rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:border-[#5b8def] hover:text-[#5b8def] border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all hover:border-[#5b8def] hover:text-[#5b8def] border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
@@ -328,14 +384,14 @@ const Dashboard = () => {
           ← Anterior
         </button>
         <span
-          className="text-lg font-bold"
+          className="text-base font-bold"
           style={{ color: colors.textPrimary }}
         >
           {getMonthName()}
         </span>
         <button
           onClick={() => changeMonth(1)}
-          className="rounded-lg cursor-pointer px-4 py-2.5 text-sm font-semibold transition-all hover:border-[#5b8def] hover:text-[#5b8def] border"
+          className="rounded-lg cursor-pointer px-3 py-1.5 text-xs font-semibold transition-all hover:border-[#5b8def] hover:text-[#5b8def] border"
           style={{
             backgroundColor: colors.tertiary,
             borderColor: colors.border,
@@ -347,88 +403,91 @@ const Dashboard = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid grid-cols-3 gap-6 mb-9">
+      <div className="grid grid-cols-3 gap-4 mb-6">
         <div
-          className="rounded-xl border border-l-4 border-l-[#27ae60] p-7 shadow-lg transition-all hover:-translate-y-1"
+          className="rounded-lg border border-l-4 border-l-[#27ae60] p-4 shadow transition-all hover:-translate-y-1"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
           <h3
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide mb-3.5"
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide mb-2"
             style={{ color: colors.textSecondary }}
           >
-            <div className="w-7 h-7 rounded bg-[#27ae6020] text-[#27ae60] flex items-center justify-center text-sm">
+            <div className="w-5 h-5 rounded bg-[#27ae6020] text-[#27ae60] flex items-center justify-center text-xs">
               ↑
             </div>
             Entradas
           </h3>
-          <div className="text-[32px] font-bold text-[#27ae60] mb-2">
+          <div className="text-2xl font-bold text-[#27ae60] mb-1">
             R$ {formatCurrency(totalIncome)}
           </div>
         </div>
 
         <div
-          className="rounded-xl border border-l-4 border-l-[#e74c3c] p-7 shadow-lg transition-all hover:-translate-y-1"
+          className="rounded-lg border border-l-4 border-l-[#e74c3c] p-4 shadow transition-all hover:-translate-y-1"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
           <h3
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide mb-3.5"
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide mb-2"
             style={{ color: colors.textSecondary }}
           >
-            <div className="w-7 h-7 rounded bg-[#e74c3c20] text-[#e74c3c] flex items-center justify-center text-sm">
+            <div className="w-5 h-5 rounded bg-[#e74c3c20] text-[#e74c3c] flex items-center justify-center text-xs">
               ↓
             </div>
             Saídas
           </h3>
-          <div className="text-[32px] font-bold text-[#e74c3c] mb-2">
+          <div className="text-2xl font-bold text-[#e74c3c] mb-1">
             R$ {formatCurrency(totalExpense)}
           </div>
         </div>
 
         <div
-          className="rounded-xl border border-l-4 border-l-[#5b8def] p-7 shadow-lg transition-all hover:-translate-y-1"
+          className="rounded-lg border border-l-4 border-l-[#5b8def] p-4 shadow transition-all hover:-translate-y-1"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
           <h3
-            className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide mb-3.5"
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide mb-2"
             style={{ color: colors.textSecondary }}
           >
-            <div className="w-7 h-7 rounded bg-[#5b8def20] text-[#5b8def] flex items-center justify-center text-sm">
+            <div className="w-5 h-5 rounded bg-[#5b8def20] text-[#5b8def] flex items-center justify-center text-xs">
               ≈
             </div>
             Saldo Previsto
           </h3>
-          <div className="text-[32px] font-bold text-[#5b8def] mb-2">
+          <div className="text-2xl font-bold text-[#5b8def] mb-1">
             R$ {formatCurrency(balance)}
           </div>
         </div>
       </div>
 
       {/* Header da Lista */}
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold" style={{ color: colors.textPrimary }}>
+      <div className="flex justify-between items-center mb-4">
+        <h3
+          className="text-base font-bold"
+          style={{ color: colors.textPrimary }}
+        >
           Transações do Mês
         </h3>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {availableMonths.length > 0 && (
             <button
               onClick={() => setIsImportModalOpen(true)}
-              className="px-6 py-3 bg-[#f39c12] text-white text-sm font-bold rounded-lg shadow-md transition-all hover:opacity-90"
+              className="px-4 py-2 bg-[#f39c12] text-white text-xs font-bold rounded-lg shadow transition-all hover:opacity-90"
             >
               📋 Importar
             </button>
           )}
           <button
             onClick={openModal}
-            className="px-6 py-3 bg-[#5b8def] text-white text-sm font-bold rounded-lg shadow-md transition-all hover:bg-[#4a7dd9]"
+            className="px-4 py-2 bg-[#5b8def] text-white text-xs font-bold rounded-lg shadow transition-all hover:bg-[#4a7dd9]"
           >
             + Nova Transação
           </button>
@@ -437,7 +496,7 @@ const Dashboard = () => {
 
       {/* Lista de Transações */}
       <div
-        className="rounded-xl border p-6 shadow-lg max-h-[600px] overflow-y-auto transactions-list"
+        className="rounded-lg border p-4 shadow max-h-[600px] overflow-y-auto transactions-list"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
@@ -445,7 +504,7 @@ const Dashboard = () => {
       >
         {sortedTransactions.length === 0 ? (
           <div
-            className="text-center py-15 px-5 text-[16px]"
+            className="text-center py-10 px-5 text-sm"
             style={{ color: colors.textSecondary }}
           >
             Nenhuma transação registrada neste mês
@@ -454,7 +513,7 @@ const Dashboard = () => {
           sortedTransactions.map((t) => (
             <div
               key={t.id}
-              className={`flex transactions-list justify-between items-center rounded-lg p-4 mb-3 transition-all border ${
+              className={`flex transactions-list justify-between items-center rounded-lg p-3 mb-2 transition-all border ${
                 t.paid ? "" : "border-l-[3px] border-[#f39c12]"
               }`}
               style={{
@@ -468,16 +527,16 @@ const Dashboard = () => {
             >
               <div className="flex-1">
                 <div
-                  className="font-bold text-[15px] mb-1.5"
+                  className="font-bold text-sm mb-1"
                   style={{ color: colors.textPrimary }}
                 >
                   {t.title}
                 </div>
                 <div
-                  className="text-[13px] flex items-center"
+                  className="text-xs flex items-center"
                   style={{ color: colors.textSecondary }}
                 >
-                  <span className="inline-block rounded px-2.5 py-1 text-xs font-bold bg-[#5b8def20] text-[#5b8def] mr-2">
+                  <span className="inline-block rounded px-2 py-0.5 text-[10px] font-bold bg-[#5b8def20] text-[#5b8def] mr-2">
                     {t.category}
                   </span>
                   <span>{new Date(t.date).toLocaleDateString("pt-BR")}</span>
@@ -486,17 +545,17 @@ const Dashboard = () => {
               </div>
 
               <div
-                className={`text-lg font-bold text-right mx-5 min-w-[120px] ${
+                className={`text-base font-bold text-right mx-4 min-w-[100px] ${
                   t.type === "income" ? "text-[#27ae60]" : "text-[#e74c3c]"
                 }`}
               >
                 {t.type === "income" ? "+" : "-"} R$ {formatCurrency(t.value)}
               </div>
 
-              <div className="flex gap-1.5">
+              <div className="flex gap-1">
                 <button
                   onClick={() => togglePaid(t.id)}
-                  className={`px-3 py-2 text-white text-[13px] rounded-lg shadow-md transition-all ${
+                  className={`px-2.5 py-1.5 text-white text-xs rounded-lg shadow transition-all ${
                     t.paid ? "bg-[#f39c12]" : "bg-[#27ae60]"
                   }`}
                 >
@@ -504,7 +563,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => editTransaction(t.id)}
-                  className="px-3 py-2 bg-[#5a6c7d] text-white text-[13px] rounded-lg shadow-md transition-all"
+                  className="px-2.5 py-1.5 bg-[#5a6c7d] text-white text-xs rounded-lg shadow transition-all"
                 >
                   ✎
                 </button>
@@ -513,7 +572,7 @@ const Dashboard = () => {
                     if (window.confirm("Excluir?"))
                       saveData(transactions.filter((i) => i.id !== t.id));
                   }}
-                  className="px-3 py-2 bg-[#e74c3c] text-white text-[13px] rounded-lg shadow-md transition-all"
+                  className="px-2.5 py-1.5 bg-[#e74c3c] text-white text-xs rounded-lg shadow transition-all"
                 >
                   ✕
                 </button>
@@ -533,7 +592,7 @@ const Dashboard = () => {
           }}
         >
           <div
-            className="rounded-2xl border p-8 w-full max-w-md shadow-2xl"
+            className="rounded-xl border p-6 w-full max-w-md shadow-2xl"
             style={{
               backgroundColor: colors.secondary,
               borderColor: colors.border,
@@ -543,139 +602,238 @@ const Dashboard = () => {
             {isModalOpen ? (
               <>
                 <h2
-                  className="text-2xl font-bold mb-6"
+                  className="text-xl font-bold mb-4"
                   style={{ color: colors.textPrimary }}
                 >
                   {editingId ? "Editar" : "Nova Transação"}
                 </h2>
-                <div className="space-y-4">
-                  <select
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({ ...formData, type: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-lg outline-none border transition-all"
-                    style={{
-                      backgroundColor: colors.tertiary,
-                      borderColor: colors.border,
-                      color: colors.textPrimary,
-                    }}
-                  >
-                    <option value="expense">Despesa</option>
-                    <option value="income">Receita</option>
-                  </select>
-                  <input
-                    type="text"
-                    placeholder="Título"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-lg outline-none border transition-all"
-                    style={{
-                      backgroundColor: colors.tertiary,
-                      borderColor: colors.border,
-                      color: colors.textPrimary,
-                    }}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Valor"
-                    value={formData.value}
-                    onChange={(e) =>
-                      setFormData({ ...formData, value: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-lg outline-none border transition-all"
-                    style={{
-                      backgroundColor: colors.tertiary,
-                      borderColor: colors.border,
-                      color: colors.textPrimary,
-                    }}
-                  />
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
-                    }
-                    className="w-full px-4 py-3 rounded-lg outline-none border transition-all"
-                    style={{
-                      backgroundColor: colors.tertiary,
-                      borderColor: colors.border,
-                      color: colors.textPrimary,
-                    }}
-                  />
-                  <div className="flex gap-3 pt-4">
+                <form onSubmit={saveTransaction} className="space-y-4">
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Tipo
+                    </label>
+                    <select
+                      value={formData.type}
+                      onChange={(e) =>
+                        setFormData({ ...formData, type: e.target.value })
+                      }
+                      className="w-full px-3 py-2 rounded-lg outline-none border transition-all text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                    >
+                      <option value="expense">Despesa</option>
+                      <option value="income">Receita</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Título
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Almoço fora"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData({ ...formData, title: e.target.value })
+                      }
+                      className="w-full px-3 py-2 rounded-lg outline-none border transition-all text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Valor (R$)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      step="0.01"
+                      value={formData.value}
+                      onChange={(e) =>
+                        setFormData({ ...formData, value: e.target.value })
+                      }
+                      className="w-full px-3 py-2 rounded-lg outline-none border transition-all text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Categoria
+                    </label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) =>
+                        setFormData({ ...formData, category: e.target.value })
+                      }
+                      className="w-full px-3 py-2 rounded-lg outline-none border transition-all text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                    >
+                      {availableCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Data
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) =>
+                        setFormData({ ...formData, date: e.target.value })
+                      }
+                      className="w-full px-3 py-2 rounded-lg outline-none border transition-all text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                      required
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
                     <button
+                      type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white rounded-lg font-bold"
+                      className="flex-1 px-4 py-2 bg-[#5a6c7d] text-white rounded-lg font-bold text-sm hover:bg-[#4a5c6d] transition-all"
                     >
                       Cancelar
                     </button>
                     <button
-                      onClick={saveTransaction}
-                      className="flex-1 px-6 py-3 bg-[#5b8def] text-white rounded-lg font-bold shadow-md"
+                      type="submit"
+                      className="flex-1 px-4 py-2 bg-[#5b8def] text-white rounded-lg font-bold shadow hover:bg-[#4a7dd9] transition-all text-sm"
                     >
                       Salvar
                     </button>
                   </div>
-                </div>
+                </form>
               </>
             ) : (
               <>
                 <h2
-                  className="text-2xl font-bold mb-4"
+                  className="text-xl font-bold mb-4"
                   style={{ color: colors.textPrimary }}
                 >
                   📋 Importar
                 </h2>
-                <select
-                  value={selectedImportMonth}
-                  onChange={(e) => setSelectedImportMonth(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border mb-6"
-                  style={{
-                    backgroundColor: colors.tertiary,
-                    borderColor: colors.border,
-                    color: colors.textPrimary,
-                  }}
-                >
-                  {availableMonths.map((m) => (
-                    <option key={m.key} value={m.key}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setIsImportModalOpen(false)}
-                    className="flex-1 px-6 py-3 bg-[#5a6c7d] text-white rounded-lg font-bold"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={() => {
-                      const [y, m] = selectedImportMonth.split("-").map(Number);
-                      const toImport = transactions.filter((t) => {
-                        const d = new Date(t.date);
-                        return d.getMonth() === m && d.getFullYear() === y;
-                      });
-                      const imported = toImport.map((t) => ({
-                        ...t,
-                        id: Date.now() + Math.random(),
-                        date: new Date(
-                          currentMonth.getFullYear(),
-                          currentMonth.getMonth(),
-                          new Date(t.date).getDate()
-                        ).toISOString(),
-                        paid: false,
-                      }));
-                      saveData([...transactions, ...imported]);
-                      setIsImportModalOpen(false);
-                    }}
-                    className="flex-1 px-6 py-3 bg-[#f39c12] text-white rounded-lg font-bold"
-                  >
-                    Importar
-                  </button>
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      className="block text-xs font-semibold mb-1.5"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      Selecione o mês
+                    </label>
+                    <select
+                      value={selectedImportMonth}
+                      onChange={(e) => setSelectedImportMonth(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border text-sm"
+                      style={{
+                        backgroundColor: colors.tertiary,
+                        borderColor: colors.border,
+                        color: colors.textPrimary,
+                      }}
+                    >
+                      <option value="">Selecione...</option>
+                      {availableMonths.map((m) => (
+                        <option key={m.key} value={m.key}>
+                          {m.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => setIsImportModalOpen(false)}
+                      className="flex-1 px-4 py-2 bg-[#5a6c7d] text-white rounded-lg font-bold text-sm hover:bg-[#4a5c6d] transition-all"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (!selectedImportMonth) {
+                          alert("Selecione um mês para importar!");
+                          return;
+                        }
+                        const [y, m] = selectedImportMonth
+                          .split("-")
+                          .map(Number);
+                        const toImport = transactions.filter((t) => {
+                          const d = new Date(t.date);
+                          return d.getMonth() === m && d.getFullYear() === y;
+                        });
+
+                        if (toImport.length === 0) {
+                          alert(
+                            "Nenhuma transação encontrada no mês selecionado!"
+                          );
+                          return;
+                        }
+
+                        const imported = toImport.map((t) => ({
+                          ...t,
+                          id: `${Date.now()}-${Math.random()
+                            .toString(36)
+                            .substr(2, 9)}`,
+                          date: new Date(
+                            currentMonth.getFullYear(),
+                            currentMonth.getMonth(),
+                            new Date(t.date).getDate()
+                          ).toISOString(),
+                          paid: false,
+                        }));
+                        saveData([...transactions, ...imported]);
+                        setIsImportModalOpen(false);
+                        setSelectedImportMonth("");
+                        alert(
+                          `${imported.length} transação(ões) importada(s) com sucesso!`
+                        );
+                      }}
+                      className="flex-1 px-4 py-2 bg-[#f39c12] text-white rounded-lg font-bold text-sm hover:bg-[#e68a00] transition-all"
+                    >
+                      Importar
+                    </button>
+                  </div>
                 </div>
               </>
             )}
