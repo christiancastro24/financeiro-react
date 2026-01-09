@@ -13,6 +13,10 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
   // Estado para controlar se o submenu está aberto
   const [openSubmenu, setOpenSubmenu] = useState(false);
 
+  // Verificar se está em ambiente de produção (Vercel)
+  const isProduction = window.location.hostname.includes("vercel.app") || 
+                       window.location.hostname.includes("financeiro-react");
+
   // Quando clicar em Open Finance, abre o submenu e seleciona a primeira opção
   useEffect(() => {
     if (activeTab === "openfinance" || activeTab === "openfinance-analysis") {
@@ -37,11 +41,12 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
     { id: "analysis", label: "Análises", icon: "📈" },
     { id: "budget", label: "Orçamento Diário", icon: "📅" },
     { id: "cards", label: "Cartões", icon: "💳" },
-    {
-      id: "openfinance",
-      label: "Open Finance",
+    { 
+      id: "openfinance", 
+      label: "Open Finance", 
       icon: "🔗",
       hasSubmenu: true,
+      hidden: isProduction // Flag para esconder em produção
     },
     { id: "investments", label: "Investimentos", icon: "💎" },
     { id: "retirement", label: "Aposentadoria", icon: "🎯" },
@@ -51,7 +56,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
 
   // Itens do submenu do Open Finance
   const openFinanceSubmenu = [
-    { id: "openfinance", label: "Dashboard", icon: "📋" }, // ou "📊"
+    { id: "openfinance", label: "Dashboard", icon: "📋" },
     { id: "openfinance-analysis", label: "Análises Financeiras", icon: "📈" },
   ];
 
@@ -69,6 +74,11 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
 
       <div className="flex-1 px-3 py-4 overflow-y-auto">
         {menuItems.map((item) => {
+          // ESCODER ITEM SE hidden = true
+          if (item.hidden) {
+            return null; // Não renderiza nada
+          }
+
           if (item.id === "openfinance") {
             return (
               <div key={item.id} className="mb-1">
