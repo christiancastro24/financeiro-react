@@ -213,7 +213,7 @@ const LoginPage = ({ onLogin, onNavigate }) => {
         </div>
 
         {/* Test Credentials Info */}
-        <div className="mt-8 p-5 bg-[#667eea]/5 border border-[#667eea]/10 rounded-2xl text-center backdrop-blur-sm">
+        {/* <div className="mt-8 p-5 bg-[#667eea]/5 border border-[#667eea]/10 rounded-2xl text-center backdrop-blur-sm">
           <div className="flex items-center justify-center gap-2 text-sm">
             <span className="text-[#8b92a7]">💡 Acesso de teste:</span>
             <code className="px-3 py-1 bg-[#252b3b] text-[#667eea] rounded-lg font-mono text-xs border border-[#2a2f3e]">
@@ -224,7 +224,7 @@ const LoginPage = ({ onLogin, onNavigate }) => {
               12345
             </code>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <style>{`

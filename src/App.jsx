@@ -11,6 +11,8 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import FinancialAssistant from "./pages/FinancialAssistant";
 import Cards from "./pages/Cards";
+import OpenFinance from "./pages/OpenFinance";
+import OpenFinanceAnalysis from "./pages/OpenFinanceAnalysis"; // Importe o componente de análises
 
 // --- FUNÇÕES AUXILIARES (Sem 'export' = HMR Seguro) ---
 function getCookie(name) {
@@ -78,6 +80,34 @@ function App() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  // Atualize o Layout para receber a navegação
+  const renderDashboardContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <Dashboard />;
+      case "analysis":
+        return <Analysis />;
+      case "budget":
+        return <DailyBudget />;
+      case "investments":
+        return <Investments />;
+      case "retirement":
+        return <Retirement />;
+      case "goals":
+        return <Goals />;
+      case "cards":
+        return <Cards />;
+      case "settings":
+        return <Settings />;
+      case "openfinance":
+        return <OpenFinance />;
+      case "openfinance-analysis":
+        return <OpenFinanceAnalysis />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
   const renderPage = () => {
     if (currentRoute === "/") return <LandingPage onNavigate={navigate} />;
     if (currentRoute === "/login")
@@ -89,44 +119,20 @@ function App() {
         return null;
       }
 
-      const pageContent = () => {
-        switch (activeTab) {
-          case "dashboard":
-            return <Dashboard />;
-          case "analysis":
-            return <Analysis />;
-          case "budget":
-            return <DailyBudget />;
-          case "investments":
-            return <Investments />;
-          case "retirement":
-            return <Retirement />;
-          case "goals":
-            return <Goals />;
-          case "cards":
-            return <Cards />;
-          case "settings":
-            return <Settings />;
-          default:
-            return <Dashboard />;
-        }
-      };
-
       return (
         <>
           <Layout
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             onLogout={handleLogout}
+            navigate={navigate} // Passe a função navigate para o Layout
           >
-            {pageContent()}
+            {renderDashboardContent()}
           </Layout>
           <FinancialAssistant />
         </>
       );
     }
-
-    // Fallback
     return <LandingPage onNavigate={navigate} />;
   };
 
