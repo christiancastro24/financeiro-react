@@ -13,6 +13,33 @@ import {
 } from "lucide-react";
 
 const OpenFinanceAnalysis = () => {
+  // --- LÓGICA DE TEMA ---
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("financeapp_theme") || "dark";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedTheme = localStorage.getItem("financeapp_theme") || "dark";
+      setTheme(savedTheme);
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const colors = {
+    primary: theme === "dark" ? "#0f1419" : "#f8f9fa",
+    secondary: theme === "dark" ? "#1a1f2e" : "#ffffff",
+    tertiary: theme === "dark" ? "#252b3b" : "#f1f3f5",
+    border: theme === "dark" ? "#2a2f3e" : "#dee2e6",
+    textPrimary: theme === "dark" ? "#ffffff" : "#1a1f2e",
+    textSecondary: theme === "dark" ? "#8b92a7" : "#6c757d",
+    cardItem: theme === "dark" ? "#1e2738" : "#f8f9fa",
+    tableHeader: theme === "dark" ? "#252833" : "#e9ecef",
+    tableRow: theme === "dark" ? "#1e2230" : "#ffffff",
+    progressBarBg: theme === "dark" ? "#252833" : "#e9ecef",
+  };
+
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [filterPeriod, setFilterPeriod] = useState("tudo"); // tudo, 7, 15, 30, 60, 90
@@ -42,12 +69,12 @@ const OpenFinanceAnalysis = () => {
   // Filtrar por período
   const getFilteredByPeriod = (txs) => {
     if (filterPeriod === "tudo") return txs;
-    
+
     const now = new Date();
     const days = parseInt(filterPeriod);
     const cutoffDate = new Date(now.setDate(now.getDate() - days));
-    
-    return txs.filter(t => new Date(t.date) >= cutoffDate);
+
+    return txs.filter((t) => new Date(t.date) >= cutoffDate);
   };
 
   // Separar transações
@@ -114,7 +141,10 @@ const OpenFinanceAnalysis = () => {
     const grouped = {};
     txs.forEach((t) => {
       const date = new Date(t.date);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}`;
       const monthName = date.toLocaleDateString("pt-BR", {
         month: "short",
         year: "numeric",
@@ -142,7 +172,7 @@ const OpenFinanceAnalysis = () => {
     .sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
     .slice(0, 10);
 
-  // Cores para categorias
+  // Cores para categorias (mantidas para progress bars)
   const categoryColors = [
     "bg-blue-500",
     "bg-purple-500",
@@ -157,24 +187,43 @@ const OpenFinanceAnalysis = () => {
   ];
 
   return (
-    <div className="ml-72 p-8 min-h-screen bg-[#0f111a] text-white">
+    <div
+      className="ml-72 p-8 min-h-screen transition-colors duration-300"
+      style={{ backgroundColor: colors.primary }}
+    >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Análises Financeiras</h1>
-        <p className="text-sm text-gray-400">
+        <h1
+          className="text-2xl font-bold mb-2"
+          style={{ color: colors.textPrimary }}
+        >
+          Análises Financeiras
+        </h1>
+        <p className="text-sm" style={{ color: colors.textSecondary }}>
           Visualize seus gastos e receitas de forma detalhada
         </p>
       </div>
 
       {/* Filtros */}
-      <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] p-6 mb-8">
+      <div
+        className="rounded-2xl border p-6 mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
         <div className="flex items-center gap-3 mb-4">
           <Filter size={20} className="text-blue-500" />
-          <h3 className="font-bold">Filtros</h3>
+          <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+            Filtros
+          </h3>
         </div>
         <div className="flex gap-4">
           <div>
-            <label className="text-xs text-gray-400 uppercase font-bold mb-2 block">
+            <label
+              className="text-xs uppercase font-bold mb-2 block"
+              style={{ color: colors.textSecondary }}
+            >
               Período
             </label>
             <div className="flex flex-wrap gap-2">
@@ -192,8 +241,16 @@ const OpenFinanceAnalysis = () => {
                   className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all whitespace-nowrap ${
                     filterPeriod === period.value
                       ? "bg-blue-500 text-white"
-                      : "bg-[#252833] text-gray-400 hover:bg-[#2a2d3a] hover:text-white"
+                      : ""
                   }`}
+                  style={
+                    filterPeriod !== period.value
+                      ? {
+                          backgroundColor: colors.tertiary,
+                          color: colors.textSecondary,
+                        }
+                      : {}
+                  }
                 >
                   {period.label}
                 </button>
@@ -206,12 +263,21 @@ const OpenFinanceAnalysis = () => {
       {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {/* Total de Receitas */}
-        <div className="bg-[#1e2230] p-6 rounded-2xl border border-[#2a2d3a]">
+        <div
+          className="rounded-2xl border p-6"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-green-500/10 rounded-lg">
               <TrendingUp size={20} className="text-green-500" />
             </div>
-            <span className="text-[10px] text-gray-400 font-bold uppercase">
+            <span
+              className="text-[10px] font-bold uppercase"
+              style={{ color: colors.textSecondary }}
+            >
               Receitas
             </span>
           </div>
@@ -221,18 +287,30 @@ const OpenFinanceAnalysis = () => {
               currency: "BRL",
             }).format(totalIncome)}
           </h2>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p
+            className="text-[10px] mt-1"
+            style={{ color: colors.textSecondary }}
+          >
             {incomeTransactions.length} transações
           </p>
         </div>
 
         {/* Total de Despesas */}
-        <div className="bg-[#1e2230] p-6 rounded-2xl border border-[#2a2d3a]">
+        <div
+          className="rounded-2xl border p-6"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-red-500/10 rounded-lg">
               <TrendingDown size={20} className="text-red-500" />
             </div>
-            <span className="text-[10px] text-gray-400 font-bold uppercase">
+            <span
+              className="text-[10px] font-bold uppercase"
+              style={{ color: colors.textSecondary }}
+            >
               Despesas
             </span>
           </div>
@@ -242,18 +320,30 @@ const OpenFinanceAnalysis = () => {
               currency: "BRL",
             }).format(totalExpenses)}
           </h2>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p
+            className="text-[10px] mt-1"
+            style={{ color: colors.textSecondary }}
+          >
             {debitTransactions.length + creditExpensesOnly.length} transações
           </p>
         </div>
 
         {/* Gastos no Débito */}
-        <div className="bg-[#1e2230] p-6 rounded-2xl border border-[#2a2d3a]">
+        <div
+          className="rounded-2xl border p-6"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-orange-500/10 rounded-lg">
               <Receipt size={20} className="text-orange-500" />
             </div>
-            <span className="text-[10px] text-gray-400 font-bold uppercase">
+            <span
+              className="text-[10px] font-bold uppercase"
+              style={{ color: colors.textSecondary }}
+            >
               Débito
             </span>
           </div>
@@ -263,18 +353,30 @@ const OpenFinanceAnalysis = () => {
               currency: "BRL",
             }).format(totalDebitSpent)}
           </h2>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p
+            className="text-[10px] mt-1"
+            style={{ color: colors.textSecondary }}
+          >
             {debitTransactions.length} transações
           </p>
         </div>
 
         {/* Gastos no Crédito */}
-        <div className="bg-[#1e2230] p-6 rounded-2xl border border-[#2a2d3a]">
+        <div
+          className="rounded-2xl border p-6"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-purple-500/10 rounded-lg">
               <ShoppingBag size={20} className="text-purple-500" />
             </div>
-            <span className="text-[10px] text-gray-400 font-bold uppercase">
+            <span
+              className="text-[10px] font-bold uppercase"
+              style={{ color: colors.textSecondary }}
+            >
               Crédito
             </span>
           </div>
@@ -284,17 +386,29 @@ const OpenFinanceAnalysis = () => {
               currency: "BRL",
             }).format(totalCreditSpent)}
           </h2>
-          <p className="text-[10px] text-gray-500 mt-1">
+          <p
+            className="text-[10px] mt-1"
+            style={{ color: colors.textSecondary }}
+          >
             {creditExpensesOnly.length} transações
           </p>
         </div>
       </div>
 
       {/* Saldo Líquido */}
-      <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] p-6 mb-8">
+      <div
+        className="rounded-2xl border p-6 mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-400 uppercase font-bold mb-2">
+            <p
+              className="text-sm uppercase font-bold mb-2"
+              style={{ color: colors.textSecondary }}
+            >
               Saldo do Período
             </p>
             <h2
@@ -309,8 +423,10 @@ const OpenFinanceAnalysis = () => {
             </h2>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Receitas - Despesas</p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-xs" style={{ color: colors.textSecondary }}>
+              Receitas - Despesas
+            </p>
+            <p className="text-sm mt-1" style={{ color: colors.textSecondary }}>
               {totalIncome > 0
                 ? `${((totalExpenses / totalIncome) * 100).toFixed(1)}% gasto`
                 : "0% gasto"}
@@ -321,10 +437,20 @@ const OpenFinanceAnalysis = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Gastos por Categoria */}
-        <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] overflow-hidden">
-          <div className="p-6 border-b border-[#2a2d3a] flex items-center gap-3">
-            <PieChart size={20} className="text-blue-500" />
-            <h3 className="font-bold">Gastos por Categoria</h3>
+        <div
+          className="rounded-2xl border overflow-hidden"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
+          <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+            <div className="flex items-center gap-3">
+              <PieChart size={20} className="text-blue-500" />
+              <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+                Gastos por Categoria
+              </h3>
+            </div>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -340,21 +466,35 @@ const OpenFinanceAnalysis = () => {
                             categoryColors[idx % categoryColors.length]
                           }`}
                         />
-                        <span className="text-sm font-medium">{category}</span>
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: colors.textPrimary }}
+                        >
+                          {category}
+                        </span>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold">
+                        <p
+                          className="text-sm font-bold"
+                          style={{ color: colors.textPrimary }}
+                        >
                           {new Intl.NumberFormat("pt-BR", {
                             style: "currency",
                             currency: "BRL",
                           }).format(data.total)}
                         </p>
-                        <p className="text-[10px] text-gray-500">
+                        <p
+                          className="text-[10px]"
+                          style={{ color: colors.textSecondary }}
+                        >
                           {data.count} transações
                         </p>
                       </div>
                     </div>
-                    <div className="w-full bg-[#252833] rounded-full h-2">
+                    <div
+                      className="w-full rounded-full h-2"
+                      style={{ backgroundColor: colors.progressBarBg }}
+                    >
                       <div
                         className={`h-2 rounded-full ${
                           categoryColors[idx % categoryColors.length]
@@ -370,10 +510,20 @@ const OpenFinanceAnalysis = () => {
         </div>
 
         {/* Evolução Mensal */}
-        <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] overflow-hidden">
-          <div className="p-6 border-b border-[#2a2d3a] flex items-center gap-3">
-            <BarChart3 size={20} className="text-blue-500" />
-            <h3 className="font-bold">Evolução Mensal</h3>
+        <div
+          className="rounded-2xl border overflow-hidden"
+          style={{
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
+          }}
+        >
+          <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+            <div className="flex items-center gap-3">
+              <BarChart3 size={20} className="text-blue-500" />
+              <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+                Evolução Mensal
+              </h3>
+            </div>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -387,7 +537,10 @@ const OpenFinanceAnalysis = () => {
                 return (
                   <div key={idx}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold uppercase text-gray-400">
+                      <span
+                        className="text-xs font-bold uppercase"
+                        style={{ color: colors.textSecondary }}
+                      >
                         {data.month}
                       </span>
                       <div className="flex gap-4 text-xs">
@@ -410,13 +563,19 @@ const OpenFinanceAnalysis = () => {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="w-full bg-[#252833] rounded-full h-1.5">
+                      <div
+                        className="w-full rounded-full h-1.5"
+                        style={{ backgroundColor: colors.progressBarBg }}
+                      >
                         <div
                           className="h-1.5 rounded-full bg-green-500"
                           style={{ width: `${incomeWidth}%` }}
                         />
                       </div>
-                      <div className="w-full bg-[#252833] rounded-full h-1.5">
+                      <div
+                        className="w-full rounded-full h-1.5"
+                        style={{ backgroundColor: colors.progressBarBg }}
+                      >
                         <div
                           className="h-1.5 rounded-full bg-red-500"
                           style={{ width: `${expensesWidth}%` }}
@@ -432,14 +591,30 @@ const OpenFinanceAnalysis = () => {
       </div>
 
       {/* Top 10 Maiores Gastos */}
-      <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] overflow-hidden mb-8">
-        <div className="p-6 border-b border-[#2a2d3a] flex items-center gap-3">
-          <TrendingDown size={20} className="text-red-500" />
-          <h3 className="font-bold">Top 10 Maiores Gastos</h3>
+      <div
+        className="rounded-2xl border overflow-hidden mb-8"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
+        <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+          <div className="flex items-center gap-3">
+            <TrendingDown size={20} className="text-red-500" />
+            <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+              Top 10 Maiores Gastos
+            </h3>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-[#252833]/50 text-gray-500 text-[10px] uppercase font-bold tracking-widest">
+            <thead
+              className="text-[10px] uppercase font-bold tracking-widest"
+              style={{
+                backgroundColor: colors.tableHeader,
+                color: colors.textSecondary,
+              }}
+            >
               <tr>
                 <th className="p-5">#</th>
                 <th className="p-5">Descrição</th>
@@ -448,36 +623,57 @@ const OpenFinanceAnalysis = () => {
                 <th className="p-5 text-right">Valor</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2a2d3a]">
+            <tbody className="divide-y" style={{ borderColor: colors.border }}>
               {topExpenses.map((t, idx) => (
                 <tr
                   key={t.id}
-                  className="hover:bg-white/[0.02] transition-colors"
+                  className="transition-colors"
+                  style={{
+                    backgroundColor: colors.tableRow,
+                    borderColor: colors.border,
+                  }}
                 >
                   <td className="p-5">
-                    <span className="text-gray-500 font-bold">#{idx + 1}</span>
+                    <span
+                      className="font-bold"
+                      style={{ color: colors.textSecondary }}
+                    >
+                      #{idx + 1}
+                    </span>
                   </td>
                   <td className="p-5">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
                         <ArrowUpRight size={16} />
                       </div>
-                      <span className="text-sm font-bold">
+                      <span
+                        className="text-sm font-bold"
+                        style={{ color: colors.textPrimary }}
+                      >
                         {t.description}
                       </span>
                     </div>
                   </td>
                   <td className="p-5">
-                    <span className="text-xs text-gray-400 uppercase">
+                    <span
+                      className="text-xs uppercase"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {t.category || "Outros"}
                     </span>
                   </td>
                   <td className="p-5">
-                    <span className="text-xs text-gray-400 font-mono">
+                    <span
+                      className="text-xs font-mono"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {new Date(t.date).toLocaleDateString("pt-BR")}
                     </span>
                   </td>
-                  <td className="p-5 text-right font-bold font-mono text-white">
+                  <td
+                    className="p-5 text-right font-bold font-mono"
+                    style={{ color: colors.textPrimary }}
+                  >
                     {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
@@ -491,14 +687,30 @@ const OpenFinanceAnalysis = () => {
       </div>
 
       {/* Histórico de Rendimentos */}
-      <div className="bg-[#1e2230] rounded-2xl border border-[#2a2d3a] overflow-hidden">
-        <div className="p-6 border-b border-[#2a2d3a] flex items-center gap-3">
-          <TrendingUp size={20} className="text-green-500" />
-          <h3 className="font-bold">Histórico de Rendimentos</h3>
+      <div
+        className="rounded-2xl border overflow-hidden"
+        style={{
+          backgroundColor: colors.secondary,
+          borderColor: colors.border,
+        }}
+      >
+        <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+          <div className="flex items-center gap-3">
+            <TrendingUp size={20} className="text-green-500" />
+            <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+              Histórico de Rendimentos
+            </h3>
+          </div>
         </div>
         <div className="max-h-[400px] overflow-y-auto">
           <table className="w-full text-left">
-            <thead className="bg-[#252833]/50 text-gray-500 text-[10px] uppercase font-bold tracking-widest sticky top-0">
+            <thead
+              className="text-[10px] uppercase font-bold tracking-widest sticky top-0"
+              style={{
+                backgroundColor: colors.tableHeader,
+                color: colors.textSecondary,
+              }}
+            >
               <tr>
                 <th className="p-5">Descrição</th>
                 <th className="p-5">Categoria</th>
@@ -506,27 +718,42 @@ const OpenFinanceAnalysis = () => {
                 <th className="p-5 text-right">Valor</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2a2d3a]">
+            <tbody className="divide-y" style={{ borderColor: colors.border }}>
               {incomeTransactions.map((t) => (
                 <tr
                   key={t.id}
-                  className="hover:bg-white/[0.02] transition-colors"
+                  className="transition-colors"
+                  style={{
+                    backgroundColor: colors.tableRow,
+                    borderColor: colors.border,
+                  }}
                 >
                   <td className="p-5">
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-green-500/10 text-green-400">
                         <ArrowDownLeft size={16} />
                       </div>
-                      <span className="text-sm font-bold">{t.description}</span>
+                      <span
+                        className="text-sm font-bold"
+                        style={{ color: colors.textPrimary }}
+                      >
+                        {t.description}
+                      </span>
                     </div>
                   </td>
                   <td className="p-5">
-                    <span className="text-xs text-gray-400 uppercase">
+                    <span
+                      className="text-xs uppercase"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {t.category || "Geral"}
                     </span>
                   </td>
                   <td className="p-5">
-                    <span className="text-xs text-gray-400 font-mono">
+                    <span
+                      className="text-xs font-mono"
+                      style={{ color: colors.textSecondary }}
+                    >
                       {new Date(t.date).toLocaleDateString("pt-BR")}
                     </span>
                   </td>
@@ -541,7 +768,10 @@ const OpenFinanceAnalysis = () => {
             </tbody>
           </table>
           {incomeTransactions.length === 0 && (
-            <div className="p-20 text-center text-gray-500 text-sm">
+            <div
+              className="p-20 text-center text-sm"
+              style={{ color: colors.textSecondary }}
+            >
               Nenhum rendimento encontrado no período.
             </div>
           )}
