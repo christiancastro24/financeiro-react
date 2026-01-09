@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from "../hooks/useTheme";
 import { useCartoesData } from "../hooks/useCartoesData";
 import { formatarReal, getCardTypeInfo, bankOptions } from "../utils/cardUtils";
-import PageHeader from '../components/Cards/PageHeader';
+import PageHeader from "../components/Cards/PageHeader";
 import StatsCards from "../components/Cards/StatsCards";
 import MonthFilter from "../components/Cards/MonthFilter";
 import AlertMessage from "../components/Cards/AlertMessage";
@@ -14,8 +14,9 @@ import { usePdfProcessor } from "../hooks/usePdfProcessor";
 
 const Cartoes = () => {
   const { theme, colors } = useTheme();
-  const { cards, deleteCard, deleteFatura, addOrUpdateFatura } = useCartoesData();
-  
+  const { cards, deleteCard, deleteFatura, addOrUpdateFatura } =
+    useCartoesData();
+
   const [activeCardId, setActiveCardId] = useState(null);
   const [activeFaturaId, setActiveFaturaId] = useState(null);
   const [error, setError] = useState(null);
@@ -28,10 +29,7 @@ const Cartoes = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState("");
 
-  const {
-    isExtracting,
-    processPdf,
-  } = usePdfProcessor({
+  const { isExtracting, processPdf } = usePdfProcessor({
     setError,
     setSuccessMessage,
     addOrUpdateFatura,
@@ -98,7 +96,10 @@ const Cartoes = () => {
     }
 
     const bankId = importandoParaCartaoId
-      ? bankOptions.find((b) => b.name === cards.find((c) => c.id === importandoParaCartaoId)?.bank)?.id
+      ? bankOptions.find(
+          (b) =>
+            b.name === cards.find((c) => c.id === importandoParaCartaoId)?.bank
+        )?.id
       : selectedBank;
 
     processPdf(selectedFile, bankId, importandoParaCartaoId);
@@ -331,8 +332,9 @@ const Cartoes = () => {
           background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
         }
 
-        tr {
-          border: none;
+        
+          tr {
+          border: 1px solid ${theme === "dark" ? "rgb(47 62 78)" : "#f3ebeb"};
         }
 
       `}</style>
