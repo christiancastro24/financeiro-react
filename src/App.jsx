@@ -45,10 +45,6 @@ function App() {
   );
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // Verificar se está em ambiente de produção
-  const isProduction = window.location.hostname.includes("vercel.app") || 
-                       window.location.hostname.includes("financeiro-react");
-
   const navigate = useCallback((path) => {
     setCurrentRoute(path);
     window.history.pushState({}, "", path);
@@ -104,18 +100,8 @@ function App() {
       case "settings":
         return <Settings />;
       case "openfinance":
-        // Se for produção, redireciona para dashboard
-        if (isProduction) {
-          setActiveTab("dashboard");
-          return <Dashboard />;
-        }
         return <OpenFinance />;
       case "openfinance-analysis":
-        // Se for produção, redireciona para dashboard
-        if (isProduction) {
-          setActiveTab("dashboard");
-          return <Dashboard />;
-        }
         return <OpenFinanceAnalysis />;
       default:
         return <Dashboard />;
@@ -146,14 +132,6 @@ function App() {
           <FinancialAssistant />
         </>
       );
-    }
-    
-    // Se alguém tentar acessar Open Finance diretamente pela URL em produção
-    if (currentRoute === "/openfinance" || currentRoute === "/openfinance-analysis") {
-      if (isProduction) {
-        navigate("/dashboard");
-        return null;
-      }
     }
 
     return <LandingPage onNavigate={navigate} />;
