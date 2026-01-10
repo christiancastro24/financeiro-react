@@ -74,7 +74,6 @@ const OpenFinanceAnalysis = () => {
   const [activeFilter, setActiveFilter] = useState("categorias");
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState({});
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   useEffect(() => {
     loadSavedData();
@@ -144,36 +143,36 @@ const OpenFinanceAnalysis = () => {
   const balance = totalIncome - totalExpenses;
 
   const categoryIcons = {
-    "Transferências": <CreditCard size={20} />,
-    "Investimentos": <TrendingUp size={20} />,
-    "Telecomunicações": <Phone size={20} />,
-    "Serviços": <Wifi size={20} />,
-    "Energia Elétrica": <Zap size={20} />,
-    "Compras": <ShoppingCart size={20} />,
-    "Alimentação": <Utensils size={20} />,
-    "Supermercado": <ShoppingCart size={20} />,
-    "Transporte": <Car size={20} />,
-    "Saúde": <Heart size={20} />,
-    "Educação": <BookOpen size={20} />,
-    "Entretenimento": <Film size={20} />,
-    "Rendimentos": <DollarSign size={20} />,
-    "Pagamentos": <FileText size={20} />,
-    "Outro": <Cloud size={20} />,
-    "Restaurante": <Coffee size={20} />,
-    "Trabalho": <Briefcase size={20} />,
-    "Presentes": <Gift size={20} />,
-    "Viagem": <Plane size={20} />,
-    "Música": <Music size={20} />,
-    "Games": <Gamepad2 size={20} />,
-    "Academia": <Dumbbell size={20} />,
-    "Arte": <Palette size={20} />,
-    "Fotografia": <Camera size={20} />,
-    "Bar": <Martini size={20} />,
-    "Metrô": <Train size={20} />,
-    "Ônibus": <Bus size={20} />,
-    "Bicicleta": <Bike size={20} />,
-    "Moradia": <Home size={20} />,
-    "Outros": <Receipt size={20} />,
+    "Transferências": <CreditCard size={18} />,
+    "Investimentos": <TrendingUp size={18} />,
+    "Telecomunicações": <Phone size={18} />,
+    "Serviços": <Wifi size={18} />,
+    "Energia Elétrica": <Zap size={18} />,
+    "Compras": <ShoppingCart size={18} />,
+    "Alimentação": <Utensils size={18} />,
+    "Supermercado": <ShoppingCart size={18} />,
+    "Transporte": <Car size={18} />,
+    "Saúde": <Heart size={18} />,
+    "Educação": <BookOpen size={18} />,
+    "Entretenimento": <Film size={18} />,
+    "Rendimentos": <DollarSign size={18} />,
+    "Pagamentos": <FileText size={18} />,
+    "Outro": <Cloud size={18} />,
+    "Restaurante": <Coffee size={18} />,
+    "Trabalho": <Briefcase size={18} />,
+    "Presentes": <Gift size={18} />,
+    "Viagem": <Plane size={18} />,
+    "Música": <Music size={18} />,
+    "Games": <Gamepad2 size={18} />,
+    "Academia": <Dumbbell size={18} />,
+    "Arte": <Palette size={18} />,
+    "Fotografia": <Camera size={18} />,
+    "Bar": <Martini size={18} />,
+    "Metrô": <Train size={18} />,
+    "Ônibus": <Bus size={18} />,
+    "Bicicleta": <Bike size={18} />,
+    "Moradia": <Home size={18} />,
+    "Outros": <Receipt size={18} />,
   };
 
   const categoryColors = {
@@ -229,7 +228,7 @@ const OpenFinanceAnalysis = () => {
   };
 
   const getCategoryIcon = (category) => {
-    return categoryIcons[category] || <Receipt size={20} />;
+    return categoryIcons[category] || <Receipt size={18} />;
   };
 
   const getCategoryColor = (category) => {
@@ -312,72 +311,61 @@ const OpenFinanceAnalysis = () => {
               {
                 label: "Receitas",
                 value: totalIncome,
-                icon: <TrendingUp size={20} />,
+                icon: <TrendingUp size={18} />,
                 color: "#22c55e",
                 count: incomeTransactions.length,
-                trend: "up",
               },
               {
                 label: "Despesas",
                 value: totalExpenses,
-                icon: <TrendingDown size={20} />,
+                icon: <TrendingDown size={18} />,
                 color: "#ef4444",
                 count: debitTransactions.length + creditExpensesOnly.length,
-                trend: "down",
               },
               {
                 label: "Débito",
                 value: totalDebitSpent,
-                icon: <CreditCard size={20} />,
+                icon: <CreditCard size={18} />,
                 color: "#f97316",
                 count: debitTransactions.length,
-                trend: "down",
               },
               {
                 label: "Crédito",
                 value: totalCreditSpent,
-                icon: <ShoppingBag size={20} />,
+                icon: <ShoppingBag size={18} />,
                 color: "#8b5cf6",
                 count: creditExpensesOnly.length,
-                trend: "down",
               },
             ].map((card, idx) => (
               <div
                 key={card.label}
-                className={`rounded-2xl border p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${
-                  hoveredCard === idx ? "scale-[1.02] shadow-lg" : ""
-                }`}
+                className="rounded-xl border p-5 transition-colors hover:border-gray-400"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
-                  background: `linear-gradient(145deg, ${colors.secondary} 0%, ${
-                    theme === "dark" ? "#1e2230" : "#f1f3f5"
-                  } 100%)`,
                 }}
-                onMouseEnter={() => setHoveredCard(idx)}
-                onMouseLeave={() => setHoveredCard(null)}
               >
                 <div className="flex items-center justify-between mb-4">
                   <div
-                    className="p-3 rounded-xl"
+                    className="p-3 rounded-lg"
                     style={{ backgroundColor: `${card.color}10` }}
                   >
                     <div style={{ color: card.color }}>{card.icon}</div>
                   </div>
-                  <div className={`text-xs font-bold px-2 py-1 rounded-full ${
-                    card.trend === "up" ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"
+                  <div className={`text-xs font-medium px-2 py-1 rounded ${
+                    idx === 0 ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
                   }`}>
-                    {card.count} transações
+                    {card.count}
                   </div>
                 </div>
                 <h2
-                  className="text-2xl font-black mb-1"
+                  className="text-xl font-bold mb-1"
                   style={{ color: card.color }}
                 >
                   {formatCurrency(card.value)}
                 </h2>
                 <p
-                  className="text-sm font-medium"
+                  className="text-sm"
                   style={{ color: colors.textPrimary }}
                 >
                   {card.label}
@@ -398,7 +386,7 @@ const OpenFinanceAnalysis = () => {
 
       case "categorias":
         return (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {expensesByCategory.map(([category, data], idx) => {
               const isExpanded = expandedCategories[category];
               const categoryColor = getCategoryColor(category);
@@ -407,9 +395,7 @@ const OpenFinanceAnalysis = () => {
               return (
                 <div
                   key={category}
-                  className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
-                    isExpanded ? "shadow-lg" : "hover:shadow-md"
-                  }`}
+                  className="rounded-xl border overflow-hidden"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
@@ -417,17 +403,13 @@ const OpenFinanceAnalysis = () => {
                 >
                   <button
                     onClick={() => toggleCategory(category)}
-                    className="w-full p-5 flex items-center justify-between hover:bg-opacity-80 transition-all duration-300"
-                    style={{
-                      backgroundColor: isExpanded ? `${categoryColor}08` : colors.secondary,
-                    }}
+                    className="w-full p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                       <div
-                        className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
                         style={{
-                          backgroundColor: `${categoryColor}15`,
-                          transform: isExpanded ? "rotate(12deg)" : "rotate(0deg)",
+                          backgroundColor: `${categoryColor}10`,
                         }}
                       >
                         <div style={{ color: categoryColor }}>
@@ -436,7 +418,7 @@ const OpenFinanceAnalysis = () => {
                       </div>
                       <div className="text-left">
                         <h4
-                          className="text-sm font-bold mb-1"
+                          className="text-sm font-medium mb-0.5"
                           style={{ color: colors.textPrimary }}
                         >
                           {category}
@@ -445,14 +427,14 @@ const OpenFinanceAnalysis = () => {
                           className="text-xs"
                           style={{ color: colors.textSecondary }}
                         >
-                          {data.count} {data.count === 1 ? "transação" : "transações"}
+                          {data.count} transações
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <h3
-                          className="text-lg font-black"
+                          className="text-base font-semibold"
                           style={{ color: colors.textPrimary }}
                         >
                           {formatCurrency(data.total)}
@@ -460,7 +442,7 @@ const OpenFinanceAnalysis = () => {
                         <div className="flex items-center gap-2">
                           <div className="w-16 bg-gray-200 rounded-full h-1.5">
                             <div
-                              className="h-1.5 rounded-full transition-all duration-1000"
+                              className="h-1.5 rounded-full"
                               style={{
                                 backgroundColor: categoryColor,
                                 width: `${percentage}%`,
@@ -468,7 +450,7 @@ const OpenFinanceAnalysis = () => {
                             />
                           </div>
                           <span
-                            className="text-xs font-bold min-w-[40px]"
+                            className="text-xs font-medium min-w-[40px]"
                             style={{ color: colors.textSecondary }}
                           >
                             {percentage.toFixed(1)}%
@@ -476,40 +458,34 @@ const OpenFinanceAnalysis = () => {
                         </div>
                       </div>
                       <div
-                        className={`transition-all duration-300 ${
-                          isExpanded ? "rotate-180" : ""
-                        }`}
                         style={{ color: colors.textSecondary }}
                       >
-                        <ChevronDown size={20} />
+                        <ChevronDown size={18} className={isExpanded ? "rotate-180" : ""} />
                       </div>
                     </div>
                   </button>
 
                   <div
-                    className={`overflow-hidden transition-all duration-300 ${
+                    className={`overflow-hidden transition-all ${
                       isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                     }`}
                   >
                     <div
-                      className="border-t px-5 py-4 space-y-2"
+                      className="border-t px-4 py-3 space-y-2"
                       style={{ borderColor: colors.border }}
                     >
                       {data.transactions.map((t, tIdx) => (
                         <div
                           key={t.id}
-                          className="flex items-center justify-between p-3 rounded-xl hover:scale-[1.01] transition-all duration-200"
+                          className="flex items-center justify-between p-2 rounded-lg"
                           style={{
                             backgroundColor: colors.tertiary,
-                            transform: `translateY(${tIdx * 5}px)`,
-                            opacity: isExpanded ? 1 : 0,
-                            transitionDelay: `${tIdx * 50}ms`,
                           }}
                         >
                           <div className="flex items-center gap-3">
                             <div
-                              className="w-8 h-8 rounded-lg flex items-center justify-center"
-                              style={{ backgroundColor: `${categoryColor}15` }}
+                              className="w-8 h-8 rounded flex items-center justify-center"
+                              style={{ backgroundColor: `${categoryColor}10` }}
                             >
                               <div style={{ color: categoryColor }}>
                                 {getCategoryIcon(category)}
@@ -517,7 +493,7 @@ const OpenFinanceAnalysis = () => {
                             </div>
                             <div>
                               <p
-                                className="text-sm font-medium"
+                                className="text-sm"
                                 style={{ color: colors.textPrimary }}
                               >
                                 {t.description}
@@ -526,30 +502,26 @@ const OpenFinanceAnalysis = () => {
                                 className="text-xs mt-0.5"
                                 style={{ color: colors.textSecondary }}
                               >
-                                {new Date(t.date).toLocaleDateString("pt-BR", {
-                                  weekday: 'short',
-                                  day: 'numeric',
-                                  month: 'short'
-                                })}
+                                {new Date(t.date).toLocaleDateString("pt-BR")}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
                             <span
-                              className="text-xs px-2 py-1 rounded-full font-bold"
+                              className="text-xs px-2 py-0.5 rounded font-medium"
                               style={{
                                 backgroundColor: t.accountId === creditAccount?.id 
-                                  ? `${getCategoryColor("Transferências")}15`
-                                  : `${getCategoryColor("Compras")}15`,
+                                  ? "#6366f110"
+                                  : "#f9731610",
                                 color: t.accountId === creditAccount?.id 
-                                  ? getCategoryColor("Transferências")
-                                  : getCategoryColor("Compras"),
+                                  ? "#6366f1"
+                                  : "#f97316",
                               }}
                             >
                               {t.accountId === creditAccount?.id ? "Crédito" : "Débito"}
                             </span>
                             <p
-                              className="text-sm font-bold"
+                              className="text-sm font-medium"
                               style={{ color: colors.textPrimary }}
                             >
                               {formatCurrency(Math.abs(t.amount))}
@@ -567,7 +539,7 @@ const OpenFinanceAnalysis = () => {
 
       case "mensal":
         return (
-          <div className="space-y-5">
+          <div className="space-y-4">
             {monthlyData.slice(-6).map((data, idx) => {
               const total = data.income + data.expenses;
               const incomePercentage =
@@ -579,23 +551,23 @@ const OpenFinanceAnalysis = () => {
               return (
                 <div
                   key={idx}
-                  className="rounded-2xl border p-5 hover:shadow-lg transition-all duration-300"
+                  className="rounded-xl border p-4"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
                   }}
                 >
-                  <div className="flex justify-between items-center mb-5">
+                  <div className="flex justify-between items-center mb-4">
                     <div>
                       <h4
-                        className="text-base font-bold mb-1"
+                        className="text-base font-medium mb-1"
                         style={{ color: colors.textPrimary }}
                       >
                         {data.month}
                       </h4>
                       <p
-                        className={`text-sm font-bold ${
-                          balance >= 0 ? "text-green-500" : "text-red-500"
+                        className={`text-sm font-medium ${
+                          balance >= 0 ? "text-green-600" : "text-red-600"
                         }`}
                       >
                         {balance >= 0 ? "+" : "-"}
@@ -605,7 +577,7 @@ const OpenFinanceAnalysis = () => {
                     <div className="text-right">
                       <div className="flex items-center gap-4">
                         <div>
-                          <p className="text-sm font-bold text-green-500">
+                          <p className="text-sm font-medium text-green-600">
                             +{formatCurrency(data.income)}
                           </p>
                           <p
@@ -616,7 +588,7 @@ const OpenFinanceAnalysis = () => {
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-red-500">
+                          <p className="text-sm font-medium text-red-600">
                             -{formatCurrency(data.expenses)}
                           </p>
                           <p
@@ -630,31 +602,31 @@ const OpenFinanceAnalysis = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-green-500" />
+                          <div className="w-2 h-2 rounded-full bg-green-600" />
                           <span
-                            className="text-sm font-medium"
+                            className="text-sm"
                             style={{ color: colors.textPrimary }}
                           >
                             Receitas
                           </span>
                         </div>
                         <span
-                          className="text-sm font-bold"
+                          className="text-sm font-medium"
                           style={{ color: colors.textPrimary }}
                         >
                           {incomePercentage.toFixed(1)}%
                         </span>
                       </div>
                       <div
-                        className="w-full rounded-full h-3 overflow-hidden"
+                        className="w-full rounded-full h-2 overflow-hidden"
                         style={{ backgroundColor: colors.progressBarBg }}
                       >
                         <div
-                          className="h-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-400"
+                          className="h-2 rounded-full bg-green-600"
                           style={{ width: `${incomePercentage}%` }}
                         />
                       </div>
@@ -663,27 +635,27 @@ const OpenFinanceAnalysis = () => {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-red-500" />
+                          <div className="w-2 h-2 rounded-full bg-red-600" />
                           <span
-                            className="text-sm font-medium"
+                            className="text-sm"
                             style={{ color: colors.textPrimary }}
                           >
                             Despesas
                           </span>
                         </div>
                         <span
-                          className="text-sm font-bold"
+                          className="text-sm font-medium"
                           style={{ color: colors.textPrimary }}
                         >
                           {expensesPercentage.toFixed(1)}%
                         </span>
                       </div>
                       <div
-                        className="w-full rounded-full h-3 overflow-hidden"
+                        className="w-full rounded-full h-2 overflow-hidden"
                         style={{ backgroundColor: colors.progressBarBg }}
                       >
                         <div
-                          className="h-3 rounded-full bg-gradient-to-r from-red-500 to-orange-400"
+                          className="h-2 rounded-full bg-red-600"
                           style={{ width: `${expensesPercentage}%` }}
                         />
                       </div>
@@ -705,43 +677,42 @@ const OpenFinanceAnalysis = () => {
               return (
                 <div
                   key={t.id}
-                  className="rounded-2xl border p-4 hover:scale-[1.01] hover:shadow-lg transition-all duration-300"
+                  className="rounded-xl border p-4"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
                   }}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3">
                       <div
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                          idx < 3 ? "bg-gradient-to-br from-red-500 to-orange-500" 
-                                 : "bg-gradient-to-br from-orange-400 to-amber-400"
-                        }`}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center font-medium text-sm"
+                        style={{ 
+                          backgroundColor: `${categoryColor}10`,
+                          color: categoryColor
+                        }}
                       >
-                        <span className="text-white font-bold text-sm">
-                          #{idx + 1}
-                        </span>
+                        {idx + 1}
                       </div>
                       <div>
                         <h4
-                          className="text-sm font-bold mb-2"
+                          className="text-sm font-medium mb-1"
                           style={{ color: colors.textPrimary }}
                         >
                           {t.description}
                         </h4>
                         <div className="flex items-center gap-2">
                           <span
-                            className="text-xs px-2 py-1 rounded-full font-bold"
+                            className="text-xs px-2 py-0.5 rounded font-medium"
                             style={{
-                              backgroundColor: `${categoryColor}15`,
+                              backgroundColor: `${categoryColor}10`,
                               color: categoryColor,
                             }}
                           >
                             {category}
                           </span>
                           <span
-                            className="text-xs px-2 py-1 rounded-full"
+                            className="text-xs px-2 py-0.5 rounded"
                             style={{
                               backgroundColor: colors.tertiary,
                               color: colors.textSecondary,
@@ -753,18 +724,18 @@ const OpenFinanceAnalysis = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <h3 className="text-xl font-black text-red-500 mb-1">
+                      <h3 className="text-base font-semibold text-red-600 mb-1">
                         {formatCurrency(Math.abs(t.amount))}
                       </h3>
                       <p
-                        className="text-xs px-2 py-1 rounded-full font-bold inline-block"
+                        className="text-xs px-2 py-0.5 rounded font-medium"
                         style={{
                           backgroundColor: t.accountId === creditAccount?.id 
-                            ? `${getCategoryColor("Transferências")}15`
-                            : `${getCategoryColor("Compras")}15`,
+                            ? "#6366f110"
+                            : "#f9731610",
                           color: t.accountId === creditAccount?.id 
-                            ? getCategoryColor("Transferências")
-                            : getCategoryColor("Compras"),
+                            ? "#6366f1"
+                            : "#f97316",
                         }}
                       >
                         {t.accountId === creditAccount?.id ? "Crédito" : "Débito"}
@@ -787,17 +758,17 @@ const OpenFinanceAnalysis = () => {
               return (
                 <div
                   key={t.id}
-                  className="rounded-2xl border p-4 hover:scale-[1.01] hover:shadow-lg transition-all duration-300"
+                  className="rounded-xl border p-4"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
                   }}
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                        style={{ backgroundColor: `${categoryColor}15` }}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: `${categoryColor}10` }}
                       >
                         <div style={{ color: categoryColor }}>
                           {getCategoryIcon(category)}
@@ -805,23 +776,23 @@ const OpenFinanceAnalysis = () => {
                       </div>
                       <div>
                         <h4
-                          className="text-sm font-bold mb-2"
+                          className="text-sm font-medium mb-1"
                           style={{ color: colors.textPrimary }}
                         >
                           {t.description}
                         </h4>
                         <div className="flex items-center gap-2">
                           <span
-                            className="text-xs px-2 py-1 rounded-full font-bold"
+                            className="text-xs px-2 py-0.5 rounded font-medium"
                             style={{
-                              backgroundColor: `${categoryColor}15`,
+                              backgroundColor: `${categoryColor}10`,
                               color: categoryColor,
                             }}
                           >
                             {category}
                           </span>
                           <span
-                            className="text-xs px-2 py-1 rounded-full"
+                            className="text-xs px-2 py-0.5 rounded"
                             style={{
                               backgroundColor: colors.tertiary,
                               color: colors.textSecondary,
@@ -833,7 +804,7 @@ const OpenFinanceAnalysis = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <h3 className="text-xl font-black text-green-500 mb-1">
+                      <h3 className="text-base font-semibold text-green-600 mb-1">
                         +{formatCurrency(t.amount)}
                       </h3>
                       <p
@@ -859,37 +830,32 @@ const OpenFinanceAnalysis = () => {
     {
       id: "resumo",
       label: "Resumo Financeiro",
-      icon: <BarChart3 size={18} />,
+      icon: <BarChart3 size={16} />,
       description: "Visão geral das receitas e despesas",
-      gradient: "from-blue-500 to-cyan-500",
     },
     {
       id: "categorias",
       label: "Gastos por Categoria",
-      icon: <PieChart size={18} />,
+      icon: <PieChart size={16} />,
       description: "Distribuição dos gastos por categoria",
-      gradient: "from-purple-500 to-pink-500",
     },
     {
       id: "mensal",
       label: "Evolução Mensal",
-      icon: <TrendingUp size={18} />,
+      icon: <TrendingUp size={16} />,
       description: "Comparativo mês a mês",
-      gradient: "from-green-500 to-emerald-500",
     },
     {
       id: "maiores",
       label: "Maiores Gastos",
-      icon: <ListOrdered size={18} />,
+      icon: <ListOrdered size={16} />,
       description: "Top 10 transações mais caras",
-      gradient: "from-red-500 to-orange-500",
     },
     {
       id: "rendimentos",
       label: "Histórico de Rendimentos",
-      icon: <DollarSign size={18} />,
+      icon: <DollarSign size={16} />,
       description: "Todas as entradas de dinheiro",
-      gradient: "from-yellow-500 to-amber-500",
     },
   ];
 
@@ -902,33 +868,21 @@ const OpenFinanceAnalysis = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1
-              className="text-2xl font-bold mb-2"
+              className="text-xl font-semibold mb-1"
               style={{ color: colors.textPrimary }}
             >
               Análises Financeiras
             </h1>
             <p className="text-sm" style={{ color: colors.textSecondary }}>
-              Visualize seus gastos e receitas de forma inteligente e interativa
+              Visualize seus gastos e receitas de forma inteligente
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl"
-              style={{
-                backgroundColor: colors.secondary,
-                border: `1px solid ${colors.border}`,
-              }}
-            >
-              <Calendar size={16} className="text-blue-500" />
-              <span className="text-sm" style={{ color: colors.textPrimary }}>
-                Período
-              </span>
-            </div>
-            
+          <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 onClick={() => setShowFilterMenu(!showFilterMenu)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 hover:scale-[1.02]"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{
                   backgroundColor: colors.secondary,
                   border: `1px solid ${colors.border}`,
@@ -937,15 +891,15 @@ const OpenFinanceAnalysis = () => {
               >
                 {filterPeriod === "tudo" ? "Todo período" : `Últimos ${filterPeriod} dias`}
                 {showFilterMenu ? (
-                  <ChevronUp size={16} />
+                  <ChevronUp size={14} />
                 ) : (
-                  <ChevronDown size={16} />
+                  <ChevronDown size={14} />
                 )}
               </button>
 
               {showFilterMenu && (
                 <div
-                  className="absolute right-0 top-full mt-2 rounded-xl border shadow-2xl z-50 min-w-[160px] overflow-hidden animate-slideDown"
+                  className="absolute right-0 top-full mt-1 rounded-lg border shadow-lg z-50 min-w-[140px] overflow-hidden"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
@@ -958,19 +912,14 @@ const OpenFinanceAnalysis = () => {
                         setFilterPeriod(days);
                         setShowFilterMenu(false);
                       }}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-blue-500/10 transition-colors ${
+                      className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${
                         filterPeriod === days 
-                          ? "text-blue-500 font-bold bg-blue-500/10" 
+                          ? "text-blue-600 font-medium bg-blue-50 dark:bg-blue-900/20" 
                           : ""
                       }`}
                       style={{ color: colors.textPrimary }}
                     >
-                      <div className="flex items-center justify-between">
-                        <span>{days === "tudo" ? "Todo período" : `${days} dias`}</span>
-                        {filterPeriod === days && (
-                          <div className="w-2 h-2 rounded-full bg-blue-500" />
-                        )}
-                      </div>
+                      {days === "tudo" ? "Todo período" : `${days} dias`}
                     </button>
                   ))}
                 </div>
@@ -979,15 +928,15 @@ const OpenFinanceAnalysis = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-2">
           {filterOptions.map((filter) => (
             <button
               key={filter.id}
               onClick={() => setActiveFilter(filter.id)}
-              className={`group relative overflow-hidden flex items-center gap-3 px-5 py-3 rounded-xl border transition-all duration-300 hover:scale-[1.02] ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                 activeFilter === filter.id
-                  ? `bg-gradient-to-r ${filter.gradient} text-white border-transparent`
-                  : "hover:bg-blue-500/10 hover:border-blue-500/30"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "hover:bg-gray-100 dark:hover:bg-gray-800"
               }`}
               style={
                 activeFilter !== filter.id
@@ -999,15 +948,8 @@ const OpenFinanceAnalysis = () => {
                   : {}
               }
             >
-              <div className="relative z-10">
-                {filter.icon}
-              </div>
-              <span className="font-medium text-sm relative z-10">
-                {filter.label}
-              </span>
-              {activeFilter === filter.id && (
-                <div className="absolute inset-0 bg-gradient-to-r opacity-20 from-white to-transparent" />
-              )}
+              {filter.icon}
+              <span>{filter.label}</span>
             </button>
           ))}
         </div>
@@ -1015,33 +957,27 @@ const OpenFinanceAnalysis = () => {
 
       {activeFilter === "resumo" && (
         <div
-          className="rounded-2xl border p-6 mb-8 hover:shadow-xl transition-all duration-300"
+          className="rounded-xl border p-5 mb-6"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
-            background: `linear-gradient(135deg, ${colors.secondary} 0%, ${
-              theme === "dark" ? "#1e2230" : "#f8f9fa"
-            } 100%)`,
-            boxShadow: balance >= 0 
-              ? "0 20px 40px rgba(34, 197, 94, 0.1)"
-              : "0 20px 40px rgba(239, 68, 68, 0.1)",
           }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500">
-                  <DollarSign size={20} className="text-white" />
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                  <DollarSign size={18} className="text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
                   <span
-                    className="text-sm font-bold uppercase tracking-wider"
+                    className="text-sm font-medium"
                     style={{ color: colors.textSecondary }}
                   >
                     Saldo do Período
                   </span>
                   <p
-                    className="text-xs mt-1"
+                    className="text-xs mt-0.5"
                     style={{ color: colors.textSecondary }}
                   >
                     {filterPeriod === "tudo" ? "Todo período" : `Últimos ${filterPeriod} dias`}
@@ -1049,40 +985,39 @@ const OpenFinanceAnalysis = () => {
                 </div>
               </div>
               <h2
-                className={`text-4xl font-black mb-2 ${
-                  balance >= 0 ? "text-green-500" : "text-red-500"
+                className={`text-2xl font-semibold mb-2 ${
+                  balance >= 0 ? "text-green-600" : "text-red-600"
                 }`}
               >
                 {formatCurrency(balance)}
-                <span className="text-lg ml-2">{balance >= 0 ? "😊" : "😔"}</span>
               </h2>
               <div className="flex items-center gap-2">
                 <span
-                  className={`text-xs px-3 py-1.5 rounded-full font-bold ${
+                  className={`text-xs px-2 py-1 rounded font-medium ${
                     balance >= 0 
-                      ? "bg-green-500/10 text-green-500" 
-                      : "bg-red-500/10 text-red-500"
+                      ? "bg-green-500/10 text-green-600" 
+                      : "bg-red-500/10 text-red-600"
                   }`}
                 >
-                  {balance >= 0 ? "✅ Superávit" : "⚠️ Déficit"}
+                  {balance >= 0 ? "Superávit" : "Déficit"}
                 </span>
                 <span
-                  className="text-xs px-3 py-1.5 rounded-full"
+                  className="text-xs px-2 py-1 rounded"
                   style={{
                     backgroundColor: colors.tertiary,
                     color: colors.textSecondary,
                   }}
                 >
-                  📊 {transactions.length} transações
+                  {transactions.length} transações
                 </span>
               </div>
             </div>
             <div className="text-right">
-              <div className="inline-flex flex-col items-end space-y-4">
+              <div className="inline-flex flex-col items-end space-y-3">
                 <div className="text-right">
-                  <div className="flex items-center gap-2 justify-end mb-1">
-                    <div className="w-2 h-2 rounded-full bg-green-500" />
-                    <p className="text-sm font-bold text-green-500">
+                  <div className="flex items-center gap-1 justify-end mb-0.5">
+                    <div className="w-2 h-2 rounded-full bg-green-600" />
+                    <p className="text-sm font-medium text-green-600">
                       +{formatCurrency(totalIncome)}
                     </p>
                   </div>
@@ -1090,13 +1025,13 @@ const OpenFinanceAnalysis = () => {
                     className="text-xs"
                     style={{ color: colors.textSecondary }}
                   >
-                    🟢 Entradas
+                    Entradas
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="flex items-center gap-2 justify-end mb-1">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
-                    <p className="text-sm font-bold text-red-500">
+                  <div className="flex items-center gap-1 justify-end mb-0.5">
+                    <div className="w-2 h-2 rounded-full bg-red-600" />
+                    <p className="text-sm font-medium text-red-600">
                       -{formatCurrency(totalExpenses)}
                     </p>
                   </div>
@@ -1104,7 +1039,7 @@ const OpenFinanceAnalysis = () => {
                     className="text-xs"
                     style={{ color: colors.textSecondary }}
                   >
-                    🔴 Saídas
+                    Saídas
                   </p>
                 </div>
               </div>
@@ -1114,28 +1049,26 @@ const OpenFinanceAnalysis = () => {
       )}
 
       <div
-        className="rounded-2xl border p-6 hover:shadow-lg transition-all duration-300"
+        className="rounded-xl border p-5"
         style={{
           backgroundColor: colors.secondary,
           borderColor: colors.border,
-          minHeight: "500px",
+          minHeight: "400px",
         }}
       >
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className={`p-2 rounded-lg bg-gradient-to-r ${
-              filterOptions.find((f) => f.id === activeFilter)?.gradient
-            }`}>
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="p-1.5 rounded bg-blue-100 dark:bg-blue-900/30">
               {filterOptions.find((f) => f.id === activeFilter)?.icon}
             </div>
             <div>
               <h3
-                className="text-lg font-bold"
+                className="text-base font-medium"
                 style={{ color: colors.textPrimary }}
               >
                 {filterOptions.find((f) => f.id === activeFilter)?.label}
               </h3>
-              <p className="text-sm" style={{ color: colors.textSecondary }}>
+              <p className="text-xs" style={{ color: colors.textSecondary }}>
                 {filterOptions.find((f) => f.id === activeFilter)?.description} • 
                 <span className="ml-1">
                   {filterPeriod === "tudo" ? "Todo período" : `Últimos ${filterPeriod} dias`}
@@ -1152,42 +1085,16 @@ const OpenFinanceAnalysis = () => {
 
       <div className="mt-6 text-center">
         <p className="text-xs" style={{ color: colors.textSecondary }}>
-          <span className="inline-flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-            {transactions.length} transações sincronizadas • 
-            <span className="mx-2">🔄</span>
-            Última atualização: {new Date().toLocaleDateString("pt-BR", {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}
-          </span>
+          {transactions.length} transações sincronizadas • 
+          Última atualização: {new Date().toLocaleDateString("pt-BR", {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
-        }
-        
-        .rotate-180 {
-          transform: rotate(180deg);
-        }
-      `}</style>
     </div>
   );
 };

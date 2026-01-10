@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, ChevronRight, ChevronDown } from "lucide-react";
+import { LogOut, ChevronRight, ChevronDown, HelpCircle } from "lucide-react";
 
 function deleteCookie(name) {
   document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
@@ -10,13 +10,20 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
     return localStorage.getItem("financeapp_username") || "Admin";
   });
 
-  // Estado para controlar se o submenu está aberto
-  const [openSubmenu, setOpenSubmenu] = useState(false);
+  // Estado para controlar quais submenus estão abertos
+  const [openSubmenus, setOpenSubmenus] = useState({
+    openfinance: false,
+    goals: false,
+  });
 
   // Quando clicar em Open Finance, abre o submenu e seleciona a primeira opção
   useEffect(() => {
     if (activeTab === "openfinance" || activeTab === "openfinance-analysis") {
-      setOpenSubmenu(true);
+      setOpenSubmenus(prev => ({ ...prev, openfinance: true }));
+    }
+    
+    if (activeTab === "retirement" || activeTab === "goals") {
+      setOpenSubmenus(prev => ({ ...prev, goals: true }));
     }
   }, [activeTab]);
 
@@ -32,20 +39,30 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
     window.location.href = "/";
   };
 
+  const toggleSubmenu = (menuId) => {
+    setOpenSubmenus(prev => ({
+      ...prev,
+      [menuId]: !prev[menuId]
+    }));
+  };
+
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "analysis", label: "Análises", icon: "📈" },
-    { id: "budget", label: "Orçamento Diário", icon: "📅" },
     { id: "cards", label: "Cartões", icon: "💳" },
+    { id: "investments", label: "Investimentos", icon: "💎" },
     {
       id: "openfinance",
       label: "Open Finance",
       icon: "🔗",
       hasSubmenu: true,
     },
-    { id: "investments", label: "Investimentos", icon: "💎" },
-    { id: "retirement", label: "Aposentadoria", icon: "🎯" },
-    { id: "goals", label: "Metas & Sonhos", icon: "✨" },
+    {
+      id: "goals",
+      label: "Metas",
+      icon: "🎯",
+      hasSubmenu: true,
+    },
+    { id: "support", label: "Suporte", icon: <HelpCircle size={18} />, isCustomIcon: true },
     { id: "settings", label: "Configurações", icon: "⚙️" },
   ];
 
@@ -53,6 +70,12 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
   const openFinanceSubmenu = [
     { id: "openfinance", label: "Dashboard", icon: "📋" },
     { id: "openfinance-analysis", label: "Análises", icon: "📈" },
+  ];
+
+  // Itens do submenu de Metas
+  const goalsSubmenu = [
+    { id: "retirement", label: "Aposentadoria", icon: "👵" },
+    { id: "goals", label: "Metas & Sonhos", icon: "✨" },
   ];
 
   return (
@@ -68,21 +91,19 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
 
       <div className="flex-1 px-4 py-5 overflow-y-auto">
         {menuItems.map((item) => {
-          if (item.id === "openfinance") {
+          if (item.hasSubmenu) {
+            const isOpen = openSubmenus[item.id];
+            const submenuItems = item.id === "openfinance" ? openFinanceSubmenu : goalsSubmenu;
+            const isAnySubActive = submenuItems.some(sub => sub.id === activeTab);
+
             return (
-              <div key={item.id} className="mb-2">
-                {/* Botão principal do Open Finance */}
+              <div key={item.id} className="mb-1">
+                {/* Botão principal com seta */}
                 <button
-                  onClick={() => {
-                    setOpenSubmenu(!openSubmenu);
-                    if (!openSubmenu) {
-                      setActiveTab("openfinance");
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer transition-all font-medium text-sm mb-2 ${
-                    activeTab === "openfinance" ||
-                    activeTab === "openfinance-analysis"
-                      ? "bg-[#2563eb] text-white"
+                  onClick={() => toggleSubmenu(item.id)}
+                  className={`w-full flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer transition-all font-medium text-sm ${
+                    isAnySubActive
+                      ? "bg-[#2563eb20] text-blue-400"
                       : "bg-transparent text-[#9ca3af] hover:bg-[#252833] hover:text-white"
                   }`}
                 >
@@ -90,39 +111,31 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
                     <span className="text-base">{item.icon}</span>
                     <span>{item.label}</span>
                   </div>
-                  {openSubmenu ? (
-                    <ChevronDown size={16} />
+                  {isOpen ? (
+                    <ChevronDown size={16} className="text-current" />
                   ) : (
-                    <ChevronRight size={16} />
+                    <ChevronRight size={16} className="text-current" />
                   )}
                 </button>
 
-                {/* Submenu - Estilo modificado */}
-                {openSubmenu && (
-                  <div className="ml-8 mt-1 mb-3 space-y-2">
-                    {openFinanceSubmenu.map((subItem) => (
+                {/* Submenu - fonte menor */}
+                {isOpen && (
+                  <div className="mt-1 mb-2 ml-3 pl-6 border-l border-[#2a2d3a] space-y-1">
+                    {submenuItems.map((subItem) => (
                       <button
                         key={subItem.id}
                         onClick={() => setActiveTab(subItem.id)}
-                        className={`w-full flex items-center gap-3 py-2.5 px-3 rounded-md cursor-pointer transition-all font-medium text-sm relative group ${
+                        className={`w-full flex items-center gap-3 py-2.5 px-3 rounded-md cursor-pointer transition-all font-medium text-xs ${
                           activeTab === subItem.id
-                            ? "text-blue-400"
-                            : "text-gray-400 hover:text-white"
+                            ? "bg-[#2563eb] text-white"
+                            : "text-gray-400 hover:bg-[#252833] hover:text-white"
                         }`}
                       >
-                        {/* Ícone */}
-                        <span className="text-base">{subItem.icon}</span>
-
-                        {/* Texto */}
-                        <span>{subItem.label}</span>
-
-                        {/* Indicador ativo - traço na esquerda */}
-                        {activeTab === subItem.id && (
-                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-r-full" />
-                        )}
-
-                        {/* Efeito de hover - traço na parte inferior */}
-                        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* Ícone do subitem */}
+                        <span className="text-sm">{subItem.icon}</span>
+                        
+                        {/* Texto do subitem - fonte menor */}
+                        <span className="text-xs">{subItem.label}</span>
                       </button>
                     ))}
                   </div>
@@ -134,23 +147,26 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
           return (
             <button
               key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setOpenSubmenu(false);
-              }}
+              onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-3 py-3 px-3 mb-2 rounded-lg cursor-pointer transition-all font-medium text-sm ${
                 activeTab === item.id
                   ? "bg-[#2563eb] text-white"
                   : "bg-transparent text-[#9ca3af] hover:bg-[#252833] hover:text-white"
               }`}
             >
-              <span className="text-base">{item.icon}</span>
+              {/* Ícone */}
+              {item.isCustomIcon ? (
+                <span className="text-base">{item.icon}</span>
+              ) : (
+                <span className="text-base">{item.icon}</span>
+              )}
               <span>{item.label}</span>
             </button>
           );
         })}
       </div>
 
+      {/* Apenas Sair no rodapé */}
       <div className="p-5 border-t border-[#2a2d3a]">
         <button
           onClick={handleLogout}

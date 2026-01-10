@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
-import Analysis from "./pages/Analysis";
-import DailyBudget from "./pages/DailyBudget";
 import Investments from "./pages/Investments";
 import Retirement from "./pages/Retirement";
 import Goals from "./pages/Goals";
@@ -13,6 +11,7 @@ import FinancialAssistant from "./pages/FinancialAssistant";
 import Cards from "./pages/Cards";
 import OpenFinance from "./pages/OpenFinance";
 import OpenFinanceAnalysis from "./pages/OpenFinanceAnalysis";
+import SupportPage from "./pages/SupportPage";
 
 // --- FUNÇÕES AUXILIARES ---
 function getCookie(name) {
@@ -85,16 +84,14 @@ function App() {
     switch (activeTab) {
       case "dashboard":
         return <Dashboard />;
-      case "analysis":
-        return <Analysis />;
-      case "budget":
-        return <DailyBudget />;
       case "investments":
         return <Investments />;
       case "retirement":
         return <Retirement />;
       case "goals":
         return <Goals />;
+      case "support":
+        return <SupportPage />;
       case "cards":
         return <Cards />;
       case "settings":
