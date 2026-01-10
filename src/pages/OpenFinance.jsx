@@ -336,29 +336,58 @@ const OpenFinance = () => {
     }
   };
 
-  // SEPARAÇÃO PF E PJ
-  const pfAccounts = accounts.filter(
-    (a) =>
-      a.name?.toLowerCase().includes("company") &&
-      a.name?.toLowerCase().includes("empresa")
-  );
-  const pjAccounts = accounts.filter(
-    (a) =>
-      !a.name?.toLowerCase().includes("company") ||
-      !a.name?.toLowerCase().includes("empresa")
-  );
+  // SEPARAÇÃO PF E PJ - baseado em subtype e quantidade
+  const hasMultipleAccounts = accounts.length > 1;
 
+  let pfAccounts = [];
+  let pjAccounts = [];
 
-  console.log(pjAccounts, 'PJ ACOOUNTS')
+  if (hasMultipleAccounts) {
+    // PJ = contas com "company", "empresa" no nome OU CNPJ (taxNumber > 11)
+    pjAccounts = accounts.filter((a) => {
+      const name = a.name?.toLowerCase() || "";
+      const tax = a.taxNumber?.replace(/\D/g, "") || "";
+      return (
+        name.includes("company") || name.includes("empresa") || tax.length > 11
+      );
+    });
+
+    // PF = o que sobrou
+    pfAccounts = accounts.filter((a) => {
+      const name = a.name?.toLowerCase() || "";
+      const tax = a.taxNumber?.replace(/\D/g, "") || "";
+      return (
+        !name.includes("company") &&
+        !name.includes("empresa") &&
+        tax.length <= 11
+      );
+    });
+  } else {
+    // Se houver apenas 1 conta, usa como PF
+    pfAccounts = accounts;
+    pjAccounts = [];
+  }
+
+  console.log(accounts, "ACCOUNTS");
+
+  // --- AQUI ESTÁ O PULO DO GATO ---
+  // Buscamos dentro dos grupos PF/PJ garantindo o TYPE para não inverter saldo com fatura
+
+  // 1. Saldo (Somente BANK)
   const pfBankAccount = pfAccounts.find((a) => a.type === "BANK");
   const pjBankAccount = pjAccounts.find((a) => a.type === "BANK");
+
+  // 2. Cartão (Somente CREDIT)
   const pfCreditAccount = pfAccounts.find((a) => a.type === "CREDIT");
   const pjCreditAccount = pjAccounts.find((a) => a.type === "CREDIT");
 
+  // 3. Atribuição de valores
   const pfBankBalance = pfBankAccount?.balance || 0;
   const pjBankBalance = pjBankAccount?.balance || 0;
-  const pfCreditBalance = pfCreditAccount?.balance || 0;
-  const pjCreditBalance = pjCreditAccount?.balance || 0;
+
+  const pfCreditBalance = pfCreditAccount?.balance || 0; // Valor da fatura
+  const pjCreditBalance = pjCreditAccount?.balance || 0; // Valor da fatura
+
   const pfCreditLimit = pfCreditAccount?.creditData?.availableCreditLimit || 0;
   const pjCreditLimit = pjCreditAccount?.creditData?.availableCreditLimit || 0;
 
@@ -462,9 +491,9 @@ const OpenFinance = () => {
       case "credit":
         return null;
       case "debit":
-        return debitTransactions.slice(0, 15); // Apenas 15 mais recentes
+        return debitTransactions.slice(0, 15);
       default:
-        return filteredByAccount.slice(0, 30); // Apenas 30 mais recentes
+        return filteredByAccount.slice(0, 30);
     }
   };
 
@@ -551,7 +580,6 @@ const OpenFinance = () => {
           </button>
           <button
             onClick={() => {
-              clearSession();
               setConnected(false);
               setAccounts([]);
               setTransactions([]);
@@ -578,7 +606,110 @@ const OpenFinance = () => {
         </div>
       )}
 
-      {/* Cards PJ APENAS */}
+      {/* Cards PF */}
+      {pfAccounts.length > 0 && (
+        <>
+          {hasMultipleAccounts && (
+            <div className="flex items-center gap-2 mb-4">
+              <User size={16} className="text-blue-400" />
+              <h2
+                className="text-sm font-bold uppercase tracking-wide"
+                style={{ color: colors.textSecondary }}
+              >
+                Pessoa Física
+              </h2>
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div
+              className="rounded-2xl border p-6 shadow-lg"
+              style={{
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
+              }}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <span className="p-2 bg-green-500/10 rounded-lg">
+                  <Wallet size={20} className="text-green-500" />
+                </span>
+                <span
+                  className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                  style={{
+                    backgroundColor: colors.cardItem,
+                    color: colors.textSecondary,
+                  }}
+                >
+                  Conta
+                </span>
+              </div>
+              <p
+                className="text-xs font-medium uppercase mb-1"
+                style={{ color: colors.textSecondary }}
+              >
+                Saldo Disponível
+              </p>
+              <h2
+                className="text-3xl font-black"
+                style={{ color: colors.textPrimary }}
+              >
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(pfBankBalance)}
+              </h2>
+            </div>
+
+            {pfCreditAccount && (
+              <div
+                className="rounded-2xl border p-6 shadow-lg"
+                style={{
+                  backgroundColor: colors.secondary,
+                  borderColor: colors.border,
+                }}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <span className="p-2 bg-red-500/10 rounded-lg">
+                    <CreditCard size={20} className="text-red-500" />
+                  </span>
+                  <span
+                    className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                    style={{
+                      backgroundColor: colors.cardItem,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Cartão
+                  </span>
+                </div>
+                <p
+                  className="text-xs font-medium uppercase mb-1"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Fatura Atual
+                </p>
+                <h2 className="text-3xl font-black text-red-400">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(Math.abs(pfCreditBalance))}
+                </h2>
+                <p
+                  className="text-[10px] mt-2 font-bold uppercase"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Limite Livre:{" "}
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(pfCreditLimit)}
+                </p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Cards PJ */}
       {pjAccounts.length > 0 && (
         <>
           <div className="flex items-center gap-2 mb-4">
@@ -629,50 +760,52 @@ const OpenFinance = () => {
               </h2>
             </div>
 
-            <div
-              className="rounded-2xl border p-6 shadow-lg"
-              style={{
-                backgroundColor: colors.secondary,
-                borderColor: colors.border,
-              }}
-            >
-              <div className="flex justify-between items-start mb-4">
-                <span className="p-2 bg-red-500/10 rounded-lg">
-                  <CreditCard size={20} className="text-red-500" />
-                </span>
-                <span
-                  className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
-                  style={{
-                    backgroundColor: colors.cardItem,
-                    color: colors.textSecondary,
-                  }}
+            {pjCreditAccount && (
+              <div
+                className="rounded-2xl border p-6 shadow-lg"
+                style={{
+                  backgroundColor: colors.secondary,
+                  borderColor: colors.border,
+                }}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <span className="p-2 bg-red-500/10 rounded-lg">
+                    <CreditCard size={20} className="text-red-500" />
+                  </span>
+                  <span
+                    className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                    style={{
+                      backgroundColor: colors.cardItem,
+                      color: colors.textSecondary,
+                    }}
+                  >
+                    Cartão
+                  </span>
+                </div>
+                <p
+                  className="text-xs font-medium uppercase mb-1"
+                  style={{ color: colors.textSecondary }}
                 >
-                  Cartão
-                </span>
+                  Fatura Atual
+                </p>
+                <h2 className="text-3xl font-black text-red-400">
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(Math.abs(pjCreditBalance))}
+                </h2>
+                <p
+                  className="text-[10px] mt-2 font-bold uppercase"
+                  style={{ color: colors.textSecondary }}
+                >
+                  Limite Livre:{" "}
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(pjCreditLimit)}
+                </p>
               </div>
-              <p
-                className="text-xs font-medium uppercase mb-1"
-                style={{ color: colors.textSecondary }}
-              >
-                Fatura Atual
-              </p>
-              <h2 className="text-3xl font-black text-red-400">
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(Math.abs(pjCreditBalance))}
-              </h2>
-              <p
-                className="text-[10px] mt-2 font-bold uppercase"
-                style={{ color: colors.textSecondary }}
-              >
-                Limite Livre:{" "}
-                {new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                }).format(pjCreditLimit)}
-              </p>
-            </div>
+            )}
           </div>
         </>
       )}
@@ -705,32 +838,16 @@ const OpenFinance = () => {
             </div>
           </div>
 
-          {/* Filtro de Conta */}
-          <div className="flex gap-2 mb-4">
-            <button
-              onClick={() => setAccountFilter("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
-                accountFilter === "all" ? "bg-gray-500 text-white" : ""
-              }`}
-              style={
-                accountFilter !== "all"
-                  ? {
-                      backgroundColor: colors.tertiary,
-                      color: colors.textSecondary,
-                    }
-                  : {}
-              }
-            >
-              Todas Contas
-            </button>
-            {pfAccounts.length > 0 && (
+          {/* Filtro de Conta - só aparece se tiver múltiplas contas */}
+          {hasMultipleAccounts && (
+            <div className="flex gap-2 mb-4">
               <button
-                onClick={() => setAccountFilter("pf")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
-                  accountFilter === "pf" ? "bg-blue-500 text-white" : ""
+                onClick={() => setAccountFilter("all")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
+                  accountFilter === "all" ? "bg-gray-500 text-white" : ""
                 }`}
                 style={
-                  accountFilter !== "pf"
+                  accountFilter !== "all"
                     ? {
                         backgroundColor: colors.tertiary,
                         color: colors.textSecondary,
@@ -738,30 +855,48 @@ const OpenFinance = () => {
                     : {}
                 }
               >
-                <User size={12} />
-                PF
+                Todas Contas
               </button>
-            )}
-            {pjAccounts.length > 0 && (
-              <button
-                onClick={() => setAccountFilter("pj")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
-                  accountFilter === "pj" ? "bg-purple-500 text-white" : ""
-                }`}
-                style={
-                  accountFilter !== "pj"
-                    ? {
-                        backgroundColor: colors.tertiary,
-                        color: colors.textSecondary,
-                      }
-                    : {}
-                }
-              >
-                <Building2 size={12} />
-                PJ
-              </button>
-            )}
-          </div>
+              {pfAccounts.length > 0 && (
+                <button
+                  onClick={() => setAccountFilter("pf")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                    accountFilter === "pf" ? "bg-blue-500 text-white" : ""
+                  }`}
+                  style={
+                    accountFilter !== "pf"
+                      ? {
+                          backgroundColor: colors.tertiary,
+                          color: colors.textSecondary,
+                        }
+                      : {}
+                  }
+                >
+                  <User size={12} />
+                  PF
+                </button>
+              )}
+              {pjAccounts.length > 0 && (
+                <button
+                  onClick={() => setAccountFilter("pj")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                    accountFilter === "pj" ? "bg-purple-500 text-white" : ""
+                  }`}
+                  style={
+                    accountFilter !== "pj"
+                      ? {
+                          backgroundColor: colors.tertiary,
+                          color: colors.textSecondary,
+                        }
+                      : {}
+                  }
+                >
+                  <Building2 size={12} />
+                  PJ
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Abas de Tipo */}
           <div className="flex gap-2">
@@ -818,15 +953,15 @@ const OpenFinance = () => {
           </div>
         </div>
 
-        <div className="max-h-[500px] overflow-y-auto">
+        <div className="max-h-[500px] overflow-y-auto transactions-list">
           {activeTab === "credit" ? (
-            <div className="divide-y" style={{ borderColor: colors.border }}>
+            <div className="divide-y" style={{ border: colors.border }}>
               {limitedCreditInvoices.length > 0 ? (
                 limitedCreditInvoices.map(([key, invoice]) => (
-                  <div key={key}>
+                  <div key={key} style={{ border: "none" }}>
                     <button
                       onClick={() => toggleInvoice(key)}
-                      className="w-full p-6 flex items-center justify-between transition-colors group hover:bg-opacity-50"
+                      className="w-full p-6 flex items-center justify-between transition-colors group hover:bg-opacity-50 border"
                       style={{
                         backgroundColor: colors.secondary,
                         borderColor: colors.border,
@@ -889,7 +1024,7 @@ const OpenFinance = () => {
                                 key={t.id}
                                 className="transition-colors group"
                                 style={{
-                                  borderColor: colors.border,
+                                  border: colors.border,
                                   backgroundColor: colors.cardItem,
                                 }}
                               >
