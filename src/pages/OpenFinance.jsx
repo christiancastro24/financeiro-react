@@ -64,7 +64,7 @@ const OpenFinance = () => {
       const savedData = localStorage.getItem("openfinance-session");
       if (savedData) {
         const session = JSON.parse(savedData);
-        console.log("📂 Sessão carregada:", session);
+
         setConnected(session.connected);
         setAccounts(session.accounts || []);
         setTransactions(session.transactions || []);
@@ -72,31 +72,22 @@ const OpenFinance = () => {
         setItemId(session.itemId);
         setApiKey(session.apiKey);
       }
-    } catch (err) {
-      console.log("⚠️ Nenhuma sessão salva encontrada:", err);
-    }
+    } catch (err) {}
   };
 
   const saveSession = (data) => {
     try {
       localStorage.setItem("openfinance-session", JSON.stringify(data));
-      console.log("💾 Sessão salva com sucesso");
-    } catch (err) {
-      console.error("❌ Erro ao salvar sessão:", err);
-    }
+    } catch (err) {}
   };
 
   const clearSession = () => {
     try {
       localStorage.removeItem("openfinance-session");
-      console.log("🗑️ Sessão limpa");
-    } catch (err) {
-      console.error("❌ Erro ao limpar sessão:", err);
-    }
+    } catch (err) {}
   };
 
   const getPluggyApiKey = async () => {
-    console.log("🔐 Obtendo API Key...");
     const response = await fetch("https://api.pluggy.ai/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -111,12 +102,11 @@ const OpenFinance = () => {
     }
 
     const data = await response.json();
-    console.log("✅ API Key obtida com sucesso");
+
     return data.apiKey;
   };
 
   const createConnectToken = async (apiKey) => {
-    console.log("🎫 Criando connect token...");
     const response = await fetch("https://api.pluggy.ai/connect_token", {
       method: "POST",
       headers: {
@@ -131,7 +121,7 @@ const OpenFinance = () => {
     }
 
     const data = await response.json();
-    console.log("✅ Connect token criado com sucesso");
+
     return data.accessToken;
   };
 
@@ -139,9 +129,6 @@ const OpenFinance = () => {
     setSyncing(true);
     setError(null);
     try {
-      console.log(`🔄 Carregando dados para item: ${itemId}`);
-      console.log("📊 Buscando contas...");
-
       const resAccounts = await fetch(
         `https://api.pluggy.ai/accounts?itemId=${itemId}`,
         {
@@ -157,31 +144,18 @@ const OpenFinance = () => {
 
       if (!resAccounts.ok) {
         const errorText = await resAccounts.text();
-        console.error(
-          `❌ Erro ao buscar contas: ${resAccounts.status}`,
-          errorText
-        );
+
         throw new Error(`Erro contas: ${resAccounts.status}`);
       }
 
       const dataAccounts = await resAccounts.json();
-      console.log(`✅ Contas encontradas:`, dataAccounts.results?.length || 0);
-      console.log("📋 Detalhes das contas:", dataAccounts.results);
 
       if (dataAccounts.results && dataAccounts.results.length > 0) {
         setAccounts(dataAccounts.results);
 
-        console.log("💳 Iniciando busca de transações...");
         const txPromises = dataAccounts.results.map(async (acc, index) => {
           try {
             const url = `https://api.pluggy.ai/transactions?accountId=${acc.id}`;
-            console.log(
-              `  📥 [Conta ${index + 1}/${
-                dataAccounts.results.length
-              }] Buscando transações para: ${acc.name || acc.type} (ID: ${
-                acc.id
-              })`
-            );
 
             const response = await fetch(url, {
               headers: {
@@ -193,29 +167,16 @@ const OpenFinance = () => {
               cache: "no-store",
             });
 
-            console.log(`  📡 Status da resposta: ${response.status}`);
-
             if (!response.ok) {
               const errorText = await response.text();
-              console.error(
-                `  ❌ Erro na conta ${acc.id}: ${response.status}`,
-                errorText
-              );
+
               return [];
             }
 
             const data = await response.json();
-            console.log(
-              `  ✅ Transações recebidas: ${data.results?.length || 0}`
-            );
 
             if (data.results && data.results.length > 0) {
-              console.log(
-                `  📝 Exemplo da primeira transação:`,
-                data.results[0]
-              );
             } else {
-              console.log(`  ⚠️ Array vazio retornado para a conta ${acc.id}`);
             }
 
             return (data.results || []).map((tx) => ({
@@ -225,10 +186,6 @@ const OpenFinance = () => {
               accountId: acc.id,
             }));
           } catch (err) {
-            console.error(
-              `  ❌ Exceção ao buscar transações da conta ${acc.id}:`,
-              err
-            );
             return [];
           }
         });
@@ -238,15 +195,38 @@ const OpenFinance = () => {
           .flat()
           .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        console.log(`🎯 Total de transações encontradas: ${allTx.length}`);
-
         if (allTx.length === 0) {
-          console.warn("⚠️ ATENÇÃO: Nenhuma transação foi encontrada!");
         }
 
         setTransactions(allTx);
         const syncDate = new Date();
         setLastSync(syncDate);
+
+        // ADICIONE:
+        const creditCardTransactions = allTx.filter(
+          (t) => t.accountType === "CREDIT"
+        );
+
+        creditCardTransactions.slice(0, 20).forEach((t, i) => {});
+
+        saveSession({
+          connected: true,
+          accounts: dataAccounts.results,
+          transactions: allTx,
+          lastSync: syncDate.toISOString(),
+          itemId,
+          apiKey,
+        });
+
+        // ADICIONE ISSO logo após carregar as transactions (linha ~260):
+
+        const cartaoTransactions = allTx.filter(
+          (t) =>
+            t.operationType === "CARTAO" ||
+            t.paymentData?.paymentMethod === "OTHER"
+        );
+
+        cartaoTransactions.forEach((t, i) => {});
 
         saveSession({
           connected: true,
@@ -257,10 +237,8 @@ const OpenFinance = () => {
           apiKey,
         });
       } else {
-        console.warn("⚠️ Nenhuma conta encontrada");
       }
     } catch (err) {
-      console.error("❌ Erro na sincronização:", err);
       setError(`Erro: ${err.message}`);
     } finally {
       setSyncing(false);
@@ -271,8 +249,6 @@ const OpenFinance = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("🚀 Iniciando autenticação...");
-
       const apiKey = await getPluggyApiKey();
       const token = await createConnectToken(apiKey);
 
@@ -280,7 +256,6 @@ const OpenFinance = () => {
         connectToken: token,
         includeSandbox: true,
         onSuccess: (data) => {
-          console.log("🎉 Conexão bem-sucedida:", data);
           const newItemId = data.item.id;
 
           setItemId(newItemId);
@@ -294,19 +269,16 @@ const OpenFinance = () => {
           setLoading(false);
         },
         onError: (err) => {
-          console.error("❌ Erro no widget:", err);
           setError(`Erro no widget: ${err.message || "Falha na conexão"}`);
           setLoading(false);
         },
         onClose: () => {
-          console.log("🚪 Widget fechado");
           setLoading(false);
         },
       });
 
       pluggyConnect.init();
     } catch (err) {
-      console.error("❌ Erro na conexão:", err);
       setError(`Falha na conexão: ${err.message}`);
       setLoading(false);
     }
@@ -318,7 +290,6 @@ const OpenFinance = () => {
       return;
     }
 
-    console.log("🔄 Solicitando atualização manual...");
     setSyncing(true);
     try {
       await fetch(`https://api.pluggy.ai/items/${itemId}`, {
@@ -331,7 +302,6 @@ const OpenFinance = () => {
 
       setTimeout(() => loadFinanceData(apiKey, itemId), 3000);
     } catch (e) {
-      console.error("❌ Erro ao solicitar atualização:", e);
       setSyncing(false);
     }
   };
@@ -368,12 +338,6 @@ const OpenFinance = () => {
     pjAccounts = [];
   }
 
-  console.log(accounts, "ACCOUNTS");
-
-  // --- AQUI ESTÁ O PULO DO GATO ---
-  // Buscamos dentro dos grupos PF/PJ garantindo o TYPE para não inverter saldo com fatura
-
-  // 1. Saldo (Somente BANK)
   const pfBankAccount = pfAccounts.find((a) => a.type === "BANK");
   const pjBankAccount = pjAccounts.find((a) => a.type === "BANK");
 
@@ -410,7 +374,7 @@ const OpenFinance = () => {
   );
 
   const creditTransactions = filteredByAccount.filter(
-    (t) => t.accountType === "CREDIT"
+    (t) => t.accountType === "CREDIT" && t.amount > 0
   );
 
   const incomeTransactions = filteredByAccount.filter(
@@ -430,42 +394,50 @@ const OpenFinance = () => {
       (desc.includes("fatura") || desc.includes("recebido"));
     return t.amount > 0 && !isPagamento;
   });
-
+  // Agrupar por mês usando as compras, mas mostrar o valor do pagamento
   const groupCreditByInvoice = () => {
     const grouped = {};
 
-    const creditExpenses = creditTransactions.filter((t) => {
-      const desc = t.description?.toLowerCase() || "";
-      const isPagamento =
-        desc.includes("pagamento") &&
-        (desc.includes("fatura") || desc.includes("recebido"));
-      return t.amount > 0 && !isPagamento;
-    });
+    creditTransactions.forEach((t) => {
+      const billId = t.creditCardMetadata?.billId;
 
-    creditExpenses.forEach((t) => {
-      const date = new Date(t.date);
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}`;
+      if (!billId) return;
 
-      if (!grouped[key]) {
-        grouped[key] = {
-          month: date.toLocaleDateString("pt-BR", {
-            month: "long",
-            year: "numeric",
-          }),
+      if (!grouped[billId]) {
+        // Pegar a MAIOR data (mais recente) das transações desse billId
+        grouped[billId] = {
+          month: null,
           total: 0,
           transactions: [],
+          dates: [],
         };
       }
-      grouped[key].total += t.amount;
-      grouped[key].transactions.push(t);
+
+      grouped[billId].transactions.push(t);
+      grouped[billId].dates.push(new Date(t.date));
+      grouped[billId].total += t.amount;
     });
+
+    // Calcular o mês baseado na MAIOR data (última compra)
+    Object.keys(grouped).forEach((billId) => {
+      const maxDate = new Date(Math.max(...grouped[billId].dates));
+
+      // O mês da fatura é o mês seguinte à última compra
+      const invoiceDate = new Date(maxDate);
+      invoiceDate.setMonth(invoiceDate.getMonth() + 1);
+
+      grouped[billId].month = invoiceDate.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      });
+      grouped[billId].closingDate = invoiceDate.getTime();
+    });
+
+    console.log("💳 Faturas agrupadas (usando data MÁXIMA):", grouped);
 
     return Object.entries(grouped)
       .filter(([_, invoice]) => invoice.transactions.length > 0)
-      .sort((a, b) => b[0].localeCompare(a[0]));
+      .sort((a, b) => b[1].closingDate - a[1].closingDate);
   };
 
   const creditInvoices = groupCreditByInvoice();
