@@ -8,17 +8,14 @@ import {
   ArrowDownLeft,
   ShoppingBag,
   CheckCircle2,
-  TrendingDown,
-  TrendingUp,
   Landmark,
-  Receipt,
   ChevronDown,
   ChevronRight,
-  BarChart3,
+  Building2,
+  User,
 } from "lucide-react";
 
 const OpenFinance = () => {
-  // --- LÓGICA DE TEMA ---
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("financeapp_theme") || "dark";
   });
@@ -53,12 +50,11 @@ const OpenFinance = () => {
   const [itemId, setItemId] = useState(null);
   const [apiKey, setApiKey] = useState(null);
   const [expandedInvoices, setExpandedInvoices] = useState({});
-  const [activeView, setActiveView] = useState("main");
+  const [accountFilter, setAccountFilter] = useState("all");
 
   const PLUGGY_CLIENT_ID = import.meta.env.VITE_PLUGGY_CLIENT_ID;
   const PLUGGY_CLIENT_SECRET = import.meta.env.VITE_PLUGGY_CLIENT_SECRET;
 
-  // Carregar dados salvos ao iniciar
   useEffect(() => {
     loadSavedSession();
   }, []);
@@ -68,6 +64,7 @@ const OpenFinance = () => {
       const savedData = localStorage.getItem("openfinance-session");
       if (savedData) {
         const session = JSON.parse(savedData);
+        console.log("📂 Sessão carregada:", session);
         setConnected(session.connected);
         setAccounts(session.accounts || []);
         setTransactions(session.transactions || []);
@@ -76,28 +73,30 @@ const OpenFinance = () => {
         setApiKey(session.apiKey);
       }
     } catch (err) {
-      console.log("Nenhuma sessão salva encontrada");
+      console.log("⚠️ Nenhuma sessão salva encontrada:", err);
     }
   };
 
   const saveSession = (data) => {
     try {
       localStorage.setItem("openfinance-session", JSON.stringify(data));
+      console.log("💾 Sessão salva com sucesso");
     } catch (err) {
-      console.error("Erro ao salvar sessão:", err);
+      console.error("❌ Erro ao salvar sessão:", err);
     }
   };
 
   const clearSession = () => {
     try {
       localStorage.removeItem("openfinance-session");
+      console.log("🗑️ Sessão limpa");
     } catch (err) {
-      console.error("Erro ao limpar sessão:", err);
+      console.error("❌ Erro ao limpar sessão:", err);
     }
   };
 
-  // 1. Autenticação
   const getPluggyApiKey = async () => {
+    console.log("🔐 Obtendo API Key...");
     const response = await fetch("https://api.pluggy.ai/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -106,45 +105,132 @@ const OpenFinance = () => {
         clientSecret: PLUGGY_CLIENT_SECRET,
       }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro na autenticação: ${response.status}`);
+    }
+
     const data = await response.json();
+    console.log("✅ API Key obtida com sucesso");
     return data.apiKey;
   };
 
-  // 2. Token do Widget
   const createConnectToken = async (apiKey) => {
+    console.log("🎫 Criando connect token...");
     const response = await fetch("https://api.pluggy.ai/connect_token", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "X-API-KEY": apiKey },
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+      },
       body: JSON.stringify({ clientUserId: "user_" + Date.now() }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro ao criar token: ${response.status}`);
+    }
+
     const data = await response.json();
+    console.log("✅ Connect token criado com sucesso");
     return data.accessToken;
   };
 
-  // 3. Busca de Dados
   const loadFinanceData = async (apiKey, itemId) => {
     setSyncing(true);
+    setError(null);
     try {
+      console.log(`🔄 Carregando dados para item: ${itemId}`);
+      console.log("📊 Buscando contas...");
+
       const resAccounts = await fetch(
         `https://api.pluggy.ai/accounts?itemId=${itemId}`,
         {
-          headers: { "X-API-KEY": apiKey },
+          headers: {
+            "X-API-KEY": apiKey,
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+          cache: "no-store",
         }
       );
-      const dataAccounts = await resAccounts.json();
 
-      if (dataAccounts.results) {
+      if (!resAccounts.ok) {
+        const errorText = await resAccounts.text();
+        console.error(
+          `❌ Erro ao buscar contas: ${resAccounts.status}`,
+          errorText
+        );
+        throw new Error(`Erro contas: ${resAccounts.status}`);
+      }
+
+      const dataAccounts = await resAccounts.json();
+      console.log(`✅ Contas encontradas:`, dataAccounts.results?.length || 0);
+      console.log("📋 Detalhes das contas:", dataAccounts.results);
+
+      if (dataAccounts.results && dataAccounts.results.length > 0) {
         setAccounts(dataAccounts.results);
 
-        const txPromises = dataAccounts.results.map(async (acc) => {
-          const r = await fetch(
-            `https://api.pluggy.ai/transactions?accountId=${acc.id}&pageSize=50`,
-            {
-              headers: { "X-API-KEY": apiKey },
+        console.log("💳 Iniciando busca de transações...");
+        const txPromises = dataAccounts.results.map(async (acc, index) => {
+          try {
+            const url = `https://api.pluggy.ai/transactions?accountId=${acc.id}`;
+            console.log(
+              `  📥 [Conta ${index + 1}/${
+                dataAccounts.results.length
+              }] Buscando transações para: ${acc.name || acc.type} (ID: ${
+                acc.id
+              })`
+            );
+
+            const response = await fetch(url, {
+              headers: {
+                "X-API-KEY": apiKey,
+                "Content-Type": "application/json",
+                "Cache-Control": "no-cache",
+                Pragma: "no-cache",
+              },
+              cache: "no-store",
+            });
+
+            console.log(`  📡 Status da resposta: ${response.status}`);
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error(
+                `  ❌ Erro na conta ${acc.id}: ${response.status}`,
+                errorText
+              );
+              return [];
             }
-          );
-          const d = await r.json();
-          return d.results || [];
+
+            const data = await response.json();
+            console.log(
+              `  ✅ Transações recebidas: ${data.results?.length || 0}`
+            );
+
+            if (data.results && data.results.length > 0) {
+              console.log(
+                `  📝 Exemplo da primeira transação:`,
+                data.results[0]
+              );
+            } else {
+              console.log(`  ⚠️ Array vazio retornado para a conta ${acc.id}`);
+            }
+
+            return (data.results || []).map((tx) => ({
+              ...tx,
+              accountType: acc.type,
+              accountName: acc.name || acc.type,
+              accountId: acc.id,
+            }));
+          } catch (err) {
+            console.error(
+              `  ❌ Exceção ao buscar transações da conta ${acc.id}:`,
+              err
+            );
+            return [];
+          }
         });
 
         const allResults = await Promise.all(txPromises);
@@ -152,32 +238,41 @@ const OpenFinance = () => {
           .flat()
           .sort((a, b) => new Date(b.date) - new Date(a.date));
 
+        console.log(`🎯 Total de transações encontradas: ${allTx.length}`);
+
+        if (allTx.length === 0) {
+          console.warn("⚠️ ATENÇÃO: Nenhuma transação foi encontrada!");
+        }
+
         setTransactions(allTx);
-        const now = new Date();
-        setLastSync(now);
+        const syncDate = new Date();
+        setLastSync(syncDate);
 
         saveSession({
           connected: true,
           accounts: dataAccounts.results,
           transactions: allTx,
-          lastSync: now.toISOString(),
+          lastSync: syncDate.toISOString(),
           itemId,
           apiKey,
         });
+      } else {
+        console.warn("⚠️ Nenhuma conta encontrada");
       }
     } catch (err) {
-      console.error("Erro na sincronização:", err);
-      setError("Não foi possível carregar os dados.");
+      console.error("❌ Erro na sincronização:", err);
+      setError(`Erro: ${err.message}`);
     } finally {
       setSyncing(false);
     }
   };
 
-  // 4. Fluxo de Conexão
   const connectPluggy = async () => {
     setLoading(true);
     setError(null);
     try {
+      console.log("🚀 Iniciando autenticação...");
+
       const apiKey = await getPluggyApiKey();
       const token = await createConnectToken(apiKey);
 
@@ -185,63 +280,133 @@ const OpenFinance = () => {
         connectToken: token,
         includeSandbox: true,
         onSuccess: (data) => {
+          console.log("🎉 Conexão bem-sucedida:", data);
           const newItemId = data.item.id;
+
           setItemId(newItemId);
           setApiKey(apiKey);
           setConnected(true);
-          setTimeout(() => loadFinanceData(apiKey, newItemId), 3000);
+
+          setTimeout(() => {
+            loadFinanceData(apiKey, newItemId);
+          }, 4000);
+
           setLoading(false);
         },
-        onError: (err) => setLoading(false),
-        onClose: () => setLoading(false),
+        onError: (err) => {
+          console.error("❌ Erro no widget:", err);
+          setError(`Erro no widget: ${err.message || "Falha na conexão"}`);
+          setLoading(false);
+        },
+        onClose: () => {
+          console.log("🚪 Widget fechado");
+          setLoading(false);
+        },
       });
 
       pluggyConnect.init();
     } catch (err) {
-      setError(err.message);
+      console.error("❌ Erro na conexão:", err);
+      setError(`Falha na conexão: ${err.message}`);
       setLoading(false);
     }
   };
 
-  // Cálculos e Separação de Dados
-  const bankAccount = accounts.find((a) => a.type === "BANK");
-  const creditAccount = accounts.find((a) => a.type === "CREDIT");
+  const handleManualRefresh = async () => {
+    if (!apiKey || !itemId) {
+      setError("API Key ou Item ID não encontrados. Reconecte sua conta.");
+      return;
+    }
 
-  const bankBalance = bankAccount?.balance || 0;
-  const creditBalance = creditAccount?.balance || 0;
-  const creditLimit = creditAccount?.creditData?.availableCreditLimit || 0;
+    console.log("🔄 Solicitando atualização manual...");
+    setSyncing(true);
+    try {
+      await fetch(`https://api.pluggy.ai/items/${itemId}`, {
+        method: "PATCH",
+        headers: {
+          "X-API-KEY": apiKey,
+          "Content-Type": "application/json",
+        },
+      });
 
-  // Separar transações por tipo
-  const debitTransactions = transactions.filter(
-    (t) => t.accountId === bankAccount?.id && t.amount < 0
+      setTimeout(() => loadFinanceData(apiKey, itemId), 3000);
+    } catch (e) {
+      console.error("❌ Erro ao solicitar atualização:", e);
+      setSyncing(false);
+    }
+  };
+
+  // SEPARAÇÃO PF E PJ
+  const pfAccounts = accounts.filter(
+    (a) =>
+      a.name?.toLowerCase().includes("company") &&
+      a.name?.toLowerCase().includes("empresa")
+  );
+  const pjAccounts = accounts.filter(
+    (a) =>
+      !a.name?.toLowerCase().includes("company") ||
+      !a.name?.toLowerCase().includes("empresa")
   );
 
-  const creditTransactions = transactions.filter(
-    (t) => t.accountId === creditAccount?.id
+
+  console.log(pjAccounts, 'PJ ACOOUNTS')
+  const pfBankAccount = pfAccounts.find((a) => a.type === "BANK");
+  const pjBankAccount = pjAccounts.find((a) => a.type === "BANK");
+  const pfCreditAccount = pfAccounts.find((a) => a.type === "CREDIT");
+  const pjCreditAccount = pjAccounts.find((a) => a.type === "CREDIT");
+
+  const pfBankBalance = pfBankAccount?.balance || 0;
+  const pjBankBalance = pjBankAccount?.balance || 0;
+  const pfCreditBalance = pfCreditAccount?.balance || 0;
+  const pjCreditBalance = pjCreditAccount?.balance || 0;
+  const pfCreditLimit = pfCreditAccount?.creditData?.availableCreditLimit || 0;
+  const pjCreditLimit = pjCreditAccount?.creditData?.availableCreditLimit || 0;
+
+  // Filtrar transações por conta
+  const filteredByAccount = transactions.filter((t) => {
+    if (accountFilter === "all") return true;
+    if (accountFilter === "pf") {
+      const pfAccountIds = pfAccounts.map((a) => a.id);
+      return pfAccountIds.includes(t.accountId);
+    }
+    if (accountFilter === "pj") {
+      const pjAccountIds = pjAccounts.map((a) => a.id);
+      return pjAccountIds.includes(t.accountId);
+    }
+    return true;
+  });
+
+  const debitTransactions = filteredByAccount.filter(
+    (t) => t.accountType === "BANK" && t.amount < 0
   );
 
-  const incomeTransactions = transactions.filter(
+  const creditTransactions = filteredByAccount.filter(
+    (t) => t.accountType === "CREDIT"
+  );
+
+  const incomeTransactions = filteredByAccount.filter(
     (t) =>
       t.amount > 0 &&
       (t.category === "Income" ||
-        t.description.toLowerCase().includes("rendimento") ||
-        (t.description.toLowerCase().includes("transfer") && t.amount > 0))
+        t.description?.toLowerCase().includes("rendimento") ||
+        (t.description?.toLowerCase().includes("transfer") && t.amount > 0) ||
+        t.description?.toLowerCase().includes("depósito") ||
+        t.description?.toLowerCase().includes("recebido"))
   );
 
   const creditExpensesOnly = creditTransactions.filter((t) => {
-    const desc = t.description.toLowerCase();
+    const desc = t.description?.toLowerCase() || "";
     const isPagamento =
       desc.includes("pagamento") &&
       (desc.includes("fatura") || desc.includes("recebido"));
     return t.amount > 0 && !isPagamento;
   });
 
-  // Agrupar transações de crédito por mês/ano (fatura)
   const groupCreditByInvoice = () => {
     const grouped = {};
 
     const creditExpenses = creditTransactions.filter((t) => {
-      const desc = t.description.toLowerCase();
+      const desc = t.description?.toLowerCase() || "";
       const isPagamento =
         desc.includes("pagamento") &&
         (desc.includes("fatura") || desc.includes("recebido"));
@@ -283,17 +448,23 @@ const OpenFinance = () => {
     }));
   };
 
-  // Filtrar transações pela aba ativa
+  // Limitar faturas de crédito a 15 transações cada
+  const limitedCreditInvoices = creditInvoices.map(([key, invoice]) => [
+    key,
+    {
+      ...invoice,
+      transactions: invoice.transactions.slice(0, 15),
+    },
+  ]);
+
   const getFilteredTransactions = () => {
     switch (activeTab) {
       case "credit":
-        return null; // Renderização especial para crédito
+        return null;
       case "debit":
-        return debitTransactions;
-      case "income":
-        return incomeTransactions;
+        return debitTransactions.slice(0, 15); // Apenas 15 mais recentes
       default:
-        return transactions;
+        return filteredByAccount.slice(0, 30); // Apenas 30 mais recentes
     }
   };
 
@@ -323,13 +494,12 @@ const OpenFinance = () => {
             Conectar Banco
           </h2>
           <p className="text-sm mb-8" style={{ color: colors.textSecondary }}>
-            Sincronize sua conta do Mercado Pago para ver seus gastos em tempo
-            real.
+            Sincronize sua conta bancária para ver seus gastos em tempo real.
           </p>
           <button
             onClick={connectPluggy}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-white"
+            className="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-white disabled:opacity-50"
           >
             {loading ? (
               <RefreshCw className="animate-spin" size={20} />
@@ -338,6 +508,11 @@ const OpenFinance = () => {
             )}
             {loading ? "Autenticando..." : "Conectar agora"}
           </button>
+          {error && (
+            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -367,7 +542,7 @@ const OpenFinance = () => {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={() => apiKey && itemId && loadFinanceData(apiKey, itemId)}
+            onClick={handleManualRefresh}
             disabled={syncing}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold uppercase flex items-center gap-2 transition-all disabled:opacity-50 text-white"
           >
@@ -391,95 +566,118 @@ const OpenFinance = () => {
         </div>
       </div>
 
-      {/* Grid de Cards Financeiros */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {/* Saldo Disponível */}
-        <div
-          className="rounded-2xl border p-6 shadow-lg"
-          style={{
-            backgroundColor: colors.secondary,
-            borderColor: colors.border,
-          }}
-        >
-          <div className="flex justify-between items-start mb-4">
-            <span className="p-2 bg-green-500/10 rounded-lg">
-              <Wallet size={20} className="text-green-500" />
-            </span>
-            <span
-              className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+      {error && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <p className="text-red-400 text-sm font-mono">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="mt-2 text-xs text-red-300 hover:text-red-100"
+          >
+            Fechar
+          </button>
+        </div>
+      )}
+
+      {/* Cards PJ APENAS */}
+      {pjAccounts.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 size={16} className="text-purple-400" />
+            <h2
+              className="text-sm font-bold uppercase tracking-wide"
+              style={{ color: colors.textSecondary }}
+            >
+              Empresa
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div
+              className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: colors.cardItem,
-                color: colors.textSecondary,
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
               }}
             >
-              Conta
-            </span>
-          </div>
-          <p
-            className="text-xs font-medium uppercase mb-1"
-            style={{ color: colors.textSecondary }}
-          >
-            Saldo Disponível
-          </p>
-          <h2
-            className="text-3xl font-black"
-            style={{ color: colors.textPrimary }}
-          >
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(bankBalance)}
-          </h2>
-        </div>
+              <div className="flex justify-between items-start mb-4">
+                <span className="p-2 bg-green-500/10 rounded-lg">
+                  <Wallet size={20} className="text-green-500" />
+                </span>
+                <span
+                  className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                  style={{
+                    backgroundColor: colors.cardItem,
+                    color: colors.textSecondary,
+                  }}
+                >
+                  Conta
+                </span>
+              </div>
+              <p
+                className="text-xs font-medium uppercase mb-1"
+                style={{ color: colors.textSecondary }}
+              >
+                Saldo Disponível
+              </p>
+              <h2
+                className="text-3xl font-black"
+                style={{ color: colors.textPrimary }}
+              >
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(pjBankBalance)}
+              </h2>
+            </div>
 
-        {/* Fatura do Cartão */}
-        <div
-          className="rounded-2xl border p-6 shadow-lg"
-          style={{
-            backgroundColor: colors.secondary,
-            borderColor: colors.border,
-          }}
-        >
-          <div className="flex justify-between items-start mb-4">
-            <span className="p-2 bg-red-500/10 rounded-lg">
-              <CreditCard size={20} className="text-red-500" />
-            </span>
-            <span
-              className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+            <div
+              className="rounded-2xl border p-6 shadow-lg"
               style={{
-                backgroundColor: colors.cardItem,
-                color: colors.textSecondary,
+                backgroundColor: colors.secondary,
+                borderColor: colors.border,
               }}
             >
-              Cartão
-            </span>
+              <div className="flex justify-between items-start mb-4">
+                <span className="p-2 bg-red-500/10 rounded-lg">
+                  <CreditCard size={20} className="text-red-500" />
+                </span>
+                <span
+                  className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                  style={{
+                    backgroundColor: colors.cardItem,
+                    color: colors.textSecondary,
+                  }}
+                >
+                  Cartão
+                </span>
+              </div>
+              <p
+                className="text-xs font-medium uppercase mb-1"
+                style={{ color: colors.textSecondary }}
+              >
+                Fatura Atual
+              </p>
+              <h2 className="text-3xl font-black text-red-400">
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(Math.abs(pjCreditBalance))}
+              </h2>
+              <p
+                className="text-[10px] mt-2 font-bold uppercase"
+                style={{ color: colors.textSecondary }}
+              >
+                Limite Livre:{" "}
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                }).format(pjCreditLimit)}
+              </p>
+            </div>
           </div>
-          <p
-            className="text-xs font-medium uppercase mb-1"
-            style={{ color: colors.textSecondary }}
-          >
-            Fatura Atual
-          </p>
-          <h2 className="text-3xl font-black text-red-400">
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(Math.abs(creditBalance))}
-          </h2>
-          <p
-            className="text-[10px] mt-2 font-bold uppercase"
-            style={{ color: colors.textSecondary }}
-          >
-            Limite Livre:{" "}
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            }).format(creditLimit)}
-          </p>
-        </div>
-      </div>
+        </>
+      )}
 
-      {/* Tabela de Extrato com Abas */}
+      {/* Tabela de Extrato */}
       <div
         className="rounded-3xl border overflow-hidden shadow-2xl"
         style={{
@@ -502,9 +700,70 @@ const OpenFinance = () => {
                 />
               )}
             </div>
+            <div className="text-xs" style={{ color: colors.textSecondary }}>
+              Total: {filteredByAccount.length} transações
+            </div>
           </div>
 
-          {/* Abas de Filtro */}
+          {/* Filtro de Conta */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setAccountFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
+                accountFilter === "all" ? "bg-gray-500 text-white" : ""
+              }`}
+              style={
+                accountFilter !== "all"
+                  ? {
+                      backgroundColor: colors.tertiary,
+                      color: colors.textSecondary,
+                    }
+                  : {}
+              }
+            >
+              Todas Contas
+            </button>
+            {pfAccounts.length > 0 && (
+              <button
+                onClick={() => setAccountFilter("pf")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                  accountFilter === "pf" ? "bg-blue-500 text-white" : ""
+                }`}
+                style={
+                  accountFilter !== "pf"
+                    ? {
+                        backgroundColor: colors.tertiary,
+                        color: colors.textSecondary,
+                      }
+                    : {}
+                }
+              >
+                <User size={12} />
+                PF
+              </button>
+            )}
+            {pjAccounts.length > 0 && (
+              <button
+                onClick={() => setAccountFilter("pj")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                  accountFilter === "pj" ? "bg-purple-500 text-white" : ""
+                }`}
+                style={
+                  accountFilter !== "pj"
+                    ? {
+                        backgroundColor: colors.tertiary,
+                        color: colors.textSecondary,
+                      }
+                    : {}
+                }
+              >
+                <Building2 size={12} />
+                PJ
+              </button>
+            )}
+          </div>
+
+          {/* Abas de Tipo */}
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab("all")}
@@ -520,7 +779,8 @@ const OpenFinance = () => {
                   : {}
               }
             >
-              Todas ({transactions.length})
+              Todas (
+              {filteredByAccount.length > 30 ? "30" : filteredByAccount.length})
             </button>
             <button
               onClick={() => setActiveTab("credit")}
@@ -552,133 +812,132 @@ const OpenFinance = () => {
                   : {}
               }
             >
-              Débito ({debitTransactions.length})
+              Débito (
+              {debitTransactions.length > 15 ? "15" : debitTransactions.length})
             </button>
           </div>
         </div>
 
         <div className="max-h-[500px] overflow-y-auto">
           {activeTab === "credit" ? (
-            // Visualização especial para Crédito com Faturas
             <div className="divide-y" style={{ borderColor: colors.border }}>
-              {creditInvoices.map(([key, invoice]) => (
-                <div key={key}>
-                  {/* Cabeçalho da Fatura */}
-                  <button
-                    onClick={() => toggleInvoice(key)}
-                    className="w-full p-6 flex items-center justify-between transition-colors group"
-                    style={{
-                      backgroundColor: colors.secondary,
-                      borderColor: colors.border,
-                    }}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-purple-500/10">
-                        <CreditCard size={20} className="text-purple-400" />
-                      </div>
-                      <div className="text-left">
-                        <p
-                          className="text-sm font-bold uppercase tracking-tight"
-                          style={{ color: colors.textPrimary }}
-                        >
-                          Fatura de {invoice.month}
-                        </p>
-                        <span
-                          className="text-[10px] font-bold uppercase"
-                          style={{ color: colors.textSecondary }}
-                        >
-                          {invoice.transactions.length} transações
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-lg font-bold text-purple-400 font-mono">
-                        {new Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(invoice.total)}
-                      </span>
-                      {expandedInvoices[key] ? (
-                        <ChevronDown
-                          size={20}
-                          style={{ color: colors.textSecondary }}
-                        />
-                      ) : (
-                        <ChevronRight
-                          size={20}
-                          style={{ color: colors.textSecondary }}
-                        />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* Transações da Fatura (Expandível) */}
-                  {expandedInvoices[key] && (
-                    <div
+              {limitedCreditInvoices.length > 0 ? (
+                limitedCreditInvoices.map(([key, invoice]) => (
+                  <div key={key}>
+                    <button
+                      onClick={() => toggleInvoice(key)}
+                      className="w-full p-6 flex items-center justify-between transition-colors group hover:bg-opacity-50"
                       style={{
-                        backgroundColor: colors.cardItem,
+                        backgroundColor: colors.secondary,
                         borderColor: colors.border,
                       }}
                     >
-                      <table className="w-full text-left">
-                        <tbody
-                          className="divide-y"
-                          style={{ borderColor: colors.border }}
-                        >
-                          {invoice.transactions.map((t) => (
-                            <tr
-                              key={t.id}
-                              className="transition-colors group"
-                              style={{
-                                borderColor: colors.border,
-                                backgroundColor: colors.cardItem,
-                              }}
-                            >
-                              <td className="p-5 pl-16">
-                                <div className="flex items-center gap-4">
-                                  <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
-                                    <ArrowUpRight size={16} />
-                                  </div>
-                                  <div>
-                                    <p
-                                      className="text-sm font-bold uppercase tracking-tight transition-colors"
-                                      style={{ color: colors.textPrimary }}
-                                    >
-                                      {t.description}
-                                    </p>
-                                    <span
-                                      className="text-[10px] font-bold uppercase"
-                                      style={{ color: colors.textSecondary }}
-                                    >
-                                      {t.category || "Geral"}
-                                    </span>
-                                  </div>
-                                </div>
-                              </td>
-                              <td
-                                className="p-5 text-xs font-mono"
-                                style={{ color: colors.textSecondary }}
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 rounded-lg bg-purple-500/10">
+                          <CreditCard size={20} className="text-purple-400" />
+                        </div>
+                        <div className="text-left">
+                          <p
+                            className="text-sm font-bold uppercase tracking-tight"
+                            style={{ color: colors.textPrimary }}
+                          >
+                            Fatura de {invoice.month}
+                          </p>
+                          <span
+                            className="text-[10px] font-bold uppercase"
+                            style={{ color: colors.textSecondary }}
+                          >
+                            {invoice.transactions.length} transações
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="text-lg font-bold text-purple-400 font-mono">
+                          {new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(invoice.total)}
+                        </span>
+                        {expandedInvoices[key] ? (
+                          <ChevronDown
+                            size={20}
+                            style={{ color: colors.textSecondary }}
+                          />
+                        ) : (
+                          <ChevronRight
+                            size={20}
+                            style={{ color: colors.textSecondary }}
+                          />
+                        )}
+                      </div>
+                    </button>
+
+                    {expandedInvoices[key] && (
+                      <div
+                        style={{
+                          backgroundColor: colors.cardItem,
+                          borderColor: colors.border,
+                        }}
+                      >
+                        <table className="w-full text-left">
+                          <tbody
+                            className="divide-y"
+                            style={{ borderColor: colors.border }}
+                          >
+                            {invoice.transactions.map((t) => (
+                              <tr
+                                key={t.id}
+                                className="transition-colors group"
+                                style={{
+                                  borderColor: colors.border,
+                                  backgroundColor: colors.cardItem,
+                                }}
                               >
-                                {new Date(t.date).toLocaleDateString("pt-BR")}
-                              </td>
-                              <td
-                                className="p-5 text-right font-bold font-mono"
-                                style={{ color: colors.textPrimary }}
-                              >
-                                {new Intl.NumberFormat("pt-BR", {
-                                  style: "currency",
-                                  currency: "BRL",
-                                }).format(t.amount)}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              ))}
-              {creditInvoices.length === 0 && (
+                                <td className="p-5 pl-16">
+                                  <div className="flex items-center gap-4">
+                                    <div className="p-2 rounded-lg bg-red-500/10 text-red-400">
+                                      <ArrowUpRight size={16} />
+                                    </div>
+                                    <div>
+                                      <p
+                                        className="text-sm font-bold uppercase tracking-tight transition-colors"
+                                        style={{ color: colors.textPrimary }}
+                                      >
+                                        {t.description}
+                                      </p>
+                                      <span
+                                        className="text-[10px] font-bold uppercase"
+                                        style={{ color: colors.textSecondary }}
+                                      >
+                                        {t.category || "Geral"}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td
+                                  className="p-5 text-xs font-mono"
+                                  style={{ color: colors.textSecondary }}
+                                >
+                                  {new Date(t.date).toLocaleDateString("pt-BR")}
+                                </td>
+                                <td
+                                  className="p-5 text-right font-bold font-mono"
+                                  style={{ color: colors.textPrimary }}
+                                >
+                                  {new Intl.NumberFormat("pt-BR", {
+                                    style: "currency",
+                                    currency: "BRL",
+                                  }).format(t.amount)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
                 <div
                   className="p-20 text-center text-sm"
                   style={{ color: colors.textSecondary }}
@@ -688,7 +947,6 @@ const OpenFinance = () => {
               )}
             </div>
           ) : (
-            // Visualização padrão para outras abas
             <table className="w-full text-left">
               <thead
                 className="text-[10px] uppercase font-bold tracking-widest sticky top-0"
@@ -708,9 +966,9 @@ const OpenFinance = () => {
                 className="divide-y"
                 style={{ borderColor: colors.border }}
               >
-                {filteredTransactions &&
+                {filteredTransactions && filteredTransactions.length > 0 ? (
                   filteredTransactions.map((t) => {
-                    const isCreditTx = t.accountId === creditAccount?.id;
+                    const isCreditTx = t.accountType === "CREDIT";
                     const isIncome = t.amount > 0;
 
                     return (
@@ -772,9 +1030,8 @@ const OpenFinance = () => {
                         </td>
                         <td
                           className={`p-5 text-right font-bold font-mono ${
-                            isIncome ? "text-green-500" : ""
+                            isIncome ? "text-green-500" : "text-red-400"
                           }`}
-                          style={!isIncome ? { color: colors.textPrimary } : {}}
                         >
                           {new Intl.NumberFormat("pt-BR", {
                             style: "currency",
@@ -783,20 +1040,19 @@ const OpenFinance = () => {
                         </td>
                       </tr>
                     );
-                  })}
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="p-20 text-center">
+                      <p style={{ color: colors.textSecondary }}>
+                        Nenhuma transação encontrada.
+                      </p>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}
-          {filteredTransactions &&
-            filteredTransactions.length === 0 &&
-            activeTab !== "credit" && (
-              <div
-                className="p-20 text-center text-sm"
-                style={{ color: colors.textSecondary }}
-              >
-                Nenhuma transação nesta categoria.
-              </div>
-            )}
         </div>
       </div>
     </div>
