@@ -52,26 +52,25 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
   // Itens do submenu do Open Finance
   const openFinanceSubmenu = [
     { id: "openfinance", label: "Dashboard", icon: "📋" },
-    { id: "openfinance-analysis", label: "Análises Financeiras", icon: "📈" },
+    { id: "openfinance-analysis", label: "Análises", icon: "📈" },
   ];
 
   return (
-    <div className="w-[270px] h-screen fixed left-0 top-0 bg-[#1a1d29] border-r border-[#2a2d3a] flex flex-col">
+    <div className="w-[260px] h-screen fixed left-0 top-0 bg-[#1a1d29] border-r border-[#2a2d3a] flex flex-col">
       <div className="p-6 pb-5 border-b border-[#2a2d3a]">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 bg-[#2563eb] rounded-lg flex items-center justify-center text-lg">
             💰
           </div>
-          <span className="text-lg font-semibold text-white">FinanceApp</span>
+          <span className="text-lg font-semibold text-white">UpGrana</span>
         </div>
-        <p className="text-[#6b7280] text-xs pl-[52px]">Financial Control</p>
       </div>
 
-      <div className="flex-1 px-3 py-4 overflow-y-auto">
+      <div className="flex-1 px-4 py-5 overflow-y-auto">
         {menuItems.map((item) => {
           if (item.id === "openfinance") {
             return (
-              <div key={item.id} className="mb-1">
+              <div key={item.id} className="mb-2">
                 {/* Botão principal do Open Finance */}
                 <button
                   onClick={() => {
@@ -80,7 +79,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
                       setActiveTab("openfinance");
                     }
                   }}
-                  className={`w-full flex items-center justify-between py-2.5 px-3 rounded-lg cursor-pointer transition-all font-medium text-sm ${
+                  className={`w-full flex items-center justify-between py-3 px-3 rounded-lg cursor-pointer transition-all font-medium text-sm mb-2 ${
                     activeTab === "openfinance" ||
                     activeTab === "openfinance-analysis"
                       ? "bg-[#2563eb] text-white"
@@ -100,7 +99,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
 
                 {/* Submenu - Estilo modificado */}
                 {openSubmenu && (
-                  <div className="ml-8 mt-1 mb-2 space-y-0.5">
+                  <div className="ml-8 mt-1 mb-3 space-y-2">
                     {openFinanceSubmenu.map((subItem) => (
                       <button
                         key={subItem.id}
@@ -139,7 +138,7 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
                 setActiveTab(item.id);
                 setOpenSubmenu(false);
               }}
-              className={`w-full flex items-center gap-3 py-2.5 px-3 mb-1 rounded-lg cursor-pointer transition-all font-medium text-sm ${
+              className={`w-full flex items-center gap-3 py-3 px-3 mb-2 rounded-lg cursor-pointer transition-all font-medium text-sm ${
                 activeTab === item.id
                   ? "bg-[#2563eb] text-white"
                   : "bg-transparent text-[#9ca3af] hover:bg-[#252833] hover:text-white"
@@ -152,10 +151,10 @@ const Navbar = ({ activeTab, setActiveTab, onLogout }) => {
         })}
       </div>
 
-      <div className="p-4 border-t border-[#2a2d3a]">
+      <div className="p-5 border-t border-[#2a2d3a]">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#252833] border border-[#2a2d3a] rounded-lg text-[#9ca3af] font-medium text-sm cursor-pointer transition-all hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626]"
+          className="w-full flex items-center justify-center gap-2 py-3 bg-[#252833] border border-[#2a2d3a] rounded-lg text-[#9ca3af] font-medium text-sm cursor-pointer transition-all hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626]"
         >
           <LogOut size={16} />
           Sair

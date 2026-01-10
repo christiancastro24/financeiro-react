@@ -639,43 +639,43 @@ const OpenFinance = () => {
   if (!connected) {
     return (
       <div
-        className="ml-72 min-h-screen flex items-center justify-center transition-colors duration-300 p-6"
+        className="ml-72 min-h-screen flex items-center justify-center transition-colors duration-300 p-4"
         style={{ backgroundColor: colors.primary }}
       >
         <div
-          className="rounded-3xl border p-10 text-center max-w-md shadow-2xl"
+          className="rounded-2xl border p-8 text-center max-w-md shadow-xl"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
-          <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Link2 size={32} className="text-blue-500" />
+          <div className="w-14 h-14 bg-blue-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <Link2 size={28} className="text-blue-500" />
           </div>
           <h2
-            className="text-xl font-bold mb-3"
+            className="text-lg font-bold mb-2"
             style={{ color: colors.textPrimary }}
           >
             Conectar Banco
           </h2>
-          <p className="text-sm mb-8" style={{ color: colors.textSecondary }}>
+          <p className="text-xs mb-6" style={{ color: colors.textSecondary }}>
             Sincronize sua conta bancária para ver seus gastos em tempo real.
           </p>
           <button
             onClick={connectPluggy}
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-white disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all text-white disabled:opacity-50 text-sm"
           >
             {loading ? (
-              <RefreshCw className="animate-spin" size={20} />
+              <RefreshCw className="animate-spin" size={18} />
             ) : (
-              <Landmark size={20} />
+              <Landmark size={18} />
             )}
             {loading ? "Autenticando..." : "Conectar agora"}
           </button>
           {error && (
-            <div className="mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mt-3 p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-red-400 text-xs">{error}</p>
             </div>
           )}
         </div>
@@ -688,45 +688,45 @@ const OpenFinance = () => {
       {showConfigModal && <ConfigModal />}
 
       <div
-        className="ml-72 min-h-screen transition-colors duration-300 p-6"
+        className="ml-72 min-h-screen transition-colors duration-300 p-4"
         style={{ backgroundColor: colors.primary }}
       >
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-6">
           <div>
             <h1
-              className="text-2xl font-bold"
+              className="text-xl font-bold"
               style={{ color: colors.textPrimary }}
             >
               Open Finance
             </h1>
             <p
-              className="text-xs flex items-center gap-1 mt-1"
+              className="text-xs flex items-center gap-1 mt-0.5"
               style={{ color: colors.textSecondary }}
             >
-              <CheckCircle2 size={12} className="text-green-500" />
+              <CheckCircle2 size={10} className="text-green-500" />
               Conexão ativa • {lastSync?.toLocaleTimeString()}
               {userConfig && (
-                <span className="ml-2 px-2 py-0.5 bg-green-500/20 text-green-400 rounded text-[10px]">
+                <span className="ml-2 px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded text-[9px]">
                   Fatura: dia {closingDay}
                 </span>
               )}
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <button
               onClick={() => setShowConfigModal(true)}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg text-xs font-bold uppercase flex items-center gap-2 transition-all text-white"
+              className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 rounded-lg text-[11px] font-bold uppercase flex items-center gap-1.5 transition-all text-white"
             >
-              <Settings size={14} />
+              <Settings size={12} />
               Configurar
             </button>
             <button
               onClick={handleManualRefresh}
               disabled={syncing}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-xs font-bold uppercase flex items-center gap-2 transition-all disabled:opacity-50 text-white"
+              className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-lg text-[11px] font-bold uppercase flex items-center gap-1.5 transition-all disabled:opacity-50 text-white"
             >
-              <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
-              {syncing ? "Sincronizando..." : "Atualizar"}
+              <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+              {syncing ? "Sinc..." : "Atualizar"}
             </button>
             <button
               onClick={() => {
@@ -738,7 +738,7 @@ const OpenFinance = () => {
                 setApiKey(null);
                 clearSession();
               }}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-bold uppercase text-white"
+              className="px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-[11px] font-bold uppercase text-white"
             >
               Desconectar
             </button>
@@ -746,11 +746,11 @@ const OpenFinance = () => {
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <p className="text-red-400 text-sm font-mono">{error}</p>
+          <div className="mb-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <p className="text-red-400 text-xs font-mono">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-xs text-red-300 hover:text-red-100"
+              className="mt-1 text-[10px] text-red-300 hover:text-red-100"
             >
               Fechar
             </button>
@@ -761,30 +761,30 @@ const OpenFinance = () => {
         {pfAccounts.length > 0 && (
           <>
             {hasMultipleAccounts && (
-              <div className="flex items-center gap-2 mb-4">
-                <User size={16} className="text-blue-400" />
+              <div className="flex items-center gap-2 mb-3">
+                <User size={14} className="text-blue-400" />
                 <h2
-                  className="text-sm font-bold uppercase tracking-wide"
+                  className="text-xs font-bold uppercase tracking-wide"
                   style={{ color: colors.textSecondary }}
                 >
                   Pessoa Física
                 </h2>
               </div>
             )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div
-                className="rounded-2xl border p-6 shadow-lg"
+                className="rounded-xl border p-4 shadow"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
                 }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="p-2 bg-green-500/10 rounded-lg">
-                    <Wallet size={20} className="text-green-500" />
+                <div className="flex justify-between items-start mb-3">
+                  <span className="p-1.5 bg-green-500/10 rounded-lg">
+                    <Wallet size={16} className="text-green-500" />
                   </span>
                   <span
-                    className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                    className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest"
                     style={{
                       backgroundColor: colors.cardItem,
                       color: colors.textSecondary,
@@ -794,13 +794,13 @@ const OpenFinance = () => {
                   </span>
                 </div>
                 <p
-                  className="text-xs font-medium uppercase mb-1"
+                  className="text-[10px] font-medium uppercase mb-0.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Saldo Disponível
                 </p>
                 <h2
-                  className="text-3xl font-black"
+                  className="text-2xl font-black"
                   style={{ color: colors.textPrimary }}
                 >
                   {new Intl.NumberFormat("pt-BR", {
@@ -812,18 +812,18 @@ const OpenFinance = () => {
 
               {pfCreditAccount && (
                 <div
-                  className="rounded-2xl border p-6 shadow-lg"
+                  className="rounded-xl border p-4 shadow"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
                   }}
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="p-2 bg-purple-500/10 rounded-lg">
-                      <CreditCard size={20} className="text-purple-500" />
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="p-1.5 bg-purple-500/10 rounded-lg">
+                      <CreditCard size={16} className="text-purple-500" />
                     </span>
                     <span
-                      className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                      className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest"
                       style={{
                         backgroundColor: colors.cardItem,
                         color: colors.textSecondary,
@@ -833,19 +833,19 @@ const OpenFinance = () => {
                     </span>
                   </div>
                   <p
-                    className="text-xs font-medium uppercase mb-1"
+                    className="text-[10px] font-medium uppercase mb-0.5"
                     style={{ color: colors.textSecondary }}
                   >
                     Fatura Atual
                   </p>
-                  <h2 className="text-3xl font-black text-red-400">
+                  <h2 className="text-2xl font-black text-red-400">
                     {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     }).format(Math.abs(pfCreditBalance))}
                   </h2>
                   <p
-                    className="text-[10px] mt-2 font-bold uppercase"
+                    className="text-[9px] mt-1 font-bold uppercase"
                     style={{ color: colors.textSecondary }}
                   >
                     Limite Livre:{" "}
@@ -863,29 +863,29 @@ const OpenFinance = () => {
         {/* Cards PJ */}
         {pjAccounts.length > 0 && (
           <>
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 size={16} className="text-purple-400" />
+            <div className="flex items-center gap-2 mb-3">
+              <Building2 size={14} className="text-purple-400" />
               <h2
-                className="text-sm font-bold uppercase tracking-wide"
+                className="text-xs font-bold uppercase tracking-wide"
                 style={{ color: colors.textSecondary }}
               >
                 Empresa
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div
-                className="rounded-2xl border p-6 shadow-lg"
+                className="rounded-xl border p-4 shadow"
                 style={{
                   backgroundColor: colors.secondary,
                   borderColor: colors.border,
                 }}
               >
-                <div className="flex justify-between items-start mb-4">
-                  <span className="p-2 bg-green-500/10 rounded-lg">
-                    <Wallet size={20} className="text-green-500" />
+                <div className="flex justify-between items-start mb-3">
+                  <span className="p-1.5 bg-green-500/10 rounded-lg">
+                    <Wallet size={16} className="text-green-500" />
                   </span>
                   <span
-                    className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                    className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest"
                     style={{
                       backgroundColor: colors.cardItem,
                       color: colors.textSecondary,
@@ -895,13 +895,13 @@ const OpenFinance = () => {
                   </span>
                 </div>
                 <p
-                  className="text-xs font-medium uppercase mb-1"
+                  className="text-[10px] font-medium uppercase mb-0.5"
                   style={{ color: colors.textSecondary }}
                 >
                   Saldo Disponível
                 </p>
                 <h2
-                  className="text-3xl font-black"
+                  className="text-2xl font-black"
                   style={{ color: colors.textPrimary }}
                 >
                   {new Intl.NumberFormat("pt-BR", {
@@ -913,18 +913,18 @@ const OpenFinance = () => {
 
               {pjCreditAccount && (
                 <div
-                  className="rounded-2xl border p-6 shadow-lg"
+                  className="rounded-xl border p-4 shadow"
                   style={{
                     backgroundColor: colors.secondary,
                     borderColor: colors.border,
                   }}
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <span className="p-2 bg-purple-500/10 rounded-lg">
-                      <CreditCard size={20} className="text-purple-500" />
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="p-1.5 bg-purple-500/10 rounded-lg">
+                      <CreditCard size={16} className="text-purple-500" />
                     </span>
                     <span
-                      className="text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest"
+                      className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest"
                       style={{
                         backgroundColor: colors.cardItem,
                         color: colors.textSecondary,
@@ -934,19 +934,19 @@ const OpenFinance = () => {
                     </span>
                   </div>
                   <p
-                    className="text-xs font-medium uppercase mb-1"
+                    className="text-[10px] font-medium uppercase mb-0.5"
                     style={{ color: colors.textSecondary }}
                   >
                     Fatura Atual
                   </p>
-                  <h2 className="text-3xl font-black text-red-400">
+                  <h2 className="text-2xl font-black text-red-400">
                     {new Intl.NumberFormat("pt-BR", {
                       style: "currency",
                       currency: "BRL",
                     }).format(Math.abs(pjCreditBalance))}
                   </h2>
                   <p
-                    className="text-[10px] mt-2 font-bold uppercase"
+                    className="text-[9px] mt-1 font-bold uppercase"
                     style={{ color: colors.textSecondary }}
                   >
                     Limite Livre:{" "}
@@ -963,37 +963,43 @@ const OpenFinance = () => {
 
         {/* Tabela de Extrato */}
         <div
-          className="rounded-3xl border overflow-hidden shadow-2xl"
+          className="rounded-2xl border overflow-hidden shadow-xl"
           style={{
             backgroundColor: colors.secondary,
             borderColor: colors.border,
           }}
         >
-          <div className="p-6 border-b" style={{ borderColor: colors.border }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <ShoppingBag size={20} className="text-blue-500" />
-                <h3 className="font-bold" style={{ color: colors.textPrimary }}>
+          <div className="p-4 border-b" style={{ borderColor: colors.border }}>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={16} className="text-blue-500" />
+                <h3
+                  className="font-bold text-sm"
+                  style={{ color: colors.textPrimary }}
+                >
                   Extrato Financeiro
                 </h3>
                 {syncing && (
                   <RefreshCw
-                    size={14}
+                    size={12}
                     className="animate-spin"
                     style={{ color: colors.textSecondary }}
                   />
                 )}
               </div>
-              <div className="text-xs" style={{ color: colors.textSecondary }}>
+              <div
+                className="text-[10px]"
+                style={{ color: colors.textSecondary }}
+              >
                 {filteredByAccount.length} transações
               </div>
             </div>
 
             {hasMultipleAccounts && (
-              <div className="flex gap-2 mb-4">
+              <div className="flex gap-1.5 mb-3">
                 <button
                   onClick={() => setAccountFilter("all")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${
+                  className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase transition-all ${
                     accountFilter === "all" ? "bg-gray-500 text-white" : ""
                   }`}
                   style={
@@ -1005,12 +1011,12 @@ const OpenFinance = () => {
                       : {}
                   }
                 >
-                  Todas Contas
+                  Todas
                 </button>
                 {pfAccounts.length > 0 && (
                   <button
                     onClick={() => setAccountFilter("pf")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                    className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase transition-all flex items-center gap-1 ${
                       accountFilter === "pf" ? "bg-blue-500 text-white" : ""
                     }`}
                     style={
@@ -1022,14 +1028,14 @@ const OpenFinance = () => {
                         : {}
                     }
                   >
-                    <User size={12} />
+                    <User size={10} />
                     PF
                   </button>
                 )}
                 {pjAccounts.length > 0 && (
                   <button
                     onClick={() => setAccountFilter("pj")}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all flex items-center gap-1 ${
+                    className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase transition-all flex items-center gap-1 ${
                       accountFilter === "pj" ? "bg-purple-500 text-white" : ""
                     }`}
                     style={
@@ -1041,17 +1047,17 @@ const OpenFinance = () => {
                         : {}
                     }
                   >
-                    <Building2 size={12} />
+                    <Building2 size={10} />
                     PJ
                   </button>
                 )}
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex gap-1.5">
               <button
                 onClick={() => setActiveTab("all")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
+                className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase transition-all ${
                   activeTab === "all" ? "bg-blue-500 text-white" : ""
                 }`}
                 style={
@@ -1071,7 +1077,7 @@ const OpenFinance = () => {
               </button>
               <button
                 onClick={() => setActiveTab("credit")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
+                className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase transition-all ${
                   activeTab === "credit" ? "bg-purple-500 text-white" : ""
                 }`}
                 style={
@@ -1083,11 +1089,11 @@ const OpenFinance = () => {
                     : {}
                 }
               >
-                Crédito ({creditExpensesOnly.length})
+                Faturas/Crédito ({creditInvoices.length})
               </button>
               <button
                 onClick={() => setActiveTab("debit")}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
+                className={`px-3 py-1.5 rounded text-[10px] font-bold uppercase transition-all ${
                   activeTab === "debit" ? "bg-orange-500 text-white" : ""
                 }`}
                 style={
@@ -1108,7 +1114,7 @@ const OpenFinance = () => {
             </div>
           </div>
 
-          <div className="max-h-[500px] overflow-y-auto transactions-list">
+          <div className="max-h-[400px] overflow-y-auto transactions-list">
             {activeTab === "credit" ? (
               <div>
                 {limitedCreditInvoices.length > 0 ? (
@@ -1116,34 +1122,34 @@ const OpenFinance = () => {
                     <div key={key}>
                       <button
                         onClick={() => toggleInvoice(key)}
-                        className="w-full p-6 flex items-center justify-between border-b"
+                        className="w-full p-4 flex items-center justify-between border-b"
                         style={{
                           backgroundColor: colors.secondary,
                           borderColor: colors.border,
                         }}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="p-2 rounded-lg bg-purple-500/10">
-                            <CreditCard size={20} className="text-purple-500" />
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 rounded-lg bg-purple-500/10">
+                            <CreditCard size={16} className="text-purple-500" />
                           </div>
                           <div className="text-left">
                             <p
-                              className="text-sm font-bold uppercase tracking-tight"
+                              className="text-xs font-bold uppercase tracking-tight"
                               style={{ color: colors.textPrimary }}
                             >
                               {invoice.month}
                             </p>
                             <span
-                              className="text-[10px] font-bold uppercase"
+                              className="text-[9px] font-bold uppercase"
                               style={{ color: colors.textSecondary }}
                             >
                               {invoice.transactions.length} transações
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3">
                           <div className="text-right">
-                            <span className="text-lg font-bold text-purple-500 font-mono block">
+                            <span className="text-base font-bold text-purple-500 font-mono block">
                               {new Intl.NumberFormat("pt-BR", {
                                 style: "currency",
                                 currency: "BRL",
@@ -1151,7 +1157,7 @@ const OpenFinance = () => {
                             </span>
                             {invoice.periodText && (
                               <span
-                                className="text-xs"
+                                className="text-[10px]"
                                 style={{ color: colors.textSecondary }}
                               >
                                 {invoice.periodText}
@@ -1160,12 +1166,12 @@ const OpenFinance = () => {
                           </div>
                           {expandedInvoices[key] ? (
                             <ChevronDown
-                              size={20}
+                              size={16}
                               style={{ color: colors.textSecondary }}
                             />
                           ) : (
                             <ChevronRight
-                              size={20}
+                              size={16}
                               style={{ color: colors.textSecondary }}
                             />
                           )}
@@ -1192,10 +1198,10 @@ const OpenFinance = () => {
                                     backgroundColor: colors.cardItem,
                                   }}
                                 >
-                                  <td className="p-5">
-                                    <div className="flex items-center gap-3">
+                                  <td className="p-3">
+                                    <div className="flex items-center gap-2">
                                       <div className="p-1 rounded-lg bg-red-500/10 text-red-400">
-                                        <ArrowUpRight size={14} />
+                                        <ArrowUpRight size={12} />
                                       </div>
                                       <div>
                                         <p
@@ -1205,7 +1211,7 @@ const OpenFinance = () => {
                                           {t.description}
                                         </p>
                                         <span
-                                          className="text-[9px] font-bold uppercase"
+                                          className="text-[8px] font-bold uppercase"
                                           style={{
                                             color: colors.textSecondary,
                                           }}
@@ -1218,7 +1224,7 @@ const OpenFinance = () => {
                                     </div>
                                   </td>
                                   <td
-                                    className="p-5 text-right font-bold font-mono"
+                                    className="p-3 text-right font-bold font-mono text-sm"
                                     style={{ color: colors.textPrimary }}
                                   >
                                     {new Intl.NumberFormat("pt-BR", {
@@ -1236,7 +1242,7 @@ const OpenFinance = () => {
                   ))
                 ) : (
                   <div
-                    className="p-20 text-center text-sm"
+                    className="p-12 text-center text-xs"
                     style={{ color: colors.textSecondary }}
                   >
                     {userConfig
@@ -1248,17 +1254,17 @@ const OpenFinance = () => {
             ) : (
               <table className="w-full text-left">
                 <thead
-                  className="text-[10px] uppercase font-bold tracking-widest sticky top-0"
+                  className="text-[9px] uppercase font-bold tracking-widest sticky top-0"
                   style={{
                     backgroundColor: colors.cardItem,
                     color: colors.textSecondary,
                   }}
                 >
                   <tr>
-                    <th className="p-5">Descrição</th>
-                    <th className="p-5">Tipo</th>
-                    <th className="p-5">Data</th>
-                    <th className="p-5 text-right">Valor</th>
+                    <th className="p-3">Descrição</th>
+                    <th className="p-3">Tipo</th>
+                    <th className="p-3">Data</th>
+                    <th className="p-3 text-right">Valor</th>
                   </tr>
                 </thead>
                 <tbody
@@ -1278,30 +1284,30 @@ const OpenFinance = () => {
                             backgroundColor: colors.secondary,
                           }}
                         >
-                          <td className="p-5">
-                            <div className="flex items-center gap-4">
+                          <td className="p-3">
+                            <div className="flex items-center gap-3">
                               <div
-                                className={`p-2 rounded-lg ${
+                                className={`p-1.5 rounded-lg ${
                                   isIncome
                                     ? "bg-green-500/10 text-green-400"
                                     : "bg-red-500/10 text-red-400"
                                 }`}
                               >
                                 {isIncome ? (
-                                  <ArrowDownLeft size={16} />
+                                  <ArrowDownLeft size={14} />
                                 ) : (
-                                  <ArrowUpRight size={16} />
+                                  <ArrowUpRight size={14} />
                                 )}
                               </div>
                               <div>
                                 <p
-                                  className="text-sm font-bold uppercase tracking-tight"
+                                  className="text-xs font-bold uppercase tracking-tight"
                                   style={{ color: colors.textPrimary }}
                                 >
                                   {t.description}
                                 </p>
                                 <span
-                                  className="text-[10px] font-bold uppercase"
+                                  className="text-[9px] font-bold uppercase"
                                   style={{ color: colors.textSecondary }}
                                 >
                                   {t.category || "Geral"}
@@ -1309,9 +1315,9 @@ const OpenFinance = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="p-5">
+                          <td className="p-3">
                             <span
-                              className={`text-[10px] px-2 py-1 rounded font-bold uppercase ${
+                              className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${
                                 isCreditTx
                                   ? "bg-purple-500/10 text-purple-400"
                                   : "bg-orange-500/10 text-orange-400"
@@ -1321,13 +1327,13 @@ const OpenFinance = () => {
                             </span>
                           </td>
                           <td
-                            className="p-5 text-xs font-mono"
+                            className="p-3 text-xs font-mono"
                             style={{ color: colors.textSecondary }}
                           >
                             {new Date(t.date).toLocaleDateString("pt-BR")}
                           </td>
                           <td
-                            className={`p-5 text-right font-bold font-mono ${
+                            className={`p-3 text-right font-bold font-mono text-sm ${
                               isIncome ? "text-green-500" : "text-red-400"
                             }`}
                           >
@@ -1341,8 +1347,11 @@ const OpenFinance = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="4" className="p-20 text-center">
-                        <p style={{ color: colors.textSecondary }}>
+                      <td colSpan="4" className="p-12 text-center">
+                        <p
+                          className="text-xs"
+                          style={{ color: colors.textSecondary }}
+                        >
                           Nenhuma transação encontrada.
                         </p>
                       </td>
